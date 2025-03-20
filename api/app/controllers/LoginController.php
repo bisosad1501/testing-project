@@ -117,6 +117,9 @@ class LoginController extends Controller
         $this->resp->accessToken = $jwt;
         $this->resp->data = $data;
         $this->jsonecho();
+
+        setcookie("accessToken", $jwt, time() + (86400 * 30), "/"); // Thêm dòng này
+
     }
 
 
