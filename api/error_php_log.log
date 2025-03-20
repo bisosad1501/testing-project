@@ -1297,3 +1297,75 @@ Stack trace:
 #4 D:\xampp\htdocs\PTIT-Do-An-Tot-Nghiep\api\app\vendor\usmanhalalit\pixie\src\Pixie\ConnectionAdapters\BaseAdapter.php(28): Pixie\ConnectionAdapters\Mysql->doConnect(Array)
 #5 D:\xampp\htdocs\PTIT-Do-An-Tot-Nghiep\api\app\vendor\usmanhalali in D:\xampp\htdocs\PTIT-Do-An-Tot-Nghiep\api\app\vendor\usmanhalalit\viocon\src\Viocon\Container.php on line 138
 [26-Dec-2022 07:32:00 Asia/Ho_Chi_Minh] PHP Warning:  min(): Array must contain at least one element in D:\xampp\htdocs\PTIT-Do-An-Tot-Nghiep\api\app\controllers\AppointmentsController.php on line 1105
+[15-Mar-2025 14:56:44 UTC] PHP Notice:  Use of undefined constant API_URL - assumed 'API_URL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:56:44 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php:231) in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:57:05 UTC] Authentication error: Signature verification failed
+[15-Mar-2025 14:57:05 UTC] PHP Notice:  Use of undefined constant API_URL - assumed 'API_URL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/API/app/core/App.php on line 242
+[15-Mar-2025 14:57:05 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/API/app/core/App.php:242) in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/API/app/core/App.php on line 242
+[15-Mar-2025 14:57:19 UTC] PHP Notice:  Use of undefined constant API_URL - assumed 'API_URL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:57:19 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php:231) in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:57:20 UTC] PHP Notice:  Use of undefined constant API_URL - assumed 'API_URL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:57:20 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php:231) in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:57:27 UTC] PHP Notice:  Use of undefined constant API_URL - assumed 'API_URL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[15-Mar-2025 14:57:27 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php:231) in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/core/App.php on line 231
+[17-Mar-2025 08:47:51 UTC] PHP Notice:  Use of undefined constant APPURL - assumed 'APPURL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/config.php on line 22
+[17-Mar-2025 08:47:51 UTC] PHP Notice:  Use of undefined constant APPURL - assumed 'APPURL' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/config.php on line 28
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_PREFIX already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 15
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_SPECIALITIES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 18
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_DOCTORS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 19
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_BOOKINGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 22
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_APPOINTMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 23
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_PATIENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 24
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Constant TABLE_SERVICES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 28
+[17-Mar-2025 08:56:07 UTC] PHP Notice:  Use of undefined constant DB_PASSWORD - assumed 'DB_PASSWORD' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/bootstrap.php on line 75
+[17-Mar-2025 08:56:07 UTC] PHP Warning:  PDO::__construct(): Server sent charset (255) unknown to the client. Please, report to the developers in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/bootstrap.php on line 75
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_PREFIX already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 15
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_SPECIALITIES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 18
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_DOCTORS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 19
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_BOOKINGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 22
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_APPOINTMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 23
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_PATIENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 24
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Constant TABLE_SERVICES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 28
+[17-Mar-2025 09:14:03 UTC] PHP Notice:  Use of undefined constant DB_PASSWORD - assumed 'DB_PASSWORD' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/bootstrap.php on line 75
+[17-Mar-2025 09:14:03 UTC] PHP Warning:  PDO::__construct(): Server sent charset (255) unknown to the client. Please, report to the developers in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/bootstrap.php on line 75
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_PREFIX already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 15
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_SPECIALITIES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 18
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_DOCTORS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 19
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_BOOKINGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 22
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_APPOINTMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 23
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_PATIENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 24
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Constant TABLE_SERVICES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 28
+[17-Mar-2025 09:21:47 UTC] PHP Notice:  Use of undefined constant DB_PASSWORD - assumed 'DB_PASSWORD' in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/bootstrap.php on line 76
+[17-Mar-2025 09:21:47 UTC] PHP Warning:  PDO::__construct(): Server sent charset (255) unknown to the client. Please, report to the developers in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/bootstrap.php on line 76
+[17-Mar-2025 09:23:49 UTC] PHP Notice:  Constant TABLE_PREFIX already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 15
+[17-Mar-2025 09:23:49 UTC] PHP Notice:  Constant TABLE_SPECIALITIES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 18
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_DOCTORS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 19
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_BOOKINGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 22
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_APPOINTMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 23
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_PATIENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 24
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_TREATMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 26
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_APPOINTMENT_RECORDS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 27
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_SERVICES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 28
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_DOCTOR_AND_SERVICE already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 30
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_NOTIFICATIONS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 31
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_ROOMS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 32
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_BOOKING_PHOTOS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 34
+[17-Mar-2025 09:23:50 UTC] PHP Notice:  Constant TABLE_DRUGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 35
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_PREFIX already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 15
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_SPECIALITIES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 18
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_DOCTORS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 19
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_BOOKINGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 22
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_APPOINTMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 23
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_PATIENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 24
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_TREATMENTS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 26
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_APPOINTMENT_RECORDS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 27
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_SERVICES already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 28
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_DOCTOR_AND_SERVICE already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 30
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_NOTIFICATIONS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 31
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_ROOMS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 32
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_BOOKING_PHOTOS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 34
+[17-Mar-2025 09:25:32 UTC] PHP Notice:  Constant TABLE_DRUGS already defined in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/db.config.php on line 35
+[17-Mar-2025 09:37:57 UTC] PHP Warning:  require_once(/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/../bootstrap.php): failed to open stream: No such file or directory in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/DbConnectionTest.php on line 5
+[17-Mar-2025 09:37:57 UTC] PHP Fatal error:  require_once(): Failed opening required '/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/../bootstrap.php' (include_path='.:/opt/homebrew/Cellar/php@5.6/5.6.40_12/share/php@5.6/pear') in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/DbConnectionTest.php on line 5
+[17-Mar-2025 09:50:22 UTC] PHP Warning:  mb_internal_encoding(): Unknown encoding "utf8mb4" in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/common.config.php on line 12
+[17-Mar-2025 09:51:35 UTC] PHP Warning:  mb_internal_encoding(): Unknown encoding "utf8mb4" in /Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/config/common.config.php on line 12

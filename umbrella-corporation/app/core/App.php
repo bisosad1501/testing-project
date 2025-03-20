@@ -217,45 +217,51 @@ class App
     {
         $AuthUser = null;
         $accessToken = Input::cookie("accessToken");
-
-
-        if($accessToken)
-        {
-
+    
+        if ($accessToken) {
             $headers = [
                 'Connection: close',
-                'Authorization: JWT '.$accessToken,
+                'Authorization: JWT ' . $accessToken,
                 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
             ];
-
+    
             $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => API_URL."/doctor/profile",
+            curl_setopt_array($curl, [
+                CURLOPT_URL => API_URL . "/doctor/profile",
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_CUSTOMREQUEST => 'GET',
                 CURLOPT_HTTPHEADER => $headers,
-            ));
-
+                CURLOPT_COOKIE => "accessToken=" . $accessToken, // Send token via cookie as well
+            ]);
+    
             $response = curl_exec($curl);
+            if ($response === false) {
+                error_log("cURL error: " . curl_error($curl));
+            }
             curl_close($curl);
-
+    
+            error_log("Auth Debug: Raw response: " . var_export($response, true));
+    
             $resp = @json_decode($response);
-            if($resp->result == 1){
-                $AuthUser = new Auth();
-                foreach ($resp->data as $field => $value){
-                    $AuthUser->set($field, $value);
-                }
-                $AuthUser->set("accessToken", $accessToken);
-                $AuthUser->markAsAvailable();
-
-                if (Input::cookie("mplrmm")) 
-                {
-                    setcookie("accessToken", $accessToken, time()+86400*30, "/");
-                    setcookie("mplrmm", "1", time()+86400*30, "/");
+            if (json_last_error() !== JSON_ERROR_NONE || !is_object($resp)) {
+                error_log("Auth Debug: JSON decode error: " . json_last_error_msg());
+            } else {
+                if (isset($resp->result) && $resp->result == 1) {
+                    $AuthUser = new Auth();
+                    foreach ($resp->data as $field => $value) {
+                        $AuthUser->set($field, $value);
+                    }
+                    $AuthUser->set("accessToken", $accessToken);
+                    $AuthUser->markAsAvailable();
+    
+                    if (Input::cookie("mplrmm")) {
+                        setcookie("accessToken", $accessToken, time() + 86400 * 30, "/");
+                        setcookie("mplrmm", "1", time() + 86400 * 30, "/");
+                    }
                 }
             }
         }
-
+    
         return $AuthUser;
     }
 
