@@ -1,7 +1,7 @@
 # Integration Testing Project
 
 ## Overview
-This project implements integration testing for an existing PHP project. The testing implementation is part of the coursework requirements for Software Testing class at PTIT.
+This project implements integration testing for an existing PHP project. The testing implementation is part of the coursework requirements for SQA class at PTIT.
 
 ## Project Structure
 ```
@@ -41,15 +41,10 @@ Overall Success Rate: 94%
 ```
 
 ## Original Project Credits
-Original project implementation by [Original Author Name]
-- Repository: [Original Repository URL]
-- License: [Original License]
-
+Original project implementation by PhongKaster
+- Repository: https://github.com/Phong-Kaster/PTIT-Do-An-Tot-Nghiep
 ## Testing Implementation Credits
-Testing implementation by Bùi Sỹ Phú
-- Student ID: [Your Student ID]
-- Course: Software Testing
-- Instructor: [Instructor Name]
+Testing implementation by Le Duc Thang
 - Institution: Posts and Telecommunications Institute of Technology (PTIT)
 
 ## Testing Requirements Met
