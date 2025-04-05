@@ -20,4 +20,5 @@ if (!defined("TABLE_NOTIFICATIONS")) define("TABLE_NOTIFICATIONS", "notification
 if (!defined("TABLE_ROOMS")) define("TABLE_ROOMS", "rooms");
 if (!defined("TABLE_BOOKING_PHOTOS")) define("TABLE_BOOKING_PHOTOS", "booking_photo");
 if (!defined("TABLE_DRUGS")) define("TABLE_DRUGS", "drugs");
+if (!defined("TABLE_CLINICS")) define("TABLE_CLINICS", "clinics");
 ?>

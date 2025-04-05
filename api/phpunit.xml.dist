@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="app/tests/bootstrap.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="API Test Suite">
+            <directory>app/tests</directory>
+        </testsuite>
+        <testsuite name="Model Tests">
+            <directory>app/tests/models</directory>
+        </testsuite>
+        <testsuite name="Controller Tests">
+            <directory>app/tests/controllers</directory>
+        </testsuite>
+        <testsuite name="Helper Tests">
+            <directory>app/tests/helpers</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">app/</directory>
+            <exclude>
+                <directory>app/tests</directory>
+                <directory>app/vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <php>
+        <ini name="display_errors" value="On" />
+        <ini name="error_reporting" value="-1" />
+    </php>
+</phpunit> 
