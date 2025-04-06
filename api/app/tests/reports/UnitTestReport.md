@@ -39,16 +39,95 @@
 
 ### 2.2. Controller đã được kiểm thử
 1. **AppointmentController** - Quản lý API cho lịch hẹn
-2. **AppointmentRecordsController** - Quản lý API cho bản ghi lịch hẹn
+2. **AppointmentQueueController** - Quản lý hàng đợi (queue) của các cuộc hẹn
+3. **AppointmentQueueNowController** - Quản lý và lấy thông tin về hàng đợi hiện tại của các cuộc hẹn
+4. **AppointmentRecordController** - Quản lý thông tin bản ghi của các cuộc hẹn
+5. **AppointmentRecordsController** - Quản lý API cho bản ghi lịch hẹn
+6. **AppointmentsController** - Quản lý các cuộc hẹn giữa bác sĩ và bệnh nhân
+7. **BookingController** - Quản lý việc thay đổi và cập nhật thông tin đặt lịch hẹn do bệnh nhân tạo ra
+8. **BookingsController** - Quản lý các đặt lịch hẹn do bệnh nhân tạo ra
+9. **DoctorController** - Quản lý thông tin bác sĩ
+10. **DoctorsController** - Quản lý danh sách bác sĩ
+11. **ClinicController** - Quản lý thông tin phòng khám
+12. **ChartsController** - Quản lý và hiển thị biểu đồ thống kê
+13. **BookingPhotoUploadController** - Quản lý việc tải lên ảnh đặt lịch
+14. **BookingPhotosController** - Quản lý danh sách ảnh đặt lịch
+15. **BookingPhotoController** - Quản lý thông tin ảnh đặt lịch
 
 ### 2.3. Model chưa được kiểm thử và lý do
-1. **Các model collection** (như BookingsModel, DoctorsModel) - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+1. **RoomsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+2. **ServicesModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+3. **SpecialitiesModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+4. **TreatmentsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+5. **AppointmentRecordsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+6. **AppointmentsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+7. **BookingPhotosModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+8. **BookingsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+9. **ClinicsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+10. **DoctorsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+11. **DrugsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+12. **NotificationsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
+13. **PatientsModel** - Kế thừa từ DataList, sẽ được kiểm thử riêng trong một test suite khác
 
 ### 2.4. Controllers chưa được kiểm thử và lý do
-Các controller còn lại hiện chưa được kiểm thử vì cần thiết lập môi trường HTTP request/response để giả lập API call. Sẽ thiết lập trong giai đoạn tiếp theo với framework kiểm thử API.
+1. **LoginController** - Chưa được kiểm thử do cần thiết lập môi trường xác thực và phiên làm việc.
+2. **RecoveryController** - Chưa được kiểm thử do cần thiết lập môi trường gửi email và xác thực.
+3. **RoomController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý phòng.
+4. **RoomsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý phòng.
+5. **ServiceController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý dịch vụ.
+6. **ServicesController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý dịch vụ.
+7. **SignupController** - Chưa được kiểm thử do cần thiết lập môi trường xác thực và gửi email.
+8. **SpecialitiesController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý chuyên khoa.
+9. **SpecialityController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý chuyên khoa.
+10. **TreatmentController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý điều trị.
+11. **TreatmentsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý điều trị.
+12. **isDoctorBusyController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý lịch làm việc của bác sĩ.
+13. **PatientAppointmentController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý lịch hẹn bệnh nhân.
+14. **PatientAppointmentsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý lịch hẹn bệnh nhân.
+15. **PatientBookingController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý đặt lịch bệnh nhân.
+16. **PatientBookingsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý đặt lịch bệnh nhân.
+17. **PatientController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý thông tin bệnh nhân.
+18. **PatientNotificationController** - Chưa được kiểm thử do cần tích hợp với hệ thống thông báo bệnh nhân.
+19. **PatientNotificationsController** - Chưa được kiểm thử do cần tích hợp với hệ thống thông báo bệnh nhân.
+20. **PatientProfileController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý hồ sơ bệnh nhân.
+21. **PatientRecordController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý hồ sơ bệnh nhân.
+22. **PatientRecordsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý hồ sơ bệnh nhân.
+23. **PatientTreatmentController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý điều trị bệnh nhân.
+24. **PatientTreatmentsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý điều trị bệnh nhân.
+25. **PatientsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý thông tin bệnh nhân.
+26. **ClinicsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý phòng khám.
+27. **DoctorProfileController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý hồ sơ bác sĩ.
+28. **DoctorsAndServicesController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý dịch vụ bác sĩ.
+29. **DoctorsAndServicesReadyController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý dịch vụ bác sĩ.
+30. **DrugController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý thuốc.
+31. **DrugsController** - Chưa được kiểm thử do cần tích hợp với hệ thống quản lý thuốc.
+32. **IndexController** - Chưa được kiểm thử do cần thiết lập môi trường trang chủ.
+33. **LoginWithGoogleController** - Chưa được kiểm thử do cần thiết lập môi trường xác thực Google.
+34. **LogoutController** - Chưa được kiểm thử do cần thiết lập môi trường xác thực và phiên làm việc.
+35. **PasswordResetController** - Chưa được kiểm thử do cần thiết lập môi trường gửi email và xác thực.
 
-### 2.5. Helpers chưa được kiểm thử và lý do
-Các helper function sẽ được kiểm thử trong giai đoạn tiếp theo với việc thiết lập môi trường độc lập và tập trung vào unit test trước.
+### 2.5. Các folder và file khác chưa được kiểm thử và lý do
+1. **Các file cấu hình** - Không cần kiểm thử vì chúng chỉ chứa các thiết lập cấu hình và không có logic nghiệp vụ.
+2. **Các file ngôn ngữ** - Không cần kiểm thử vì chúng chỉ chứa các chuỗi văn bản để hỗ trợ đa ngôn ngữ.
+3. **Các file tài nguyên tĩnh** - Không cần kiểm thử vì chúng chỉ chứa tài nguyên như hình ảnh, CSS, và JavaScript không có logic động.
+4. **Các file thư viện bên thứ ba** - Không cần kiểm thử vì chúng là mã nguồn của bên thứ ba và đã được kiểm thử bởi nhà cung cấp.
+5. **Các file mẫu (template)** - Không cần kiểm thử vì chúng chỉ định dạng giao diện người dùng và không chứa logic nghiệp vụ.
+6. **Thư mục logs** - Không cần kiểm thử vì chỉ chứa các file log phục vụ cho việc ghi lại hoạt động của hệ thống.
+7. **Thư mục cache** - Không cần kiểm thử vì chỉ chứa dữ liệu tạm thời để cải thiện hiệu suất hệ thống.
+8. **Thư mục vendor** - Không cần kiểm thử vì chứa các thư viện bên thứ ba được quản lý bởi công cụ quản lý gói.
+9. **vendor/** - Chứa các thư viện bên thứ ba được quản lý bởi công cụ quản lý gói, không cần kiểm thử vì đã được kiểm thử bởi nhà cung cấp.
+10. **inc/** - Thường chứa các file bao gồm (include) hoặc các file cấu hình, không cần kiểm thử vì không chứa logic nghiệp vụ.
+11. **document/** - Chứa tài liệu dự án, không cần kiểm thử vì không liên quan đến mã nguồn.
+12. **assets/** - Chứa tài nguyên tĩnh như hình ảnh, CSS, và JavaScript, không cần kiểm thử vì không có logic động.
+13. **views/** - Chứa các file giao diện người dùng, không cần kiểm thử vì không chứa logic nghiệp vụ.
+14. **.DS_Store** - File hệ thống của macOS, không cần kiểm thử.
+15. **composer.lock** và **composer.json** - File cấu hình cho Composer, không cần kiểm thử vì không chứa logic nghiệp vụ.
+16. **phpunit.xml.dist** - File cấu hình cho PHPUnit, không cần kiểm thử.
+17. **error_php_log.log** - File log ghi lại lỗi PHP, không cần kiểm thử.
+18. **index.php** - Thường là điểm vào của ứng dụng, có thể không cần kiểm thử nếu chỉ chứa mã khởi tạo cơ bản.
+19. **.gitignore** - File cấu hình cho Git, không cần kiểm thử.
+20. **.htaccess** - File cấu hình cho Apache, không cần kiểm thử.
+21. **Graduating Project.postman_collection.json** - File cấu hình cho Postman, không cần kiểm thử.
 
 ## 3. Bộ Test Case
 
@@ -297,147 +376,82 @@ Các helper function sẽ được kiểm thử trong giai đoạn tiếp theo v
 | CTRL_QUEUE_NOW_FORMAT_009 | Kiểm tra định dạng ngày | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: doctor_id | - Query sử dụng định dạng d-m-Y | Controller sử dụng định dạng ngày khác với định dạng Y-m-d phổ biến |
 
 ### 3.19. AppointmentRecordsController
-
-| Mã test | Mục tiêu | Input | Expected Output | Trạng thái | Vấn đề |
-|---------|----------|-------|----------------|------------|--------|
-| CTRL_APRECS_GET_001 | Kiểm tra chức năng lấy danh sách bản ghi lịch hẹn với quyền admin | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET | - result = 1<br>- data chứa danh sách bản ghi | ✅ PASS | Không |
-| CTRL_APRECS_GET_002 | Kiểm tra chức năng lấy danh sách bản ghi lịch hẹn với quyền member | - Tài khoản đăng nhập: Member<br>- Phương thức: GET | - result = 1<br>- data chỉ chứa bản ghi của member | ❌ FAIL | Lọc theo member không hoạt động |
-| CTRL_APRECS_GET_003 | Kiểm tra chức năng lọc danh sách bản ghi theo doctor_id | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET<br>- doctor_id = member ID | - result = 1<br>- data chỉ chứa bản ghi của doctor đã chọn | ❌ FAIL | Lọc doctor_id không hoạt động |
-| CTRL_APRECS_GET_004 | Kiểm tra chức năng lọc danh sách bản ghi theo ngày | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET<br>- date = ngày hiện tại | - result = 1<br>- data chỉ chứa bản ghi có ngày trùng | ❌ FAIL | Lọc ngày không hoạt động |
-| CTRL_APRECS_GET_005 | Kiểm tra chức năng tìm kiếm bản ghi | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET<br>- search = từ khóa | - result = 1<br>- data chỉ chứa bản ghi khớp với từ khóa | ❌ FAIL | Tìm kiếm không hoạt động |
-| CTRL_APRECS_SAVE_006 | Kiểm tra chức năng tạo mới bản ghi khám bệnh | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- Dữ liệu đầy đủ | - result = 1<br>- msg = "CREATE successfully"<br>- data chứa thông tin bản ghi | ⚠️ INCOMPLETE | Lỗi cú pháp SQL |
-| CTRL_APRECS_SAVE_007 | Kiểm tra chức năng cập nhật bản ghi khám bệnh | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- Dữ liệu đầy đủ với appointment_id đã có record | - result = 1<br>- msg = "UPDATE successfully"<br>- data chứa thông tin đã cập nhật | ⚠️ INCOMPLETE | Lỗi cú pháp SQL |
-| CTRL_APRECS_SAVE_008 | Kiểm tra validation khi thiếu trường bắt buộc | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- Thiếu trường reason | - result = 0<br>- msg = "Missing field: reason" | ✅ PASS | Không |
-| CTRL_APRECS_SAVE_009 | Kiểm tra validation cho lý do không hợp lệ | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- reason chứa ký tự đặc biệt | - result = 0<br>- msg = "Reason before only has letters, space, number & dash. Try again !" | ✅ PASS | Không |
-| CTRL_APRECS_SAVE_010 | Kiểm tra validation cho trạng thái trước không hợp lệ | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- status_before chứa ký tự đặc biệt | - result = 0<br>- msg = "Status before only has letters, space, number & dash. Try again !" | ✅ PASS | Không |
-| CTRL_APRECS_SAVE_011 | Kiểm tra validation cho lịch hẹn không tồn tại | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- appointment_id không tồn tại | - result = 0<br>- msg = "Appointment is not available" | ✅ PASS | Không |
-| CTRL_APRECS_SAVE_012 | Kiểm tra validation cho lịch hẹn trong quá khứ | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- appointment_id có ngày trong quá khứ | - result = 0<br>- msg chứa "you can not create new appointment record" | ✅ PASS | Không |
-| CTRL_APRECS_SAVE_013 | Kiểm tra validation cho lịch hẹn đã hoàn thành | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- appointment_id có status = "done" | - result = 0<br>- msg = "The status of appointment is done so that you can't do this action" | ✅ PASS | Không |
-| CTRL_APRECS_AUTH_014 | Kiểm tra quyền truy cập - supporter không có quyền | - Tài khoản đăng nhập: Supporter<br>- Phương thức: GET | - result = 0<br>- msg chứa "Only Doctor's role as admin, member who can do this action" | ⚠️ WARNING | Controller trả về result = 1 (thành công) thay vì 0 (thất bại) |
-| CTRL_APRECS_NO_AUTH_015 | Kiểm tra xử lý khi không có người dùng đăng nhập | - Không có người dùng đăng nhập<br>- Phương thức: GET | - Chuyển hướng đến trang login | ✅ PASS | Không |
+| Mã test | Mục tiêu | Input | Expected Output | Ghi chú |
+|---------|----------|-------|----------------|----------|
+| CTRL_APRECS_GET_001 | Kiểm tra chức năng lấy danh sách bản ghi lịch hẹn với quyền admin | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET | - result = 1<br>- data chứa danh sách bản ghi | ✅ PASS |
+| CTRL_APRECS_GET_002 | Kiểm tra chức năng lấy danh sách bản ghi lịch hẹn với quyền member | - Tài khoản đăng nhập: Member<br>- Phương thức: GET | - result = 1<br>- data chỉ chứa bản ghi của member | ❌ FAIL - Lọc theo member không hoạt động |
+| CTRL_APRECS_GET_003 | Kiểm tra chức năng lọc danh sách bản ghi theo doctor_id | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET<br>- doctor_id = member ID | - result = 1<br>- data chỉ chứa bản ghi của doctor đã chọn | ❌ FAIL - Lọc doctor_id không hoạt động |
+| CTRL_APRECS_GET_004 | Kiểm tra chức năng lọc danh sách bản ghi theo ngày | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET<br>- date = ngày hiện tại | - result = 1<br>- data chỉ chứa bản ghi có ngày trùng | ❌ FAIL - Lọc ngày không hoạt động |
+| CTRL_APRECS_GET_005 | Kiểm tra chức năng tìm kiếm bản ghi | - Tài khoản đăng nhập: Admin<br>- Phương thức: GET<br>- search = từ khóa | - result = 1<br>- data chỉ chứa bản ghi khớp với từ khóa | ❌ FAIL - Tìm kiếm không hoạt động |
+| CTRL_APRECS_SAVE_006 | Kiểm tra chức năng tạo mới bản ghi khám bệnh | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- Dữ liệu đầy đủ | - result = 1<br>- msg = "CREATE successfully"<br>- data chứa thông tin bản ghi | ⚠️ INCOMPLETE - Lỗi cú pháp SQL |
+| CTRL_APRECS_SAVE_007 | Kiểm tra chức năng cập nhật bản ghi khám bệnh | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- Dữ liệu đầy đủ với appointment_id đã có record | - result = 1<br>- msg = "UPDATE successfully"<br>- data chứa thông tin đã cập nhật | ⚠️ INCOMPLETE - Lỗi cú pháp SQL |
+| CTRL_APRECS_SAVE_008 | Kiểm tra validation khi thiếu trường bắt buộc | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- Thiếu trường reason | - result = 0<br>- msg = "Missing field: reason" | ✅ PASS |
+| CTRL_APRECS_SAVE_009 | Kiểm tra validation cho lý do không hợp lệ | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- reason chứa ký tự đặc biệt | - result = 0<br>- msg = "Reason before only has letters, space, number & dash. Try again !" | ✅ PASS |
+| CTRL_APRECS_SAVE_010 | Kiểm tra validation cho trạng thái trước không hợp lệ | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- status_before chứa ký tự đặc biệt | - result = 0<br>- msg = "Status before only has letters, space, number & dash. Try again !" | ✅ PASS |
+| CTRL_APRECS_SAVE_011 | Kiểm tra validation cho lịch hẹn không tồn tại | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- appointment_id không tồn tại | - result = 0<br>- msg = "Appointment is not available" | ✅ PASS |
+| CTRL_APRECS_SAVE_012 | Kiểm tra validation cho lịch hẹn trong quá khứ | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- appointment_id có ngày trong quá khứ | - result = 0<br>- msg chứa "you can not create new appointment record" | ✅ PASS |
+| CTRL_APRECS_SAVE_013 | Kiểm tra validation cho lịch hẹn đã hoàn thành | - Tài khoản đăng nhập: Admin<br>- Phương thức: POST<br>- appointment_id có status = "done" | - result = 0<br>- msg = "The status of appointment is done so that you can't do this action" | ✅ PASS |
+| CTRL_APRECS_AUTH_014 | Kiểm tra quyền truy cập - supporter không có quyền | - Tài khoản đăng nhập: Supporter<br>- Phương thức: GET | - result = 0<br>- msg chứa "Only Doctor's role as admin, member who can do this action" | ⚠️ WARNING - Controller trả về result = 1 |
+| CTRL_APRECS_NO_AUTH_015 | Kiểm tra xử lý khi không có người dùng đăng nhập | - Không có người dùng đăng nhập<br>- Phương thức: GET | - Chuyển hướng đến trang login | ✅ PASS |
 
 ### 3.20. AppointmentsController
 
-| Mã test | Mục tiêu | Input | Expected Output | 
-Trạng thái | Vấn đề |
-|---------|----------|-------|----------------|
-------------|--------|
-| CTRL_APPTS_GET_001 | Kiểm tra chức năng lấy danh 
-sách lịch hẹn với quyền admin | - Tài khoản: Admin 
-doctor<br>- Phương thức: GET | - result = 1<br>- msg 
-= "Action successfully !"<br>- data chứa danh sách 
-lịch hẹn | ✅ PASS | Không |
-| CTRL_APPTS_GET_002 | Kiểm tra chức năng lấy danh 
-sách lịch hẹn với quyền member | - Tài khoản: Member 
-doctor<br>- Phương thức: GET | - result = 1<br>- data 
-chỉ chứa lịch hẹn của member | ✅ PASS | Không |
-| CTRL_APPTS_GET_003 | Kiểm tra chức năng lọc danh 
-sách lịch hẹn theo ngày | - Tài khoản: Admin 
-doctor<br>- Phương thức: GET<br>- Parameter: date | - 
-result = 1<br>- data chỉ chứa lịch hẹn có ngày 
-trùng | ✅ PASS | Không |
-| CTRL_APPTS_GET_004 | Kiểm tra chức năng lọc danh 
-sách lịch hẹn theo bác sĩ | - Tài khoản: Admin 
-doctor<br>- Phương thức: GET<br>- Parameter: 
-doctor_id | - result = 1<br>- data chỉ chứa lịch hẹn 
-của bác sĩ đã chọn | ✅ PASS | Không |
-| CTRL_APPTS_GET_005 | Kiểm tra chức năng tìm kiếm 
-lịch hẹn | - Tài khoản: Admin doctor<br>- Phương 
-thức: GET<br>- Parameter: search | - result = 1<br>- 
-data chỉ chứa lịch hẹn khớp với từ khóa | ✅ PASS | 
-Không |
-| CTRL_APPTS_NEW_006 | Kiểm tra chức năng tạo lịch 
-hẹn mới với doctor_id | - Tài khoản: Admin 
-doctor<br>- Phương thức: POST<br>- Data: doctor_id, 
-patient_name, patient_birthday, patient_reason, 
-patient_phone | - result = 1<br>- Lịch hẹn được tạo 
-với số thứ tự và vị trí | ⚠️ SKIPPED | Lỗi cú pháp 
-SQL trong hàm getTheLaziestDoctor() |
-| CTRL_APPTS_NEW_007 | Kiểm tra chức năng tạo lịch 
-hẹn mới với service_id | - Tài khoản: Admin 
-doctor<br>- Phương thức: POST<br>- Data: service_id, 
-patient_name, patient_birthday, patient_reason, 
-patient_phone | - result = 1<br>- Lịch hẹn được tạo 
-với bác sĩ ít bệnh nhân nhất | ⚠️ SKIPPED | Lỗi cú 
-pháp SQL trong hàm getTheLaziestDoctor() |
-| CTRL_APPTS_NEW_008 | Kiểm tra validation khi thiếu 
-dữ liệu bắt buộc | - Tài khoản: Admin doctor<br>- 
-Phương thức: POST<br>- Data: thiếu patient_reason | - 
-result = 0<br>- msg = "Missing field: 
-patient_reason" | ✅ PASS | Không |
-| CTRL_APPTS_NEW_009 | Kiểm tra quyền - chỉ admin và 
-supporter mới được tạo lịch hẹn | - Tài khoản: Member 
-doctor<br>- Phương thức: POST<br>- Data: đầy đủ | - 
-result = 0<br>- msg = "You don't have permission" | ✅ 
-PASS | Không |
-| CTRL_APPTS_NEW_010 | Kiểm tra tính hợp lệ của 
-patient_name | - Tài khoản: Admin doctor<br>- Phương 
-thức: POST<br>- Data: patient_name có ký tự đặc 
-biệt | - result = 0<br>- msg chứa "Vietnamese name 
-only has letters and space" | ⚠️ SKIPPED | Validation 
-không hoạt động đúng |
-| CTRL_APPTS_NEW_011 | Kiểm tra tính hợp lệ của 
-patient_phone | - Tài khoản: Admin doctor<br>- Phương 
-thức: POST<br>- Data: patient_phone quá ngắn | - 
-result = 0<br>- msg chứa "phone number has at least 
-10 number" | ⚠️ SKIPPED | Lỗi cú pháp SQL trong 
-controller |
-| CTRL_APPTS_NEW_012 | Kiểm tra xử lý khi cả 
-service_id và doctor_id đều thiếu | - Tài khoản: 
-Admin doctor<br>- Phương thức: POST<br>- Data: thiếu 
-service_id và doctor_id | - result = 0<br>- msg chứa 
-"cần cung cấp nhu cầu khám bệnh hoặc tên bác sĩ" | ⚠️ 
-SKIPPED | Thông báo lỗi không nhất quán |
-| CTRL_APPTS_NEW_013 | Kiểm tra xử lý khi doctor_id 
-là supporter | - Tài khoản: Admin doctor<br>- Phương 
-thức: POST<br>- Data: doctor_id của supporter | - 
-result = 0<br>- msg chứa "You can't assign 
-appointment to SUPPORTER" | ⚠️ SKIPPED | Lỗi cú pháp 
-SQL trong controller |
+| Mã test | Mục tiêu | Input | Expected Output | Ghi chú |
+|---------|----------|-------|----------------|----------|
+| CTRL_APPTS_GET_001 | Kiểm tra chức năng lấy danh sách lịch hẹn với quyền admin | - Tài khoản: Admin doctor<br>- Phương thức: GET | - result = 1<br>- msg = "Action successfully !"<br>- data chứa danh sách lịch hẹn | ✅ PASS |
+| CTRL_APPTS_GET_002 | Kiểm tra chức năng lấy danh sách lịch hẹn với quyền member | - Tài khoản: Member doctor<br>- Phương thức: GET | - result = 1<br>- data chỉ chứa lịch hẹn của member | ✅ PASS |
+| CTRL_APPTS_GET_003 | Kiểm tra chức năng lọc danh sách lịch hẹn theo ngày | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: date | - result = 1<br>- data chỉ chứa lịch hẹn có ngày trùng | ✅ PASS |
+| CTRL_APPTS_GET_004 | Kiểm tra chức năng lọc danh sách lịch hẹn theo bác sĩ | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: doctor_id | - result = 1<br>- data chỉ chứa lịch hẹn của bác sĩ đã chọn | ✅ PASS |
+| CTRL_APPTS_GET_005 | Kiểm tra chức năng tìm kiếm lịch hẹn | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: search | - result = 1<br>- data chỉ chứa lịch hẹn khớp với từ khóa | ✅ PASS |
+| CTRL_APPTS_NEW_006 | Kiểm tra chức năng tạo lịch hẹn mới với doctor_id | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: doctor_id, patient_name, patient_birthday, patient_reason, patient_phone | - result = 1<br>- Lịch hẹn được tạo với số thứ tự và vị trí | ⚠️ SKIPPED - Lỗi cú pháp SQL trong hàm getTheLaziestDoctor() |
+| CTRL_APPTS_NEW_007 | Kiểm tra chức năng tạo lịch hẹn mới với service_id | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: service_id, patient_name, patient_birthday, patient_reason, patient_phone | - result = 1<br>- Lịch hẹn được tạo với bác sĩ ít bệnh nhân nhất | ⚠️ SKIPPED - Lỗi cú pháp SQL trong hàm getTheLaziestDoctor() |
+| CTRL_APPTS_NEW_008 | Kiểm tra validation khi thiếu dữ liệu bắt buộc | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: thiếu patient_reason | - result = 0<br>- msg = "Missing field: patient_reason" | ✅ PASS |
+| CTRL_APPTS_NEW_009 | Kiểm tra quyền - chỉ admin và supporter mới được tạo lịch hẹn | - Tài khoản: Member doctor<br>- Phương thức: POST<br>- Data: đầy đủ | - result = 0<br>- msg = "You don't have permission" | ✅ PASS |
+| CTRL_APPTS_NEW_010 | Kiểm tra tính hợp lệ của patient_name | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: patient_name có ký tự đặc biệt | - result = 0<br>- msg chứa "Vietnamese name only has letters and space" | ⚠️ SKIPPED - Validation không hoạt động đúng |
+| CTRL_APPTS_NEW_011 | Kiểm tra tính hợp lệ của patient_phone | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: patient_phone quá ngắn | - result = 0<br>- msg chứa "phone number has at least 10 number" | ⚠️ SKIPPED - Lỗi cú pháp SQL trong controller |
+| CTRL_APPTS_NEW_012 | Kiểm tra xử lý khi cả service_id và doctor_id đều thiếu | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: thiếu service_id và doctor_id | - result = 0<br>- msg chứa "cần cung cấp nhu cầu khám bệnh hoặc tên bác sĩ" | ⚠️ SKIPPED - Thông báo lỗi không nhất quán |
+| CTRL_APPTS_NEW_013 | Kiểm tra xử lý khi doctor_id là supporter | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: doctor_id của supporter | - result = 0<br>- msg chứa "You can't assign appointment to SUPPORTER" | ⚠️ SKIPPED - Lỗi cú pháp SQL trong controller |
 
 ### 3.21. BookingController
-
-| Mã test | Mục tiêu | Input | Expected Output | Trạng thái | Vấn đề |
-|---------|----------|-------|----------------|------------|--------|
-| CTRL_BOOK_GET_001 | Kiểm tra chức năng lấy thông tin đặt lịch theo ID với quyền admin | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Phương thức: GET | - result = 1<br>- msg = "Action successfully !"<br>- data chứa thông tin chi tiết đặt lịch | ❌ FAIL | Lỗi khởi tạo khi thiếu trường doctor_id |
-| CTRL_BOOK_GET_002 | Kiểm tra chức năng lấy thông tin đặt lịch theo ID với quyền supporter | - Tài khoản: Supporter<br>- ID đặt lịch hợp lệ<br>- Phương thức: GET | - result = 1<br>- msg = "Action successfully !"<br>- data chứa thông tin chi tiết đặt lịch | ❌ FAIL | Lỗi khởi tạo khi thiếu trường doctor_id |
-| CTRL_BOOK_GET_003 | Kiểm tra xử lý khi ID không tồn tại | - Tài khoản: Admin doctor<br>- ID đặt lịch không tồn tại<br>- Phương thức: GET | - result = 0<br>- msg = "Booking is not available" | ❌ FAIL | Thông báo lỗi không đúng kỳ vọng |
-| CTRL_BOOK_GET_004 | Kiểm tra xử lý khi không có ID | - Tài khoản: Admin doctor<br>- Không có ID trong route params<br>- Phương thức: GET | - result = 0<br>- msg = "ID is required !" | ❌ FAIL | Thông báo lỗi không đúng kỳ vọng |
-| CTRL_BOOK_GET_005 | Kiểm tra xử lý khi người dùng không có quyền | - Tài khoản: Member doctor<br>- ID đặt lịch hợp lệ<br>- Phương thức: GET | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL | Controller cho phép role member truy cập |
-| CTRL_BOOK_UPDATE_006 | Kiểm tra chức năng cập nhật đặt lịch thành công | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Dữ liệu cập nhật hợp lệ<br>- Phương thức: PUT | - result = 1<br>- msg chứa "successfully"<br>- data chứa thông tin đã cập nhật | ❌ FAIL | Lỗi khởi tạo khi thiếu trường doctor_id |
-| CTRL_BOOK_UPDATE_007 | Kiểm tra validation khi thiếu trường bắt buộc | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Thiếu trường name<br>- Phương thức: PUT | - result = 0<br>- msg = "Missing field: name" | ❌ FAIL | Controller không kiểm tra trường thiếu |
-| CTRL_BOOK_UPDATE_008 | Kiểm tra validation khi booking_name không hợp lệ | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- booking_name chứa ký tự đặc biệt<br>- Phương thức: PUT | - result = 0<br>- msg chứa "Vietnamese name only has letters and space" | ❌ FAIL | Validation không hoạt động đúng |
-| CTRL_BOOK_UPDATE_009 | Kiểm tra validation khi booking_phone không hợp lệ | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- booking_phone quá ngắn<br>- Phương thức: PUT | - result = 0<br>- msg chứa "has at least 10 number" | ❌ FAIL | Validation không hoạt động đúng |
-| CTRL_BOOK_CONFIRM_010 | Kiểm tra chức năng xác nhận đặt lịch (status = verified) | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- newStatus = "verified"<br>- Phương thức: PATCH | - result = 1<br>- msg chứa "VERIFIED"<br>- Status đặt lịch được cập nhật thành "verified" | ❌ FAIL | Lỗi khởi tạo khi thiếu trường doctor_id |
-| CTRL_BOOK_CONFIRM_011 | Kiểm tra chức năng hủy đặt lịch (status = cancelled) | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- newStatus = "cancelled"<br>- Phương thức: PATCH | - result = 1<br>- msg chứa "cancelled successfully"<br>- Status đặt lịch được cập nhật thành "cancelled" | ❌ FAIL | Lỗi khởi tạo khi thiếu trường doctor_id |
-| CTRL_BOOK_CONFIRM_012 | Kiểm tra xử lý khi không có trạng thái mới | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Không có newStatus<br>- Phương thức: PATCH | - result = 0<br>- msg = "New status is required to continue !" | ❌ FAIL | Controller không kiểm tra trường thiếu |
-| CTRL_BOOK_CONFIRM_013 | Kiểm tra xử lý khi trạng thái mới không hợp lệ | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- newStatus không hợp lệ<br>- Phương thức: PATCH | - result = 0<br>- msg chứa "Booking's status is not valid" | ❌ FAIL | Controller không kiểm tra giá trị hợp lệ |
-| CTRL_BOOK_CONFIRM_014 | Kiểm tra xử lý khi đặt lịch đã bị hủy trước đó | - Tài khoản: Admin doctor<br>- ID đặt lịch với status = "cancelled"<br>- newStatus = "verified"<br>- Phương thức: PATCH | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL | Controller cho phép cập nhật status đã bị hủy |
+| Mã test | Mục tiêu | Input | Expected Output | Ghi chú |
+|---------|----------|-------|----------------|----------|
+| CTRL_BOOK_GET_001 | Kiểm tra chức năng lấy thông tin đặt lịch theo ID với quyền admin | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Phương thức: GET | - result = 1<br>- msg = "Action successfully !"<br>- data chứa thông tin chi tiết đặt lịch | ❌ FAIL - Lỗi khởi tạo khi thiếu trường doctor_id |
+| CTRL_BOOK_GET_002 | Kiểm tra chức năng lấy thông tin đặt lịch theo ID với quyền supporter | - Tài khoản: Supporter<br>- ID đặt lịch hợp lệ<br>- Phương thức: GET | - result = 1<br>- msg = "Action successfully !"<br>- data chứa thông tin chi tiết đặt lịch | ❌ FAIL - Lỗi khởi tạo khi thiếu trường doctor_id |
+| CTRL_BOOK_GET_003 | Kiểm tra xử lý khi ID không tồn tại | - Tài khoản: Admin doctor<br>- ID đặt lịch không tồn tại<br>- Phương thức: GET | - result = 0<br>- msg = "Booking is not available" | ❌ FAIL - Thông báo lỗi không đúng kỳ vọng |
+| CTRL_BOOK_GET_004 | Kiểm tra xử lý khi không có ID | - Tài khoản: Admin doctor<br>- Không có ID trong route params<br>- Phương thức: GET | - result = 0<br>- msg = "ID is required !" | ❌ FAIL - Thông báo lỗi không đúng kỳ vọng |
+| CTRL_BOOK_GET_005 | Kiểm tra xử lý khi người dùng không có quyền | - Tài khoản: Member doctor<br>- ID đặt lịch hợp lệ<br>- Phương thức: GET | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL - Controller cho phép role member truy cập |
+| CTRL_BOOK_UPDATE_006 | Kiểm tra chức năng cập nhật đặt lịch thành công | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Dữ liệu cập nhật hợp lệ<br>- Phương thức: PUT | - result = 1<br>- msg chứa "successfully"<br>- data chứa thông tin đã cập nhật | ❌ FAIL - Lỗi khởi tạo khi thiếu trường doctor_id |
+| CTRL_BOOK_UPDATE_007 | Kiểm tra validation khi thiếu trường bắt buộc | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Thiếu trường name<br>- Phương thức: PUT | - result = 0<br>- msg = "Missing field: name" | ❌ FAIL - Controller không kiểm tra trường thiếu |
+| CTRL_BOOK_UPDATE_008 | Kiểm tra validation khi booking_name không hợp lệ | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- booking_name chứa ký tự đặc biệt<br>- Phương thức: PUT | - result = 0<br>- msg chứa "Vietnamese name only has letters and space" | ❌ FAIL - Validation không hoạt động đúng |
+| CTRL_BOOK_UPDATE_009 | Kiểm tra validation khi booking_phone không hợp lệ | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- booking_phone quá ngắn<br>- Phương thức: PUT | - result = 0<br>- msg chứa "has at least 10 number" | ❌ FAIL - Validation không hoạt động đúng |
+| CTRL_BOOK_CONFIRM_010 | Kiểm tra chức năng xác nhận đặt lịch (status = verified) | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- newStatus = "verified"<br>- Phương thức: PATCH | - result = 1<br>- msg chứa "VERIFIED"<br>- Status đặt lịch được cập nhật thành "verified" | ❌ FAIL - Lỗi khởi tạo khi thiếu trường doctor_id |
+| CTRL_BOOK_CONFIRM_011 | Kiểm tra chức năng hủy đặt lịch (status = cancelled) | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- newStatus = "cancelled"<br>- Phương thức: PATCH | - result = 1<br>- msg chứa "cancelled successfully"<br>- Status đặt lịch được cập nhật thành "cancelled" | ❌ FAIL - Lỗi khởi tạo khi thiếu trường doctor_id |
+| CTRL_BOOK_CONFIRM_012 | Kiểm tra xử lý khi không có trạng thái mới | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- Không có newStatus<br>- Phương thức: PATCH | - result = 0<br>- msg = "New status is required to continue !" | ❌ FAIL - Controller không kiểm tra trường thiếu |
+| CTRL_BOOK_CONFIRM_013 | Kiểm tra xử lý khi trạng thái mới không hợp lệ | - Tài khoản: Admin doctor<br>- ID đặt lịch hợp lệ<br>- newStatus không hợp lệ<br>- Phương thức: PATCH | - result = 0<br>- msg chứa "Booking's status is not valid" | ❌ FAIL - Controller không kiểm tra giá trị hợp lệ |
+| CTRL_BOOK_CONFIRM_014 | Kiểm tra xử lý khi đặt lịch đã bị hủy trước đó | - Tài khoản: Admin doctor<br>- ID đặt lịch với status = "cancelled"<br>- newStatus = "verified"<br>- Phương thức: PATCH | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL - Controller cho phép cập nhật status đã bị hủy |
 
 ### 3.22. BookingsController
 
-| Mã test | Mục tiêu | Input | Expected Output | Trạng thái | Vấn đề |
-|---------|----------|-------|----------------|------------|--------|
-| CTRL_BOOKINGS_GET_001 | Kiểm tra chức năng lấy danh sách đặt lịch với quyền admin | - Tài khoản: Admin doctor<br>- Phương thức: GET | - result = 1<br>- data chứa danh sách đặt lịch | ✅ PASS | Không |
-| CTRL_BOOKINGS_GET_002 | Kiểm tra chức năng lấy danh sách đặt lịch với quyền member | - Tài khoản: Member doctor<br>- Phương thức: GET | - result = 1<br>- data chỉ chứa đặt lịch của member | ✅ PASS | Không |
-| CTRL_BOOKINGS_GET_003 | Kiểm tra chức năng lọc danh sách đặt lịch theo ngày | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: appointment_date | - result = 1<br>- data chỉ chứa đặt lịch có ngày trùng | ❌ FAIL | Lọc theo ngày không hoạt động đúng |
-| CTRL_BOOKINGS_GET_004 | Kiểm tra chức năng lọc danh sách đặt lịch theo bác sĩ | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: doctor_id | - result = 1<br>- data chỉ chứa đặt lịch của bác sĩ đã chọn | ✅ PASS | Không |
-| CTRL_BOOKINGS_GET_005 | Kiểm tra chức năng tìm kiếm đặt lịch | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: search | - result = 1<br>- data chỉ chứa đặt lịch khớp với từ khóa | ✅ PASS | Không |
-| CTRL_BOOKINGS_NEW_006 | Kiểm tra chức năng tạo đặt lịch mới | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: đầy đủ thông tin | - result = 1<br>- msg chứa "successfully"<br>- data chứa thông tin đặt lịch mới | ⚠️ SKIPPED | Lỗi cú pháp SQL trong controller |
-| CTRL_BOOKINGS_NEW_007 | Kiểm tra validation khi thiếu trường bắt buộc | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: thiếu reason | - result = 0<br>- msg = "Missing field: reason" | ❌ FAIL | Lỗi cú pháp SQL xuất hiện trước kiểm tra trường thiếu |
-| CTRL_BOOKINGS_NEW_008 | Kiểm tra quyền - chỉ admin và supporter mới được tạo đặt lịch | - Tài khoản: Member doctor<br>- Phương thức: POST<br>- Data: đầy đủ | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL | Lỗi cú pháp SQL xuất hiện trước kiểm tra quyền |
-| CTRL_BOOKINGS_NEW_009 | Kiểm tra tính hợp lệ của booking_name | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: booking_name có ký tự đặc biệt | - result = 0<br>- msg chứa "Vietnamese name only has letters and space" | ⚠️ SKIPPED | Lỗi cú pháp SQL xuất hiện trước validation |
-| CTRL_BOOKINGS_NEW_010 | Kiểm tra tính hợp lệ của booking_phone | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: booking_phone quá ngắn | - result = 0<br>- msg chứa "has at least 10 number" | ⚠️ SKIPPED | Lỗi cú pháp SQL xuất hiện trước validation |
+| Mã test | Mục tiêu | Input | Expected Output | Ghi chú |
+|---------|----------|-------|----------------|----------|
+| CTRL_BOOKINGS_GET_001 | Kiểm tra chức năng lấy danh sách đặt lịch với quyền admin | - Tài khoản: Admin doctor<br>- Phương thức: GET | - result = 1<br>- data chứa danh sách đặt lịch | ✅ PASS |
+| CTRL_BOOKINGS_GET_002 | Kiểm tra chức năng lấy danh sách đặt lịch với quyền member | - Tài khoản: Member doctor<br>- Phương thức: GET | - result = 1<br>- data chỉ chứa đặt lịch của member | ✅ PASS |
+| CTRL_BOOKINGS_GET_003 | Kiểm tra chức năng lọc danh sách đặt lịch theo ngày | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: appointment_date | - result = 1<br>- data chỉ chứa đặt lịch có ngày trùng | ❌ FAIL - Lọc theo ngày không hoạt động đúng |
+| CTRL_BOOKINGS_GET_004 | Kiểm tra chức năng lọc danh sách đặt lịch theo trạng thái | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: status | - result = 1<br>- data chỉ chứa đặt lịch có trạng thái khớp | ✅ PASS |
+| CTRL_BOOKINGS_SEARCH_005 | Kiểm tra chức năng tìm kiếm đặt lịch | - Tài khoản: Admin doctor<br>- Phương thức: GET<br>- Parameter: search | - result = 1<br>- data chỉ chứa đặt lịch khớp với từ khóa | ❌ FAIL - Chức năng tìm kiếm không hoạt động đúng |
+| CTRL_BOOKINGS_NEW_006 | Kiểm tra chức năng tạo đặt lịch mới | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: đầy đủ thông tin | - result = 1<br>- msg chứa "successfully"<br>- data chứa thông tin đặt lịch mới | ⚠️ SKIPPED - Lỗi cú pháp SQL trong controller |
+| CTRL_BOOKINGS_NEW_007 | Kiểm tra validation khi thiếu trường bắt buộc | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: thiếu reason | - result = 0<br>- msg = "Missing field: reason" | ❌ FAIL - Lỗi cú pháp SQL xuất hiện trước kiểm tra trường thiếu |
+| CTRL_BOOKINGS_NEW_008 | Kiểm tra quyền - chỉ admin và supporter mới được tạo đặt lịch | - Tài khoản: Member doctor<br>- Phương thức: POST<br>- Data: đầy đủ | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL - Lỗi cú pháp SQL xuất hiện trước kiểm tra quyền |
+| CTRL_BOOKINGS_NEW_009 | Kiểm tra tính hợp lệ của booking_name | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: booking_name có ký tự đặc biệt | - result = 0<br>- msg chứa "Vietnamese name only has letters and space" | ⚠️ SKIPPED - Lỗi cú pháp SQL xuất hiện trước validation |
+| CTRL_BOOKINGS_NEW_010 | Kiểm tra tính hợp lệ của booking_phone | - Tài khoản: Admin doctor<br>- Phương thức: POST<br>- Data: booking_phone quá ngắn | - result = 0<br>- msg chứa "has at least 10 number" | ⚠️ SKIPPED - Lỗi cú pháp SQL xuất hiện trước validation |
 
 ### 3.23. BookingPhotoController
-
-| Mã test | Mục tiêu | Input | Expected Output | Trạng thái | Vấn đề |
-|---------|----------|-------|----------------|------------|--------|
-| CTRL_BPHOTO_DEL_001 | Kiểm tra xóa ảnh đặt lịch thành công | - Tài khoản: Patient<br>- ID ảnh đặt lịch hợp lệ<br>- Phương thức: DELETE | - result = 1<br>- msg chứa "deleted successfully"<br>- Ảnh bị xóa khỏi database | ✅ PASS | Không |
-| CTRL_BPHOTO_DEL_002 | Kiểm tra xóa ảnh đặt lịch khi không cung cấp ID | - Tài khoản: Patient<br>- ID = null<br>- Phương thức: DELETE | - msg = "Photo ID is required !" | ❌ FAIL | Controller vẫn xóa ảnh dù không cung cấp ID |
-| CTRL_BPHOTO_DEL_003 | Kiểm tra xóa ảnh đặt lịch với ID không tồn tại | - Tài khoản: Patient<br>- ID không tồn tại (99999)<br>- Phương thức: DELETE | - msg = "Photo does not exist. Try again!" | ❌ FAIL | Controller không kiểm tra sự tồn tại của ảnh |
-| CTRL_BPHOTO_DEL_PERM_004 | Kiểm tra quyền xóa ảnh - user không phải là patient | - Tài khoản: Admin doctor<br>- ID ảnh đặt lịch hợp lệ<br>- Phương thức: DELETE | - msg = "This function is only used by PATIENT !" | ❌ FAIL | Controller không kiểm tra quyền người dùng đúng cách |
-| CTRL_BPHOTO_DEL_NOAUTH_005 | Kiểm tra người dùng chưa đăng nhập | - Không đăng nhập<br>- ID bất kỳ<br>- Phương thức: DELETE | - Chuyển hướng tới trang đăng nhập | ⚠️ INCOMPLETE | Không thể test header redirect trong PHPUnit |
+| Mã test | Mục tiêu | Input | Expected Output | Ghi chú |
+|---------|----------|-------|----------------|----------|
+| CTRL_BPHOTO_DEL_001 | Kiểm tra xóa ảnh đặt lịch thành công | - Tài khoản: Patient<br>- ID ảnh đặt lịch hợp lệ<br>- Phương thức: DELETE | - result = 1<br>- msg chứa "deleted successfully"<br>- Ảnh bị xóa khỏi database | ✅ PASS |
+| CTRL_BPHOTO_DEL_002 | Kiểm tra xóa ảnh đặt lịch khi không cung cấp ID | - Tài khoản: Patient<br>- ID = null<br>- Phương thức: DELETE | - msg = "Photo ID is required !" | ❌ FAIL - Controller vẫn xóa ảnh dù không cung cấp ID |
+| CTRL_BPHOTO_DEL_003 | Kiểm tra xóa ảnh đặt lịch với ID không tồn tại | - Tài khoản: Patient<br>- ID không tồn tại (99999)<br>- Phương thức: DELETE | - msg = "Photo does not exist. Try again!" | ❌ FAIL - Controller không kiểm tra sự tồn tại của ảnh |
+| CTRL_BPHOTO_DEL_004 | Kiểm tra quyền xóa ảnh - chỉ patient mới được xóa | - Tài khoản: Admin<br>- ID ảnh đặt lịch hợp lệ<br>- Phương thức: DELETE | - result = 0<br>- msg chứa "You don't have permission" | ❌ FAIL - Controller không kiểm tra quyền |
 
 ### 3.24. BookingPhotosController
 | Mã test | Mục tiêu | Input | Expected Output | Ghi chú |
@@ -587,6 +601,72 @@ Số lượng booking >= 0 | ✅ PASS | |
 | CTRL_DOCS_SAVE_023 | Kiểm tra khi người dùng không có quyền tạo bác sĩ | - Tài khoản: Member<br>- Phương thức: POST<br>- Dữ liệu hợp lệ | - result = 0<br>- msg chứa "don't have permission" | Lỗi SQL syntax |
 | CTRL_DOCS_SAVE_024 | Kiểm tra xử lý lỗi khi có exception trong quá trình lưu | - Tài khoản: Admin<br>- Phương thức: POST<br>- Dữ liệu hợp lệ | - result = 0<br>- msg chứa "Database error" | Không thể mock Controller class |
 | CTRL_DOCS_EMAIL_025 | Kiểm tra gửi email khi tạo bác sĩ thành công | - Tài khoản: Admin<br>- Phương thức: POST<br>- Dữ liệu hợp lệ | - result = 1<br>- msg chứa "created successfully" | Lỗi SQL syntax |
+
+### 3.29 AppointmentQueueNowController Test Cases
+
+| Test Case ID | Mục tiêu | Input | Expected 
+Output | Kết quả |
+|--------------|----------|--------|
+-----------------|----------|
+| CTRL_QUEUE_NOW_GET_001 | Kiểm tra chức năng lấy 
+thông tin hàng đợi hiện tại khi là Admin | - Tài 
+khoản đăng nhập: Admin doctor<br>- Phương thức: 
+GET<br>- Parameter: doctor_id | - Controller xử 
+lý request đúng với phương thức getQueue()<br>- 
+result chứa thông tin 3 cuộc hẹn đầu tiên trong 
+hàng đợi | Test được đánh dấu là skipped vì 
+controller hiện tại không trả về response mà chỉ 
+thực hiện query |
+| CTRL_QUEUE_NOW_GET_002 | Kiểm tra chức năng lấy 
+thông tin hàng đợi hiện tại khi là Member | - Tài 
+khoản đăng nhập: Member doctor<br>- Phương thức: 
+GET<br>- Không cần doctor_id vì member sẽ dùng ID 
+của chính mình | - Controller tự động sử dụng ID 
+của member doctor<br>- result chứa thông tin hàng 
+đợi của member doctor | Test được đánh dấu là 
+skipped vì controller hiện tại không trả về 
+response mà chỉ thực hiện query |
+| CTRL_QUEUE_NOW_GET_MISSING_ID_003 | Kiểm tra xử 
+lý khi thiếu doctor_id đối với admin | - Tài 
+khoản đăng nhập: Admin doctor<br>- Phương thức: 
+GET<br>- Không truyền doctor_id | - result = 
+0<br>- msg = "Missing doctor ID" | Test passed - 
+Controller trả về thông báo lỗi khi thiếu 
+doctor_id |
+| CTRL_QUEUE_NOW_NO_AUTH_004 | Kiểm tra xử lý khi 
+không có người dùng đăng nhập | - Không có 
+AuthUser<br>- Phương thức: GET | - Redirect đến 
+trang login | Test passed - Controller thực hiện 
+redirect khi không có người dùng đăng nhập |
+| CTRL_QUEUE_NOW_PROCESS_005 | Kiểm tra phương 
+thức process() với request GET | - Tài khoản đăng 
+nhập: Admin doctor<br>- Phương thức: GET<br>- 
+Parameter: doctor_id | - Method getQueue() được 
+gọi | Test được đánh dấu là skipped do không thể 
+mock cách PHPUnit mong muốn với setup hiện tại |
+| CTRL_QUEUE_NOW_PROCESS_005_ALT | Kiểm tra 
+phương thức process() với request GET - cách tiếp 
+cận thay thế | - Tài khoản đăng nhập: Admin 
+doctor<br>- Phương thức: GET<br>- Không truyền 
+doctor_id | - Method getQueue() được gọi<br>- 
+Response có thông báo "Missing doctor ID" | Test 
+passed - Controller gọi getQueue() và trả về 
+thông báo lỗi khi thiếu doctor_id |
+
+**Tổng kết bộ test case**:
+- Số lượng test case: 6
+- Test passed: 3
+- Test skipped: 3
+- Test failed: 0
+
+**Các vấn đề cần cải thiện**:
+1. Controller cần được cải thiện để trả về 
+response thay vì chỉ thực hiện query
+2. Cần cải thiện khả năng mock trong môi trường 
+test
+3. Cần thêm test case cho các trường hợp lỗi khác 
+như doctor_id không tồn tại
+
 
 **Tổng kết:**
 - Tổng số test case: 25
@@ -765,3 +845,25 @@ if (!$role_validation) {
 Quá trình kiểm thử đã phát hiện một số vấn đề quan trọng trong hệ thống, đặc biệt là các lỗi cú pháp SQL và vấn đề quyền truy cập. Các model cơ bản đã hoạt động đúng, nhưng cần cải thiện các controller để xử lý các trường hợp đặc biệt tốt hơn.
 
 Tỷ lệ pass 87.4% là một kết quả khả quan, nhưng vẫn cần tiếp tục cải thiện để đạt được độ tin cậy cao hơn cho hệ thống. Đề xuất tập trung vào việc sửa các lỗi trong AppointmentRecordsController và mở rộng kiểm thử cho các controller còn lại.
+
+### 3.29 AppointmentQueueNowController Test Cases
+
+| Test Case ID | Mục tiêu | Input | Expected Output | Kết quả |
+|--------------|----------|--------|-----------------|----------|
+| CTRL_QUEUE_NOW_GET_001 | Kiểm tra chức năng lấy thông tin hàng đợi hiện tại khi là Admin | - Tài khoản đăng nhập: Admin doctor<br>- Phương thức: GET<br>- Parameter: doctor_id | - Controller xử lý request đúng với phương thức getQueue()<br>- result chứa thông tin 3 cuộc hẹn đầu tiên trong hàng đợi | Test được đánh dấu là skipped vì controller hiện tại không trả về response mà chỉ thực hiện query |
+| CTRL_QUEUE_NOW_GET_002 | Kiểm tra chức năng lấy thông tin hàng đợi hiện tại khi là Member | - Tài khoản đăng nhập: Member doctor<br>- Phương thức: GET<br>- Không cần doctor_id vì member sẽ dùng ID của chính mình | - Controller tự động sử dụng ID của member doctor<br>- result chứa thông tin hàng đợi của member doctor | Test được đánh dấu là skipped vì controller hiện tại không trả về response mà chỉ thực hiện query |
+| CTRL_QUEUE_NOW_GET_MISSING_ID_003 | Kiểm tra xử lý khi thiếu doctor_id đối với admin | - Tài khoản đăng nhập: Admin doctor<br>- Phương thức: GET<br>- Không truyền doctor_id | - result = 0<br>- msg = "Missing doctor ID" | Test passed - Controller trả về thông báo lỗi khi thiếu doctor_id |
+| CTRL_QUEUE_NOW_NO_AUTH_004 | Kiểm tra xử lý khi không có người dùng đăng nhập | - Không có AuthUser<br>- Phương thức: GET | - Redirect đến trang login | Test passed - Controller thực hiện redirect khi không có người dùng đăng nhập |
+| CTRL_QUEUE_NOW_PROCESS_005 | Kiểm tra phương thức process() với request GET | - Tài khoản đăng nhập: Admin doctor<br>- Phương thức: GET<br>- Parameter: doctor_id | - Method getQueue() được gọi | Test được đánh dấu là skipped do không thể mock cách PHPUnit mong muốn với setup hiện tại |
+| CTRL_QUEUE_NOW_PROCESS_005_ALT | Kiểm tra phương thức process() với request GET - cách tiếp cận thay thế | - Tài khoản đăng nhập: Admin doctor<br>- Phương thức: GET<br>- Không truyền doctor_id | - Method getQueue() được gọi<br>- Response có thông báo "Missing doctor ID" | Test passed - Controller gọi getQueue() và trả về thông báo lỗi khi thiếu doctor_id |
+
+**Tổng kết bộ test case**:
+- Số lượng test case: 6
+- Test passed: 3
+- Test skipped: 3
+- Test failed: 0
+
+**Các vấn đề cần cải thiện**:
+1. Controller cần được cải thiện để trả về response thay vì chỉ thực hiện query
+2. Cần cải thiện khả năng mock trong môi trường test
+3. Cần thêm test case cho các trường hợp lỗi khác như doctor_id không tồn tại
