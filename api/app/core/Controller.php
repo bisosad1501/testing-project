@@ -5,6 +5,24 @@
 class Controller
 {   
     /**
+     * Enable test mode
+     * @var boolean
+     */
+    public static $testMode = false;
+
+    /**
+     * Custom model method for testing
+     * @var string|null
+     */
+    public static $modelMethod = null;
+
+    /**
+     * Model mocks for testing
+     * @var array
+     */
+    public static $modelMocks = [];
+    
+    /**
      * Assosiative array
      * Key: will be converted to variable for view
      * Value: value of the variable with name Key
@@ -37,6 +55,12 @@ class Controller
      */
     public static function model($name, $args=array())
     {
+          // Thêm đoạn code này để hỗ trợ testing
+        if (self::$testMode && self::$modelMethod) {
+            $method = self::$modelMethod;
+            return $method($name, $args);
+        }
+        
         if (is_array($name)) {
             if (count($name) != 2) {
                 throw new Exception('Invalid parameter');
@@ -117,18 +141,24 @@ class Controller
 
 
     /**
-     * Print json(or jsonp) string and exit;
-     * @return void 
-     */
-    protected function jsonecho($resp = null)
-    {
-        if (is_null($resp)) {
-            $resp = $this->resp;
-        }
-        
-        echo Input::get("callback") ? 
-                Input::get("callback")."(".json_encode($resp).")" : 
-                    json_encode($resp);
+ * Print json(or jsonp) string and exit;
+ * @return void 
+ */
+protected function jsonecho($resp = null)
+{
+    if (is_null($resp)) {
+        $resp = $this->resp;
+    }
+    
+    $output = Input::get("callback") ? 
+            Input::get("callback")."(".json_encode($resp).")" : 
+                json_encode($resp);
+    
+    echo $output;
+    
+    // Không gọi exit() trong môi trường test
+    if (!defined('PHPUNIT_TESTSUITE') || PHPUNIT_TESTSUITE !== true) {
         exit;
     }
+}
 }

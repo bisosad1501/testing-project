@@ -1,17 +1,14 @@
 ---
 description: 
 globs: 
-alwaysApply: true
 ---
 Quy tắc thực hiện unit test:
 Viết script unit test:
 Đảm bảo tất cả code có comment đầy đủ, rõ ràng để người đọc dễ hiểu
-Thêm comment cho từng test case và gắn với mã test case tương ứng (TC-xx)
+Thêm comment cho từng test case và gắn với mã test case tương ứng, đặt tên rõ ràng dễ phân biệt
 Sử dụng tên biến và tên hàm có ý nghĩa, dễ hiểu
 Triển khai kiểm tra rollback và kiểm tra DB khi cần thiết
 Báo cáo về quy trình test:
-Mục 2.1: Liệt kê đầy đủ công cụ và thư viện sử dụng (PHPUnit, phiên bản, và các thư viện hỗ trợ)
-Mục 2.2: Nêu rõ những function/class/file được test và lý do không test các thành phần khác(mục này sẽ được hoàn thiện sau khi test xong toàn bộ dự án)
 Mục 2.3: Lập bảng bộ test case với cấu trúc:
 Tên file/class
 Mã test case
@@ -19,7 +16,6 @@ Mục tiêu của test
 Input dữ liệu
 Expected output
 Ghi chú
-Mục 2.4: Cung cấp link GitHub của dự án(mục này tôi sẽ tự làm)
 Mục 2.5: Báo cáo kết quả chạy test kèm ảnh chụp minh chứng(thêm log khi chạy test xong là được)
 Mục 2.6: Báo cáo độ phủ code kèm ảnh chụp minh chứng(làm sau khi hoàn thành test toàn bộ dự án )
 Thứ tự thực hiện:

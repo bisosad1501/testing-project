@@ -1,0 +1,180 @@
+Table	Create Table
+np_options	CREATE TABLE `np_options` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `option_name` varchar(255) NOT NULL,
+ `option_value` text NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+np_plugins	CREATE TABLE `np_plugins` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(255) NOT NULL,
+ `version` varchar(50) NOT NULL,
+ `is_active` tinyint(1) NOT NULL DEFAULT '0',
+ `created_at` datetime DEFAULT NULL,
+ `updated_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+tn_appointments	CREATE TABLE `tn_appointments` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `booking_id` int(11) NOT NULL,
+ `doctor_id` int(11) DEFAULT NULL,
+ `patient_id` int(11) DEFAULT NULL,
+ `patient_name` varchar(50) DEFAULT NULL,
+ `patient_birthday` varchar(10) DEFAULT NULL,
+ `patient_reason` varchar(255) DEFAULT NULL,
+ `patient_phone` varchar(15) DEFAULT NULL,
+ `numerical_order` int(11) DEFAULT NULL,
+ `position` int(11) DEFAULT NULL,
+ `appointment_time` varchar(20) DEFAULT NULL,
+ `date` varchar(10) DEFAULT NULL,
+ `status` varchar(15) DEFAULT NULL,
+ `create_at` datetime DEFAULT NULL,
+ `update_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `doctor_id` (`doctor_id`),
+ KEY `patient_id` (`patient_id`),
+ CONSTRAINT `tn_appointments_ibfk_1` FOREIGN KEY (`doctor_id`) REFERENCES `tn_doctors` (`id`),
+ CONSTRAINT `tn_appointments_ibfk_2` FOREIGN KEY (`patient_id`) REFERENCES `tn_patients` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=360 DEFAULT CHARSET=utf8mb4
+tn_appointment_records	CREATE TABLE `tn_appointment_records` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `appointment_id` int(11) DEFAULT NULL,
+ `reason` varchar(100) DEFAULT NULL,
+ `description` text,
+ `status_before` varchar(255) DEFAULT NULL,
+ `status_after` varchar(255) DEFAULT NULL,
+ `create_at` datetime DEFAULT NULL,
+ `update_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `appointment_id` (`appointment_id`),
+ CONSTRAINT `tn_appointment_records_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `tn_appointments` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+tn_booking	CREATE TABLE `tn_booking` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `service_id` int(11) DEFAULT NULL,
+ `doctor_id` int(11) NOT NULL,
+ `patient_id` int(11) DEFAULT NULL,
+ `booking_name` varchar(50) DEFAULT NULL,
+ `booking_phone` varchar(15) DEFAULT NULL,
+ `name` varchar(50) DEFAULT NULL,
+ `gender` int(11) DEFAULT NULL,
+ `birthday` varchar(10) DEFAULT NULL,
+ `address` varchar(255) DEFAULT NULL,
+ `reason` varchar(255) DEFAULT NULL,
+ `appointment_date` varchar(10) DEFAULT NULL,
+ `appointment_time` varchar(5) NOT NULL,
+ `status` varchar(15) DEFAULT NULL,
+ `create_at` datetime DEFAULT NULL,
+ `update_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `patient_id` (`patient_id`),
+ KEY `service_id` (`service_id`),
+ CONSTRAINT `tn_booking_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `tn_patients` (`id`),
+ CONSTRAINT `tn_booking_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `tn_services` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4
+tn_booking_photo	CREATE TABLE `tn_booking_photo` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `url` varchar(255) DEFAULT NULL,
+ `booking_id` int(11) DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `booking_id` (`booking_id`),
+ CONSTRAINT `tn_booking_photo_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `tn_booking` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4
+tn_doctors	CREATE TABLE `tn_doctors` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `email` varchar(255) DEFAULT NULL,
+ `phone` varchar(15) DEFAULT NULL,
+ `password` varchar(255) DEFAULT NULL,
+ `name` varchar(50) DEFAULT NULL,
+ `description` text,
+ `price` int(11) DEFAULT NULL,
+ `role` varchar(10) DEFAULT NULL,
+ `active` int(11) DEFAULT NULL,
+ `avatar` varchar(255) DEFAULT NULL,
+ `create_at` datetime DEFAULT NULL,
+ `update_at` datetime DEFAULT NULL,
+ `speciality_id` int(11) DEFAULT NULL,
+ `room_id` int(11) DEFAULT NULL,
+ `recovery_token` varchar(255) DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `speciality_id` (`speciality_id`),
+ KEY `room_id` (`room_id`),
+ CONSTRAINT `tn_doctors_ibfk_1` FOREIGN KEY (`speciality_id`) REFERENCES `tn_specialities` (`id`),
+ CONSTRAINT `tn_doctors_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `tn_rooms` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4
+tn_doctor_and_service	CREATE TABLE `tn_doctor_and_service` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `service_id` int(11) DEFAULT NULL,
+ `doctor_id` int(11) DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `doctor_id` (`doctor_id`),
+ KEY `service_id` (`service_id`),
+ CONSTRAINT `tn_doctor_and_service_ibfk_1` FOREIGN KEY (`doctor_id`) REFERENCES `tn_doctors` (`id`),
+ CONSTRAINT `tn_doctor_and_service_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `tn_services` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4
+tn_drugs	CREATE TABLE `tn_drugs` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(255) DEFAULT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4
+tn_notifications	CREATE TABLE `tn_notifications` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `message` text,
+ `record_id` int(11) DEFAULT NULL,
+ `record_type` varchar(20) DEFAULT NULL,
+ `patient_id` int(11) DEFAULT NULL,
+ `is_read` int(11) DEFAULT NULL,
+ `create_at` datetime DEFAULT NULL,
+ `update_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `patient_id` (`patient_id`),
+ CONSTRAINT `tn_notifications_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `tn_patients` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8mb4
+tn_patients	CREATE TABLE `tn_patients` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `email` varchar(255) DEFAULT NULL,
+ `phone` varchar(15) DEFAULT NULL,
+ `password` varchar(255) DEFAULT NULL,
+ `name` varchar(50) DEFAULT NULL,
+ `gender` int(11) DEFAULT NULL,
+ `birthday` varchar(10) DEFAULT NULL,
+ `address` varchar(255) DEFAULT NULL,
+ `avatar` varchar(255) DEFAULT NULL,
+ `create_at` datetime DEFAULT NULL,
+ `update_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4
+tn_rooms	CREATE TABLE `tn_rooms` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(15) DEFAULT NULL,
+ `location` varchar(255) DEFAULT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4
+tn_services	CREATE TABLE `tn_services` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(255) DEFAULT NULL,
+ `image` varchar(255) NOT NULL,
+ `description` text NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4
+tn_specialities	CREATE TABLE `tn_specialities` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(30) DEFAULT NULL,
+ `description` text,
+ `image` varchar(255) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4
+tn_treatments	CREATE TABLE `tn_treatments` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `appointment_id` int(11) DEFAULT NULL,
+ `name` varchar(50) DEFAULT NULL,
+ `type` varchar(20) DEFAULT NULL,
+ `times` int(11) DEFAULT NULL,
+ `purpose` varchar(50) DEFAULT NULL,
+ `instruction` varchar(255) DEFAULT NULL,
+ `repeat_days` varchar(255) NOT NULL,
+ `repeat_time` varchar(255) NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `appointment_id` (`appointment_id`),
+ CONSTRAINT `tn_treatments_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `tn_appointments` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4

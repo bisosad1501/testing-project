@@ -4,10 +4,19 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
+         processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="API Test Suite">
-            <directory>./tests/</directory>
+        <testsuite name="Controllers">
+            <directory suffix="Test.php">./tests/controllers</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./controllers</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+    </php>
 </phpunit>
