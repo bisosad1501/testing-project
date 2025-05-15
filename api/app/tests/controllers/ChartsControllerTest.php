@@ -1,7 +1,7 @@
 <?php
 /**
  * Unit tests cho ChartsController
- * 
+ *
  * File: api/app/tests/controllers/ChartsControllerTest.php
  * Class: ChartsControllerTest
  */
@@ -22,28 +22,8 @@ if (!defined('PHPUNIT_TESTSUITE')) {
     define('PHPUNIT_TESTSUITE', true);
 }
 
-/**
- * Mock model cho AuthUser với phương thức get() có thể kiểm soát
- */
-class MockAuthUser
-{
-    private $data;
-    private $role;
-    
-    public function __construct($data, $role)
-    {
-        $this->data = $data;
-        $this->role = $role;
-    }
-    
-    public function get($key)
-    {
-        if ($key === 'role') {
-            return $this->role;
-        }
-        return isset($this->data[$key]) ? $this->data[$key] : null;
-    }
-}
+// Include MockAuthUser
+require_once __DIR__ . '/../mocks/MockAuthUser.php';
 
 class ChartsControllerTest extends ControllerTestCase
 {
@@ -51,26 +31,26 @@ class ChartsControllerTest extends ControllerTestCase
      * @var ChartsController Controller instance
      */
     protected $controller;
-    
+
     /**
      * @var array Test data for fixtures
      */
     protected $testData;
-    
+
     /**
      * Set up test environment before each test
      */
     protected function setUp()
     {
         parent::setUp();
-        
+
         // Create controller
         $this->controller = $this->createController('ChartsController');
-        
+
         // Reset các mock trước mỗi test
         InputMock::$methodMock = null;
         InputMock::$getMock = null;
-        
+
         // Set up test data
         $this->testData = [
             'doctors' => [
@@ -138,11 +118,11 @@ class ChartsControllerTest extends ControllerTestCase
                 ]
             ]
         ];
-        
+
         // Create fixtures for common test dependencies
         $this->createFixtures();
     }
-    
+
     /**
      * Create database fixtures for testing
      */
@@ -152,16 +132,16 @@ class ChartsControllerTest extends ControllerTestCase
             // Insert specialities
             $specialityId = $this->insertFixture(TABLE_PREFIX.TABLE_SPECIALITIES, [
                 'name' => 'Cardiology',
-                'image' => 'cardiology.jpg', 
+                'image' => 'cardiology.jpg',
                 'description' => 'Heart specialists'
             ]);
-            
+
             // Insert rooms
             $roomId = $this->insertFixture(TABLE_PREFIX.TABLE_ROOMS, [
                 'name' => 'Room 101',
                 'location' => 'First Floor'
             ]);
-            
+
             // Update references
             $this->testData['doctors']['admin']['speciality_id'] = $specialityId;
             $this->testData['doctors']['admin']['room_id'] = $roomId;
@@ -169,38 +149,38 @@ class ChartsControllerTest extends ControllerTestCase
             $this->testData['doctors']['supporter']['room_id'] = $roomId;
             $this->testData['doctors']['member']['speciality_id'] = $specialityId;
             $this->testData['doctors']['member']['room_id'] = $roomId;
-            
+
             // Insert doctors
             $adminDoctorId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['doctors']['admin']);
             $supporterDoctorId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['doctors']['supporter']);
             $memberDoctorId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['doctors']['member']);
-            
+
             // Update ID references
             $this->testData['doctors']['admin']['id'] = $adminDoctorId;
             $this->testData['doctors']['supporter']['id'] = $supporterDoctorId;
             $this->testData['doctors']['member']['id'] = $memberDoctorId;
-            
+
             // Insert patients
             $patientId = $this->insertFixture(TABLE_PREFIX.TABLE_PATIENTS, $this->testData['patients']['patient1']);
             $this->testData['patients']['patient1']['id'] = $patientId;
-            
+
             // Tạo booking cần thiết cho appointments
             $date = new \Moment\Moment("now", 'Asia/Ho_Chi_Minh');
-            
+
             // Create some bookings and appointments for today and past days
             $this->createAppointmentsForDate($date->format('Y-m-d'), 3, $patientId, $adminDoctorId);
-            
+
             // Create appointments for past 6 days (total 7 days including today)
             for ($i = 1; $i <= 6; $i++) {
                 $pastDate = $date->cloning()->subtractDays($i);
                 $this->createAppointmentsForDate($pastDate->format('Y-m-d'), $i % 3 + 1, $patientId, $adminDoctorId);
             }
-            
+
         } catch (Exception $e) {
             $this->fail("Failed to create test fixtures: " . $e->getMessage());
         }
     }
-    
+
     /**
      * Helper function to create appointments for a specific date
      */
@@ -209,7 +189,7 @@ class ChartsControllerTest extends ControllerTestCase
         for ($i = 0; $i < $count; $i++) {
             $isBooking = ($i % 2 == 0); // Every other appointment is a booking
             $time = $isBooking ? sprintf("%02d:00", 8 + $i) : ""; // Bookings have time, appointments don't
-            
+
             // First create a booking if it's a booking-type appointment
             $bookingId = 0;
             if ($isBooking) {
@@ -231,7 +211,7 @@ class ChartsControllerTest extends ControllerTestCase
                     'update_at' => date('Y-m-d H:i:s')
                 ]);
             }
-            
+
             // Then create the appointment
             $this->insertFixture(TABLE_PREFIX.TABLE_APPOINTMENTS, [
                 'booking_id' => $bookingId,
@@ -251,10 +231,10 @@ class ChartsControllerTest extends ControllerTestCase
             ]);
         }
     }
-    
+
     /**
      * Mock người dùng đã xác thực
-     * 
+     *
      * @param string $type User type (doctor or patient)
      * @param string $role Role for doctor (admin, supporter, member)
      */
@@ -268,7 +248,7 @@ class ChartsControllerTest extends ControllerTestCase
             $userData = $this->testData['patients']['patient1'];
             $authUser = new MockAuthUser($userData, 'patient');
         }
-        
+
         // Thiết lập trong biến variables của controller
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('variables');
@@ -277,7 +257,7 @@ class ChartsControllerTest extends ControllerTestCase
         $variables['AuthUser'] = $authUser;
         $property->setValue($this->controller, $variables);
     }
-    
+
     /**
      * Thiết lập các tham số request
      */
@@ -287,7 +267,7 @@ class ChartsControllerTest extends ControllerTestCase
         InputMock::$methodMock = function() use ($method) {
             return $method;
         };
-        
+
         // Set Input::get
         InputMock::$getMock = function($key) use ($requestType) {
             if ($key === 'request') {
@@ -296,7 +276,7 @@ class ChartsControllerTest extends ControllerTestCase
             return null;
         };
     }
-    
+
     /**
      * Lấy response từ controller sau khi process
      */
@@ -307,10 +287,10 @@ class ChartsControllerTest extends ControllerTestCase
         $property = $reflection->getProperty('resp');
         $property->setAccessible(true);
         $resp = $property->getValue($this->controller);
-        
+
         return (array)$resp;
     }
-    
+
     /**
      * Gọi controller với output capture
      */
@@ -318,20 +298,20 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Bắt đầu output buffering để bắt bất kỳ output nào
         ob_start();
-        
+
         try {
             $this->controller->process();
         } catch (Exception $e) {
             // Ghi log exception nếu cần
             // error_log("Exception in test: " . $e->getMessage());
         }
-        
+
         // Xóa buffer và lấy response từ controller
         ob_end_clean();
-        
+
         return $this->getControllerResponse();
     }
-    
+
     /**
      * CTRL_CHARTS_AUTH_001
      * Kiểm tra khi người dùng chưa đăng nhập
@@ -343,7 +323,7 @@ class ChartsControllerTest extends ControllerTestCase
           'This test cannot verify header redirects in PHPUnit CLI environment'
         );
     }
-    
+
     /**
      * CTRL_CHARTS_PERM_002
      * Kiểm tra quyền - patient không được phép truy cập
@@ -352,18 +332,18 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là patient
         $this->mockAuthUser('patient');
-        
+
         // Thiết lập request
         $this->setupInput('GET', 'appointmentsinlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when user is patient');
         $this->assertContains('permission', strtolower($response['msg']), 'Error message should indicate permission issue');
     }
-    
+
     /**
      * CTRL_CHARTS_PERM_003
      * Kiểm tra quyền - admin doctor được phép truy cập
@@ -372,18 +352,18 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là admin doctor
         $this->mockAuthUser('doctor', 'admin');
-        
+
         // Thiết lập request
         $this->setupInput('GET', 'appointmentsinlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when user is admin doctor');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
     }
-    
+
     /**
      * CTRL_CHARTS_PERM_004
      * Kiểm tra quyền - supporter doctor được phép truy cập
@@ -392,18 +372,18 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là supporter doctor
         $this->mockAuthUser('doctor', 'supporter');
-        
+
         // Thiết lập request
         $this->setupInput('GET', 'appointmentsinlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when user is supporter doctor');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
     }
-    
+
     /**
      * CTRL_CHARTS_PERM_005
      * Kiểm tra quyền - member doctor được phép truy cập
@@ -412,18 +392,18 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là member doctor
         $this->mockAuthUser('doctor', 'member');
-        
+
         // Thiết lập request
         $this->setupInput('GET', 'appointmentsinlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when user is member doctor');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
     }
-    
+
     /**
      * CTRL_CHARTS_REQ_006
      * Kiểm tra với phương thức không phải GET
@@ -432,18 +412,18 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là admin doctor
         $this->mockAuthUser('doctor', 'admin');
-        
+
         // Thiết lập request với method POST
         $this->setupInput('POST', 'appointmentsinlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error for non-GET requests');
         $this->assertContains('invalid', $response['msg'], 'Error message should indicate invalid request');
     }
-    
+
     /**
      * CTRL_CHARTS_REQ_007
      * Kiểm tra với request parameter không hợp lệ
@@ -452,18 +432,18 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là admin doctor
         $this->mockAuthUser('doctor', 'admin');
-        
+
         // Thiết lập request với parameter không hợp lệ
         $this->setupInput('GET', 'invalidrequest');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error for invalid request parameter');
         $this->assertContains('invalid', $response['msg'], 'Error message should indicate invalid request');
     }
-    
+
     /**
      * CTRL_CHARTS_DATA_008
      * Kiểm tra kết quả của phương thức appointmentsInLast7Days
@@ -472,25 +452,25 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là admin doctor
         $this->mockAuthUser('doctor', 'admin');
-        
+
         // Thiết lập request appointmentsinlast7days
         $this->setupInput('GET', 'appointmentsinlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
         $this->assertArrayHasKey('quantity', $response, 'Response should include quantity');
         $this->assertEquals(7, $response['quantity'], 'Should return data for 7 days');
-        
+
         // Kiểm tra cấu trúc dữ liệu trả về
         $this->assertCount(7, $response['data'], 'Should return 7 items in data array');
         $this->assertArrayHasKey('date', $response['data'][0], 'Each item should have date field');
         $this->assertArrayHasKey('appointment', $response['data'][0], 'Each item should have appointment field');
     }
-    
+
     /**
      * CTRL_CHARTS_DATA_009
      * Kiểm tra kết quả của phương thức appointmentsAndBookingInLast7days
@@ -499,26 +479,26 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là admin doctor
         $this->mockAuthUser('doctor', 'admin');
-        
+
         // Thiết lập request appointmentandbookinginlast7days
         $this->setupInput('GET', 'appointmentandbookinginlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
         $this->assertArrayHasKey('quantity', $response, 'Response should include quantity');
         $this->assertEquals(7, $response['quantity'], 'Should return data for 7 days');
-        
+
         // Kiểm tra cấu trúc dữ liệu trả về
         $this->assertCount(7, $response['data'], 'Should return 7 items in data array');
         $this->assertArrayHasKey('date', $response['data'][0], 'Each item should have date field');
         $this->assertArrayHasKey('appointment', $response['data'][0], 'Each item should have appointment field');
         $this->assertArrayHasKey('booking', $response['data'][0], 'Each item should have booking field');
     }
-    
+
     /**
      * CTRL_CHARTS_DATA_010
      * Kiểm tra logic quantityBookingInDate
@@ -527,16 +507,16 @@ class ChartsControllerTest extends ControllerTestCase
     {
         // Auth user là admin doctor
         $this->mockAuthUser('doctor', 'admin');
-        
+
         // Thiết lập request appointmentandbookinginlast7days
         $this->setupInput('GET', 'appointmentandbookinginlast7days');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success');
-        
+
         // Kiểm tra tổng số lượng booking cho mỗi ngày
         foreach ($response['data'] as $data) {
             $this->assertGreaterThanOrEqual(0, $data['booking'], 'Booking count should be >= 0');

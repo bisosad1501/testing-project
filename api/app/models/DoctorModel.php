@@ -1,14 +1,14 @@
-<?php 
+<?php
 	/**
 	 * User Model
 	 *
 	 * @version 1.0
-	 * @author Onelab <hello@onelab.co> 
-	 * 
+	 * @author Onelab <hello@onelab.co>
+	 *
 	 */
-	
+
 	class DoctorModel extends DataEntry
-	{	
+	{
 		/**
 		 * Extend parents constructor and select entry
 		 * @param mixed $uniqid Value of the unique identifier
@@ -16,7 +16,18 @@
 	    public function __construct($uniqid=0)
 	    {
 	        parent::__construct();
-	        $this->select($uniqid);
+
+	        // Xác định kiểu dữ liệu của $uniqid để chọn trường phù hợp
+	        if (is_int($uniqid) || ctype_digit($uniqid)) {
+	            $this->select($uniqid, "id");
+	        } else if (filter_var($uniqid, FILTER_VALIDATE_EMAIL)) {
+	            $this->select($uniqid, "email");
+	        } else if (is_string($uniqid) && !empty($uniqid)) {
+	            $this->select($uniqid, "phone");
+	        } else {
+	            // Giá trị mặc định hoặc không hợp lệ
+	            $this->select($uniqid);
+	        }
 	    }
 
 
@@ -24,25 +35,42 @@
 	    /**
 	     * Select entry with uniqid
 	     * @param  int|string $uniqid Value of the any unique field
-	     * @return self       
+	     * @return self
 	     */
-	    public function select($uniqid)
+	    public function select($uniqid, $field = null)
 	    {
-	    	if (is_int($uniqid) || ctype_digit($uniqid)) {
-	    		$col = $uniqid > 0 ? "id" : null;
-	    	} else if (filter_var($uniqid, FILTER_VALIDATE_EMAIL)) {
-	    		$col = "email";
+	    	// Nếu trường được chỉ định rõ ràng, sử dụng nó
+	    	if ($field) {
+	    		$col = $field;
+	    	} else {
+	    		// Tự động xác định trường dựa trên giá trị
+		    	if (is_int($uniqid) || ctype_digit($uniqid)) {
+		    		$col = $uniqid > 0 ? "id" : null;
+		    	} else if (filter_var($uniqid, FILTER_VALIDATE_EMAIL)) {
+		    		$col = "email";
+		    	} else {
+		    		$col = "phone";
+		    	}
 	    	}
-			else 
-			{
-				$col = "phone";
-			}
 
 	    	if ($col) {
 		    	$query = DB::table(TABLE_PREFIX.TABLE_DOCTORS)
 			    	      ->where($col, "=", $uniqid)
 			    	      ->limit(1)
 			    	      ->select("*");
+
+			    // Nếu không tìm thấy và col là phone, thử tìm kiếm với các định dạng số điện thoại khác nhau
+			    if ($query->count() == 0 && $col == "phone" && is_string($uniqid)) {
+			    	// Thử tìm kiếm với số điện thoại đã được chuẩn hóa (chỉ chứa số)
+			    	$normalized_phone = preg_replace('/[^0-9]/', '', $uniqid);
+			    	if ($normalized_phone) {
+			    		$query = DB::table(TABLE_PREFIX.TABLE_DOCTORS)
+				    	      ->where($col, "=", $normalized_phone)
+				    	      ->limit(1)
+				    	      ->select("*");
+			    	}
+			    }
+
 		    	if ($query->count() == 1) {
 		    		$resp = $query->get();
 		    		$r = $resp[0];
@@ -176,11 +204,11 @@
 
 	    /**
 	     * Check if account has administrative privilages
-	     * @return boolean 
+	     * @return boolean
 	     */
 	    public function isAdmin()
 	    {
-	    	if ($this->isAvailable() && 
+	    	if ($this->isAvailable() &&
 				in_array($this->get("role"), array("developer", "admin"))) {
 	    		return true;
 	    	}
@@ -191,25 +219,25 @@
 
 	    /**
 	     * Checks if this user can edit another user's data
-	     * 
+	     *
 	     * @param  UserModel $User Another user
-	     * @return boolean          
+	     * @return boolean
 	     */
 	    public function canEdit(UserModel $User)
-	    {	
+	    {
 	    	if ($this->isAvailable()) {
 	    		if ($this->get("role") == "developer" || $this->get("id") == $User->get("id")) {
     				return true;
-    			}	
+    			}
 
     			if (
-    				$this->get("role") == "admin" && 
+    				$this->get("role") == "admin" &&
     				(
 	    				in_array($User->get("role"), array("member", "admin")) ||
 	    				!$User->isAvailable() // New User
     				)
     			) {
-    				return true;    				
+    				return true;
     			}
 	    	}
 
@@ -237,7 +265,7 @@
 
 	    /**
 	     * get date-time format preference
-	     * @return null|string 
+	     * @return null|string
 	     */
 	    public function getDateTimeFormat()
 	    {
@@ -246,6 +274,12 @@
 	    	}
 
 	    	$date_format = $this->get("preferences.dateformat");
+
+	    	// Nếu không có cột data hoặc preferences.dateformat không tồn tại
+	    	if ($date_format === null) {
+	    		return null;
+	    	}
+
 	    	$time_format = $this->get("preferences.timeformat") == "24"
 	    	             ? "H:i" : "h:i A";
 	    	return $date_format . " " . $time_format;
@@ -254,7 +288,7 @@
 
 	    /**
 	     * Check if user's (primary) email is verified or not
-	     * @return boolean 
+	     * @return boolean
 	     */
 	    public function isEmailVerified()
 	    {
@@ -262,7 +296,16 @@
 	    		return false;
 	    	}
 
-	    	if ($this->get("data.email_verification_hash")) {
+	    	// Kiểm tra xem data.email_verification_hash có tồn tại không
+	    	$hash = $this->get("data.email_verification_hash");
+
+	    	// Nếu không có cột data hoặc data.email_verification_hash không tồn tại
+	    	if ($hash === null) {
+	    		return false;
+	    	}
+
+	    	// Nếu có hash, email chưa được xác minh
+	    	if ($hash) {
 	    		return false;
 	    	}
 
@@ -273,7 +316,7 @@
 	    /**
 	     * Send verification email to the user
 	     * @param  boolean $force_new Create a new hash if it's true
-	     * @return [bool]                  
+	     * @return [bool]
 	     */
 	    public function sendVerificationEmail($force_new = false)
 	    {
@@ -290,7 +333,7 @@
 
 	    	// Get site settings
 	    	$site_settings = \Controller::model("GeneralData", "settings");
-	    	
+
 
 	    	// Send mail
 	    	$mail = new \Email;

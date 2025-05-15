@@ -20,7 +20,7 @@
                 exit;
             }
 
-            
+
 
             $request_method = Input::method();
             if($request_method === 'GET')
@@ -36,6 +36,18 @@
                 }
                 $this->upload();
             }
+        }
+
+        /**
+         * @since 08-12-2022
+         * Phương thức tạm thời để tránh lỗi Fatal Error khi chạy test
+         * Cần được triển khai đúng trong phiên bản sản phẩm
+         */
+        private function upload()
+        {
+            $this->resp->result = 0;
+            $this->resp->msg = "Upload method not implemented yet";
+            $this->jsonecho();
         }
 
         /**
@@ -56,7 +68,7 @@
             }
 
 
-        
+
             $bookingId = $Route->params->id;
             $Booking = Controller::model("Booking", $bookingId);
             if( !$Booking->isAvailable())
@@ -74,7 +86,7 @@
 
             $Service = Controller::model("Service", $Booking->get("service_id"));
 
-            try 
+            try
             {
                 $query = DB::table(TABLE_PREFIX.TABLE_BOOKING_PHOTOS)
                 ->where(TABLE_PREFIX.TABLE_BOOKING_PHOTOS.".booking_id", "=", $bookingId)
@@ -112,11 +124,11 @@
                     "service" => array(
                         "id"=> (int)$Service->get("id"),
                         "name"=>$Service->get("name")
-                    )    
+                    )
                 );
                 $this->resp->data = $data;
-            } 
-            catch (\Exception $ex) 
+            }
+            catch (\Exception $ex)
             {
                 $this->resp->msg = $ex->getMessage();
             }

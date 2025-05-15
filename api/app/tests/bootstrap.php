@@ -27,7 +27,7 @@ if (!defined('APPURL')) define('APPURL', 'http://localhost/api');
     if (!defined('TABLE_PATIENTS')) define('TABLE_PATIENTS', 'patients');
     if (!defined('TABLE_APPOINTMENTS')) define('TABLE_APPOINTMENTS', 'appointments');
     if (!defined('TABLE_SPECIALITIES')) define('TABLE_SPECIALITIES', 'specialities');
-    if (!defined('TABLE_ROOMS')) define('TABLE_ROOMS', 'rooms'); 
+    if (!defined('TABLE_ROOMS')) define('TABLE_ROOMS', 'rooms');
     if (!defined('TABLE_NOTIFICATIONS')) define('TABLE_NOTIFICATIONS', 'notifications');
     if (!defined('TABLE_SERVICES')) define('TABLE_SERVICES', 'services');
     if (!defined('TABLE_DOCTOR_AND_SERVICE')) define('TABLE_DOCTOR_AND_SERVICE', 'doctor_and_service');
@@ -81,6 +81,7 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 $_SERVER['REQUEST_METHOD'] = 'GET';
 
 // 10. Thêm các hàm phụ trợ cho việc test
+require_once __DIR__ . '/helper.php';
 function isVietnameseName($name)
 {
     // Thực hiện kiểm tra tên tiếng Việt
@@ -116,7 +117,7 @@ class InputMock
     public static $patchMock;
     public static $getMock;
     public static $postMock;
-    
+
     public static function method()
     {
         if (isset(self::$methodMock)) {
@@ -125,7 +126,7 @@ class InputMock
         }
         return $_SERVER['REQUEST_METHOD'];
     }
-    
+
     public static function get($key = null)
     {
         if (isset(self::$getMock)) {
@@ -134,7 +135,7 @@ class InputMock
         }
         return isset($_GET[$key]) ? $_GET[$key] : null;
     }
-    
+
     public static function post($key = null)
     {
         if (isset(self::$postMock)) {
@@ -143,7 +144,7 @@ class InputMock
         }
         return isset($_POST[$key]) ? $_POST[$key] : null;
     }
-    
+
     public static function put($key = null)
     {
         if (isset(self::$putMock)) {
@@ -153,7 +154,7 @@ class InputMock
         global $_PUT;
         return isset($_PUT[$key]) ? $_PUT[$key] : null;
     }
-    
+
     public static function patch($key = null)
     {
         if (isset(self::$patchMock)) {
@@ -168,7 +169,9 @@ class InputMock
 }
 
 // 12. Đăng ký class Input mock để sử dụng trong test
-class_alias('InputMock', 'Input');
+if (!class_exists('Input')) {
+    class_alias('InputMock', 'Input');
+}
 
 // 13. Thay thế Controller::model để trả về các model thực
 Controller::$testMode = true;
@@ -176,6 +179,11 @@ Controller::$modelMocks = [];
 
 // Override static method model
 function mockControllerModel($modelName, $id = null) {
+    // Xử lý trường hợp đặc biệt cho GeneralData
+    if ($modelName === 'GeneralData') {
+        return new GeneralData();
+    }
+
     $className = $modelName . 'Model';
     return new $className($id);
 }

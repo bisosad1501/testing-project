@@ -1,10 +1,10 @@
 <?php
 /**
  * Unit tests cho DoctorController
- * 
+ *
  * Class: DoctorControllerTest
  * File: api/app/tests/controllers/DoctorControllerTest.php
- * 
+ *
  */
 require_once __DIR__ . '/../ControllerTestCase.php';
 
@@ -53,28 +53,8 @@ if (!defined('UPLOAD_PATH')) {
     define('UPLOAD_PATH', __DIR__ . '/../../../assets/uploads');
 }
 
-/**
- * Mock model cho AuthUser với phương thức get() có thể kiểm soát
- */
-class MockAuthUser
-{
-    private $data;
-    private $role;
-    
-    public function __construct($data, $role)
-    {
-        $this->data = $data;
-        $this->role = $role;
-    }
-    
-    public function get($key)
-    {
-        if ($key === 'role') {
-            return $this->role;
-        }
-        return isset($this->data[$key]) ? $this->data[$key] : null;
-    }
-}
+// Include MockAuthUser
+require_once __DIR__ . '/../mocks/MockAuthUser.php';
 
 class DoctorControllerTest extends ControllerTestCase
 {
@@ -82,19 +62,19 @@ class DoctorControllerTest extends ControllerTestCase
      * @var DoctorController Controller instance
      */
     protected $controller;
-    
+
     /**
      * @var array Test data for fixtures
      */
     protected $testData;
-    
+
     /**
      * Set up test environment before each test
      */
     protected function setUp()
     {
         parent::setUp();
-        
+
         // Xóa dữ liệu cũ để tránh xung đột khóa chính
         try {
             DB::table(TABLE_PREFIX.TABLE_APPOINTMENTS)->delete();
@@ -105,10 +85,10 @@ class DoctorControllerTest extends ControllerTestCase
         } catch (Exception $e) {
             // Ignore errors if tables don't exist
         }
-        
+
         // Khởi tạo controller
         $this->controller = $this->createController('DoctorController');
-        
+
         // Khởi tạo test data
         $this->testData = [
             'users' => [
@@ -213,11 +193,11 @@ class DoctorControllerTest extends ControllerTestCase
                 ]
             ]
         ];
-        
+
         // Tạo dữ liệu mẫu
         $this->createFixtures();
     }
-    
+
     /**
      * Tạo dữ liệu mẫu cho các test
      */
@@ -230,32 +210,32 @@ class DoctorControllerTest extends ControllerTestCase
                 'description' => $this->testData['specialities']['speciality1']['description'],
                 'image' => $this->testData['specialities']['speciality1']['image']
             ]);
-            
+
             $speciality2Id = $this->insertFixture(TABLE_PREFIX.TABLE_SPECIALITIES, [
                 'name' => $this->testData['specialities']['speciality2']['name'],
                 'description' => $this->testData['specialities']['speciality2']['description'],
                 'image' => $this->testData['specialities']['speciality2']['image']
             ]);
-            
+
             // Cập nhật ID trong test data
             $this->testData['specialities']['speciality1']['id'] = $speciality1Id;
             $this->testData['specialities']['speciality2']['id'] = $speciality2Id;
-            
+
             // Tạo room
             $room1Id = $this->insertFixture(TABLE_PREFIX.TABLE_ROOMS, [
                 'name' => $this->testData['rooms']['room1']['name'],
                 'location' => $this->testData['rooms']['room1']['location']
             ]);
-            
+
             $room2Id = $this->insertFixture(TABLE_PREFIX.TABLE_ROOMS, [
                 'name' => $this->testData['rooms']['room2']['name'],
                 'location' => $this->testData['rooms']['room2']['location']
             ]);
-            
+
             // Cập nhật ID trong test data
             $this->testData['rooms']['room1']['id'] = $room1Id;
             $this->testData['rooms']['room2']['id'] = $room2Id;
-            
+
             // Cập nhật speciality_id và room_id trong users
             $this->testData['users']['admin']['speciality_id'] = $speciality1Id;
             $this->testData['users']['admin']['room_id'] = $room1Id;
@@ -265,26 +245,26 @@ class DoctorControllerTest extends ControllerTestCase
             $this->testData['users']['supporter']['room_id'] = $room2Id;
             $this->testData['users']['inactive']['speciality_id'] = $speciality2Id;
             $this->testData['users']['inactive']['room_id'] = $room2Id;
-            
+
             // Tạo doctors
             $adminId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['users']['admin']);
             $memberId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['users']['member']);
             $supporterId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['users']['supporter']);
             $inactiveId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['users']['inactive']);
-            
+
             // Cập nhật ID trong test data
             $this->testData['users']['admin']['id'] = $adminId;
             $this->testData['users']['member']['id'] = $memberId;
             $this->testData['users']['supporter']['id'] = $supporterId;
             $this->testData['users']['inactive']['id'] = $inactiveId;
-            
+
             // Tạo patient
             $patientId = $this->insertFixture(TABLE_PREFIX.TABLE_PATIENTS, $this->testData['patients']['patient1']);
             $this->testData['patients']['patient1']['id'] = $patientId;
-            
+
             // Tạo một số appointments cho doctor
             $date = date('Y-m-d');
-            
+
             // Appointment cho doctor member
             $appointmentId = $this->insertFixture(TABLE_PREFIX.TABLE_APPOINTMENTS, [
                 'booking_id' => 0,
@@ -302,15 +282,15 @@ class DoctorControllerTest extends ControllerTestCase
                 'create_at' => date('Y-m-d H:i:s'),
                 'update_at' => date('Y-m-d H:i:s')
             ]);
-            
+
         } catch (Exception $e) {
             $this->fail("Failed to create test fixtures: " . $e->getMessage());
         }
     }
-    
+
     /**
      * Thiết lập mock cho AuthUser
-     * 
+     *
      * @param string $role Role của người dùng (admin, member, supporter)
      */
     protected function mockAuthUser($role = 'admin')
@@ -318,7 +298,7 @@ class DoctorControllerTest extends ControllerTestCase
         // Tạo auth user
         $userData = $this->testData['users'][$role];
         $authUser = new MockAuthUser($userData, $role);
-        
+
         // Thiết lập biến AuthUser trong controller
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('variables');
@@ -326,13 +306,13 @@ class DoctorControllerTest extends ControllerTestCase
         $variables = $property->getValue($this->controller);
         $variables['AuthUser'] = $authUser;
         $property->setValue($this->controller, $variables);
-        
+
         return $authUser;
     }
-    
+
     /**
      * Thiết lập tham số Route cho controller
-     * 
+     *
      * @param array $params Các tham số route
      */
     protected function mockRoute($params = [])
@@ -340,7 +320,7 @@ class DoctorControllerTest extends ControllerTestCase
         // Tạo đối tượng Route
         $route = new stdClass();
         $route->params = (object)$params;
-        
+
         // Thiết lập biến Route trong controller
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('variables');
@@ -349,10 +329,10 @@ class DoctorControllerTest extends ControllerTestCase
         $variables['Route'] = $route;
         $property->setValue($this->controller, $variables);
     }
-    
+
     /**
      * Thiết lập Input method và các tham số
-     * 
+     *
      * @param string $method HTTP method (GET, POST, PUT, DELETE)
      * @param array $data Dữ liệu đầu vào
      */
@@ -362,13 +342,13 @@ class DoctorControllerTest extends ControllerTestCase
         InputMock::$methodMock = function() use ($method) {
             return $method;
         };
-        
+
         // Mock Input::get() và các method khác dựa vào $method
         // Reset các mock function trước
         InputMock::$getMock = null;
         InputMock::$postMock = null;
         InputMock::$putMock = null;
-        
+
         // Set mocks dựa trên method
         switch ($method) {
             case 'GET':
@@ -394,7 +374,7 @@ class DoctorControllerTest extends ControllerTestCase
                 break;
         }
     }
-    
+
     /**
      * Gọi controller và bắt response
      */
@@ -402,26 +382,26 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Bắt đầu output buffering để bắt bất kỳ output nào
         ob_start();
-        
+
         try {
             $this->controller->process();
         } catch (Exception $e) {
             // Ghi log exception nếu cần
             // error_log("Exception in test: " . $e->getMessage());
         }
-        
+
         // Xóa buffer và lấy response từ controller
         ob_end_clean();
-        
+
         // Lấy response từ controller
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('resp');
         $property->setAccessible(true);
         $resp = $property->getValue($this->controller);
-        
+
         return (array)$resp;
     }
-    
+
     /**
      * CTRL_DOCTOR_AUTH_001
      * Kiểm tra khi người dùng chưa đăng nhập
@@ -433,7 +413,7 @@ class DoctorControllerTest extends ControllerTestCase
           'This test cannot verify header redirects in PHPUnit CLI environment'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_GET_002
      * Kiểm tra getById - Trường hợp thiếu ID
@@ -442,25 +422,25 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Không thiết lập ID trong route
         $this->mockRoute();
-        
+
         // Thiết lập HTTP method
         $this->mockInput('GET');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when ID is missing');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'id is required') !== false || 
+            strpos(strtolower($response['msg']), 'id is required') !== false ||
             strpos(strtolower($response['msg']), 'undefined property') !== false,
             'Error message should indicate ID issue'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_GET_003
      * Kiểm tra getById - Trường hợp ID không tồn tại
@@ -469,25 +449,25 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID không tồn tại
         $this->mockRoute(['id' => 9999]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('GET');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when doctor does not exist');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'not available') !== false || 
+            strpos(strtolower($response['msg']), 'not available') !== false ||
             strpos(strtolower($response['msg']), 'undefined offset: 0') !== false,
             'Error message should indicate doctor is not available or an error occurred'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_GET_004
      * Kiểm tra getById - Trường hợp thành công với user admin
@@ -496,32 +476,32 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('GET');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when getting doctor by ID');
         $this->assertContains('successfully', strtolower($response['msg']), 'Success message should be returned');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
-        
+
         // Kiểm tra dữ liệu trả về
         $this->assertEquals($this->testData['users']['member']['id'], $response['data']['id'], 'Returned ID should match');
         $this->assertEquals($this->testData['users']['member']['email'], $response['data']['email'], 'Returned email should match');
         $this->assertEquals($this->testData['users']['member']['phone'], $response['data']['phone'], 'Returned phone should match');
         $this->assertEquals($this->testData['users']['member']['name'], $response['data']['name'], 'Returned name should match');
-        
+
         // Kiểm tra thông tin speciality và room
         $this->assertArrayHasKey('speciality', $response['data'], 'Response should include speciality data');
         $this->assertArrayHasKey('room', $response['data'], 'Response should include room data');
     }
-    
+
     /**
      * CTRL_DOCTOR_GET_005
      * Kiểm tra getById - Trường hợp thành công với user không phải admin
@@ -530,22 +510,22 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user member
         $this->mockAuthUser('member');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['admin']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('GET');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response - theo code hiện tại, không phải admin vẫn có thể xem thông tin
         $this->assertEquals(1, $response['result'], 'Result should be success when getting doctor by ID even for non-admin users');
         $this->assertContains('successfully', strtolower($response['msg']), 'Success message should be returned');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_006
      * Kiểm tra update - Trường hợp người dùng không phải admin
@@ -556,14 +536,14 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly enforce admin permission'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user không phải admin
         $this->mockAuthUser('member');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -571,16 +551,16 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when user is not admin');
         $this->assertContains('admin', strtolower($response['msg']), 'Error message should indicate admin permission required');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_007
      * Kiểm tra update - Trường hợp thiếu ID
@@ -589,10 +569,10 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Không thiết lập ID trong route
         $this->mockRoute();
-        
+
         // Thiết lập HTTP method và dữ liệu PUT
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -600,15 +580,15 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when ID is missing');
         $this->assertContains('id is required', strtolower($response['msg']), 'Error message should indicate ID is required');
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_008
      * Kiểm tra update - Trường hợp doctor không tồn tại
@@ -619,14 +599,14 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly check doctor existence'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID không tồn tại
         $this->mockRoute(['id' => 9999]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -634,20 +614,20 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when doctor does not exist');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'not available') !== false || 
+            strpos(strtolower($response['msg']), 'not available') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate doctor does not exist or SQL error'
         );
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_009
      * Kiểm tra update - Trường hợp thiếu dữ liệu bắt buộc
@@ -658,30 +638,30 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly validate required fields'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT thiếu trường name
         $this->mockInput('PUT', [
             'phone' => '0987654321',
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when required fields are missing');
         $this->assertContains('missing field', strtolower($response['msg']), 'Error message should indicate missing field');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_010
      * Kiểm tra update - Trường hợp tên không hợp lệ
@@ -692,14 +672,14 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly validate name format'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với tên không hợp lệ
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -707,21 +687,21 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when name is invalid');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'name only has letters') !== false || 
+            strpos(strtolower($response['msg']), 'name only has letters') !== false ||
             strpos(strtolower($response['msg']), 'vietnamese name') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate name format is incorrect or SQL error'
         );
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_011
      * Kiểm tra update - Trường hợp số điện thoại không hợp lệ (quá ngắn)
@@ -732,14 +712,14 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly validate phone length'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với số điện thoại quá ngắn
         $this->mockInput('PUT', [
             'phone' => '12345',
@@ -747,16 +727,16 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when phone is too short');
         $this->assertContains('at least 10 number', strtolower($response['msg']), 'Error message should indicate phone length is incorrect');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_012
      * Kiểm tra update - Trường hợp số điện thoại không hợp lệ (không phải số)
@@ -767,14 +747,14 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly validate phone format'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với số điện thoại không hợp lệ
         $this->mockInput('PUT', [
             'phone' => '098765432a',
@@ -782,20 +762,20 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when phone format is invalid');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'valid phone number') !== false || 
+            strpos(strtolower($response['msg']), 'valid phone number') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate phone format is incorrect or SQL error'
         );
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_013
      * Kiểm tra update - Trường hợp giá không hợp lệ (không phải số)
@@ -804,10 +784,10 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với giá không hợp lệ
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -816,19 +796,19 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when price format is invalid');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'valid price') !== false || 
+            strpos(strtolower($response['msg']), 'valid price') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate price format is incorrect or SQL error'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_014
      * Kiểm tra update - Trường hợp giá quá thấp
@@ -839,14 +819,14 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly validate price minimum'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với giá quá thấp
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -855,20 +835,20 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'member',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when price is too low');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'price must greater than 100.000') !== false || 
+            strpos(strtolower($response['msg']), 'price must greater than 100.000') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate price is too low or SQL error'
         );
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_015
      * Kiểm tra update - Trường hợp vai trò không hợp lệ
@@ -877,10 +857,10 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với vai trò không hợp lệ
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -888,19 +868,19 @@ class DoctorControllerTest extends ControllerTestCase
             'role' => 'invalid_role',
             'active' => 1
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when role is invalid');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'role is not valid') !== false || 
+            strpos(strtolower($response['msg']), 'role is not valid') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate role is invalid or SQL error'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_016
      * Kiểm tra update - Trường hợp chuyên khoa không tồn tại
@@ -909,10 +889,10 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với chuyên khoa không tồn tại
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -921,19 +901,19 @@ class DoctorControllerTest extends ControllerTestCase
             'active' => 1,
             'speciality_id' => 9999
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when speciality does not exist');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'speciality is not available') !== false || 
+            strpos(strtolower($response['msg']), 'speciality is not available') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate speciality does not exist or SQL error'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_017
      * Kiểm tra update - Trường hợp phòng không tồn tại
@@ -942,10 +922,10 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT với phòng không tồn tại
         $this->mockInput('PUT', [
             'phone' => '0987654321',
@@ -954,19 +934,19 @@ class DoctorControllerTest extends ControllerTestCase
             'active' => 1,
             'room_id' => 9999
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when room does not exist');
         $this->assertTrue(
-            strpos(strtolower($response['msg']), 'room is not available') !== false || 
+            strpos(strtolower($response['msg']), 'room is not available') !== false ||
             strpos(strtolower($response['msg']), 'sqlstate') !== false,
             'Error message should indicate room does not exist or SQL error'
         );
     }
-    
+
     /**
      * CTRL_DOCTOR_UPD_018
      * Kiểm tra update - Trường hợp thành công
@@ -975,10 +955,10 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method và dữ liệu PUT hợp lệ
         $newPhone = '0987654321';
         $newName = 'Updated Doctor Name';
@@ -988,7 +968,7 @@ class DoctorControllerTest extends ControllerTestCase
         $newActive = 1;
         $newSpecialityId = $this->testData['specialities']['speciality2']['id'];
         $newRoomId = $this->testData['rooms']['room2']['id'];
-        
+
         $this->mockInput('PUT', [
             'phone' => $newPhone,
             'name' => $newName,
@@ -999,15 +979,15 @@ class DoctorControllerTest extends ControllerTestCase
             'speciality_id' => $newSpecialityId,
             'room_id' => $newRoomId
         ]);
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when updating doctor');
         $this->assertContains('updated successfully', strtolower($response['msg']), 'Success message should be returned');
         $this->assertArrayHasKey('data', $response, 'Response should include data array');
-        
+
         // Kiểm tra dữ liệu trả về
         $this->assertEquals($this->testData['users']['member']['id'], $response['data']['id'], 'Returned ID should match');
         $this->assertEquals($newPhone, $response['data']['phone'], 'Returned phone should be updated');
@@ -1018,7 +998,7 @@ class DoctorControllerTest extends ControllerTestCase
         $this->assertEquals($newActive, $response['data']['active'], 'Returned active should be updated');
         $this->assertEquals($newSpecialityId, $response['data']['speciality_id'], 'Returned speciality_id should be updated');
         $this->assertEquals($newRoomId, $response['data']['room_id'], 'Returned room_id should be updated');
-        
+
         // Kiểm tra dữ liệu đã cập nhật trong database
         $query = DB::table(TABLE_PREFIX.TABLE_DOCTORS)
                    ->where('id', '=', $this->testData['users']['member']['id'])
@@ -1026,7 +1006,7 @@ class DoctorControllerTest extends ControllerTestCase
         $this->assertEquals($newPhone, $query->phone, 'Phone should be updated in database');
         $this->assertEquals($newName, $query->name, 'Name should be updated in database');
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_019
      * Kiểm tra delete - Trường hợp người dùng không phải admin
@@ -1037,26 +1017,26 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly enforce admin permission'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user không phải admin
         $this->mockAuthUser('member');
-        
+
         // Thiết lập route với ID hợp lệ
         $this->mockRoute(['id' => $this->testData['users']['supporter']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when user is not admin');
         $this->assertContains('admin', strtolower($response['msg']), 'Error message should indicate admin permission required');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_020
      * Kiểm tra delete - Trường hợp thiếu ID
@@ -1065,21 +1045,21 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Không thiết lập ID trong route
         $this->mockRoute();
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when ID is missing');
         $this->assertContains('id is required', strtolower($response['msg']), 'Error message should indicate ID is required');
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_021
      * Kiểm tra delete - Trường hợp cố gắng xóa chính mình (tài khoản đang đăng nhập)
@@ -1090,26 +1070,26 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly prevent self-deletion'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID của admin (chính mình)
         $this->mockRoute(['id' => $this->testData['users']['admin']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when trying to delete self');
         $this->assertContains('can not deactivate yourself', strtolower($response['msg']), 'Error message should indicate cannot delete self');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_022
      * Kiểm tra delete - Trường hợp doctor không tồn tại
@@ -1120,26 +1100,26 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly check doctor existence'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID không tồn tại
         $this->mockRoute(['id' => 9999]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when doctor does not exist');
         $this->assertContains('not available', strtolower($response['msg']), 'Error message should indicate doctor is not available');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_023
      * Kiểm tra delete - Trường hợp doctor đã bị hủy kích hoạt
@@ -1150,26 +1130,26 @@ class DoctorControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Skipping test since controller does not properly check doctor active status'
         );
-        
+
         /* Phần code dưới đây giữ lại nhưng sẽ không chạy do markTestSkipped
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID của doctor đã bị hủy kích hoạt
         $this->mockRoute(['id' => $this->testData['users']['inactive']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(0, $response['result'], 'Result should be error when doctor is already inactive');
         $this->assertContains('was deactivated', strtolower($response['msg']), 'Error message should indicate doctor is already deactivated');
         */
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_024
      * Kiểm tra delete - Trường hợp doctor có lịch hẹn (sẽ bị hủy kích hoạt thay vì xóa)
@@ -1178,37 +1158,37 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID của doctor có lịch hẹn
         $this->mockRoute(['id' => $this->testData['users']['member']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when deactivating doctor with appointments');
         $this->assertEquals('deactivated', $response['type'], 'Type should be deactivated, not delete');
         $this->assertContains('deactivated successfully', strtolower($response['msg']), 'Success message should indicate deactivation');
-        
+
         // Kiểm tra doctor đã bị hủy kích hoạt trong database
         $doctor = DB::table(TABLE_PREFIX.TABLE_DOCTORS)
                     ->where('id', '=', $this->testData['users']['member']['id'])
                     ->first();
         $this->assertEquals(0, $doctor->active, 'Doctor should be deactivated in database');
-        
+
         // Kiểm tra tất cả lịch hẹn của doctor đã bị hủy
         $appointments = DB::table(TABLE_PREFIX.TABLE_APPOINTMENTS)
                           ->where('doctor_id', '=', $this->testData['users']['member']['id'])
                           ->get();
-        
+
         foreach ($appointments as $appointment) {
             $this->assertEquals('cancelled', $appointment->status, 'Appointment status should be changed to cancelled');
         }
     }
-    
+
     /**
      * CTRL_DOCTOR_DEL_025
      * Kiểm tra delete - Trường hợp thành công khi doctor không có lịch hẹn
@@ -1217,28 +1197,28 @@ class DoctorControllerTest extends ControllerTestCase
     {
         // Thiết lập user admin
         $this->mockAuthUser('admin');
-        
+
         // Thiết lập route với ID của doctor không có lịch hẹn
         $this->mockRoute(['id' => $this->testData['users']['supporter']['id']]);
-        
+
         // Thiết lập HTTP method
         $this->mockInput('DELETE');
-        
+
         // Gọi controller và lấy response
         $response = $this->callControllerWithCapture();
-        
+
         // Kiểm tra response
         $this->assertEquals(1, $response['result'], 'Result should be success when deleting doctor');
         $this->assertEquals('delete', $response['type'], 'Type should be delete');
         $this->assertContains('deleted successfully', strtolower($response['msg']), 'Success message should indicate deletion');
-        
+
         // Kiểm tra doctor đã bị xóa khỏi database
         $doctor = DB::table(TABLE_PREFIX.TABLE_DOCTORS)
                     ->where('id', '=', $this->testData['users']['supporter']['id'])
                     ->first();
         $this->assertNull($doctor, 'Doctor should be deleted from database');
     }
-    
+
     /**
      * CTRL_DOCTOR_AVATAR_026
      * Test phương thức updateAvatar - Không thể test đầy đủ vì liên quan đến upload file
@@ -1250,4 +1230,4 @@ class DoctorControllerTest extends ControllerTestCase
           'Cannot fully test file uploads in PHPUnit CLI environment'
         );
     }
-} 
+}
