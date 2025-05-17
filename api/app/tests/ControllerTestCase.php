@@ -10,6 +10,134 @@
  */
 require_once __DIR__ . '/DatabaseTestCase.php';
 
+/**
+ * Mock class for Input static methods
+ */
+if (!class_exists('InputMock')) {
+    class InputMock
+    {
+        /**
+         * @var callable Mock function for Input::method
+         */
+        public static $methodMock;
+
+        /**
+         * @var callable Mock function for Input::get
+         */
+        public static $getMock;
+
+        /**
+         * @var callable Mock function for Input::post
+         */
+        public static $postMock;
+
+        /**
+         * @var callable Mock function for Input::put
+         */
+        public static $putMock;
+
+        /**
+         * @var callable Mock function for Input::patch
+         */
+        public static $patchMock;
+    }
+}
+
+/**
+ * Override Input class methods for testing
+ */
+if (!class_exists('Input')) {
+    class Input
+    {
+        /**
+         * Mock for Input::method method
+         *
+         * @return string HTTP method
+         */
+        public static function method()
+        {
+            if (isset(InputMock::$methodMock) && is_callable(InputMock::$methodMock)) {
+                $func = InputMock::$methodMock;
+                return $func();
+            }
+
+            return isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+        }
+
+        /**
+         * Mock for Input::get method
+         *
+         * @param string|null $key Key to get from GET data
+         * @return mixed GET data
+         */
+        public static function get($key = null)
+        {
+            if (isset(InputMock::$getMock) && is_callable(InputMock::$getMock)) {
+                $func = InputMock::$getMock;
+                return $func($key);
+            }
+
+            if ($key === null) {
+                return $_GET;
+            }
+
+            return isset($_GET[$key]) ? $_GET[$key] : null;
+        }
+
+        /**
+         * Mock for Input::post method
+         *
+         * @param string|null $key Key to get from POST data
+         * @return mixed POST data
+         */
+        public static function post($key = null)
+        {
+            if (isset(InputMock::$postMock) && is_callable(InputMock::$postMock)) {
+                $func = InputMock::$postMock;
+                return $func($key);
+            }
+
+            if ($key === null) {
+                return $_POST;
+            }
+
+            return isset($_POST[$key]) ? $_POST[$key] : null;
+        }
+
+        /**
+         * Mock for Input::put method
+         *
+         * @param string|null $key Key to get from PUT data
+         * @return mixed PUT data
+         */
+        public static function put($key = null)
+        {
+            if (isset(InputMock::$putMock) && is_callable(InputMock::$putMock)) {
+                $func = InputMock::$putMock;
+                return $func($key);
+            }
+
+            return null;
+        }
+
+        /**
+         * Mock for Input::patch method
+         *
+         * @param string|null $key Key to get from PATCH data
+         * @return mixed PATCH data
+         */
+        public static function patch($key = null)
+        {
+            if (isset(InputMock::$patchMock) && is_callable(InputMock::$patchMock)) {
+                $func = InputMock::$patchMock;
+                return $func($key);
+            }
+
+            return null;
+        }
+    }
+}
+
 class ControllerTestCase extends DatabaseTestCase
 {
     /**

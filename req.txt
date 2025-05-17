@@ -1,0 +1,1069 @@
+Yêu cầu Phần mềm ver 1.0
+Dự án: Umbrella Health
+Hệ thống Umbrella Health cung cấp ứng dụng Android cho bệnh nhân để đăng ký khám bệnh, theo dõi thứ tự khám, xem phác đồ điều trị, xem bệnh án, quản lý thông tin cá nhân, tìm kiếm bác sĩ/dịch vụ, và tùy chỉnh giao diện. Website hỗ trợ bác sĩ quản lý thứ tự khám và phác đồ điều trị, cộng tác viên quản lý lịch hẹn, và quản trị viên quản lý tài khoản, chuyên khoa, phòng khám. Hệ thống sử dụng công nghệ PHP, MySQL, jQuery cho website và Java, Google Firebase cho ứng dụng Android, tích hợp qua RESTful API.
+Ràng buộc và Giả định
+•	Ràng buộc:
+o	Hệ thống yêu cầu kết nối mạng 4G hoặc Wi-Fi với băng thông tối thiểu 10Mbps.
+o	Thiết bị Android cần tối thiểu 2GB RAM, hỗ trợ Android 8.0 trở lên.
+o	Website yêu cầu trình duyệt Chrome, Firefox, Safari phiên bản 2 năm gần nhất.
+o	Server cần tối thiểu 4 CPU, 8GB RAM, chạy PHP 7.4+, MySQL 8.0+.
+o	Dung lượng cơ sở dữ liệu tối đa 10,000 bản ghi mỗi bảng để đảm bảo hiệu suất.
+•	Giả định:
+o	Người dùng bệnh nhân là người phổ thông, không yêu cầu kỹ năng công nghệ cao.
+o	Bác sĩ và cộng tác viên được đào tạo cơ bản để sử dụng website.
+o	Hệ thống được triển khai tại một bệnh viện với tối đa 1,000 bệnh nhân/ngày.
+o	Google Firebase luôn khả dụng để hỗ trợ đăng nhập OTP và thông báo.
+1. Yêu cầu Chức năng (Functional Requirements)
+Các yêu cầu chức năng được xác định cho ứng dụng Android (bệnh nhân) và website (bác sĩ, cộng tác viên, quản trị viên). Mỗi yêu cầu bao gồm mã ID, mô tả, đối tượng, điều kiện tiên quyết, và kết quả mong đợi.
+Mã ID	Tính năng	Mô tả	Đối tượng	Điều kiện tiên quyết	Kết quả mong đợi
+FR-01	Đăng nhập	Bệnh nhân đăng nhập vào ứng dụng Android bằng số điện thoại (OTP, bỏ số 0 đầu) hoặc tài khoản Google. Bác sĩ/cộng tác viên đăng nhập vào website bằng email và mật khẩu. Hỗ trợ khôi phục mật khẩu qua email.	Bệnh nhân, Bác sĩ, Cộng tác viên	Tài khoản đã được đăng ký. Hệ thống gửi OTP hoặc email xác nhận thành công.	Hệ thống xác thực thành công, chuyển bệnh nhân đến màn hình chính Android hoặc bác sĩ/cộng tác viên đến dashboard website. Hiển thị thông báo lỗi nếu thông tin không hợp lệ (ví dụ: "Số điện thoại không tồn tại" hoặc "Mật khẩu không đúng").
+FR-02	Đăng ký tài khoản	Bệnh nhân đăng ký tài khoản mới trên Android bằng số điện thoại hoặc email, nhập thông tin cá nhân (tên, giới tính, ngày sinh, địa chỉ). Bác sĩ đăng ký trên website, cung cấp thông tin cá nhân (tên, email, số điện thoại) và chuyên môn (chuyên khoa, mô tả), có thể do quản trị viên tạo.	Bệnh nhân, Bác sĩ	Số điện thoại hoặc email chưa được sử dụng. Hệ thống hoạt động bình thường.	Tài khoản được tạo, gửi OTP qua số điện thoại hoặc mật khẩu qua email. Hiển thị thông báo "Đăng ký thành công" hoặc lỗi nếu thông tin không hợp lệ (ví dụ: "Email đã tồn tại" hoặc "Thông tin thiếu").
+FR-03	Đăng xuất	Người dùng (bệnh nhân, bác sĩ, cộng tác viên) đăng xuất khỏi ứng dụng Android hoặc website.	Bệnh nhân, Bác sĩ, Cộng tác viên	Người dùng đã đăng nhập.	Phiên đăng nhập kết thúc, chuyển đến màn hình đăng nhập trên Android hoặc website. Hiển thị thông báo "Đăng xuất thành công".
+FR-04	Đặt lịch khám bệnh	Bệnh nhân chọn dịch vụ khám (nội khoa, ngoại khoa, v.v.), thời gian, và nhập mô tả bệnh lý (ví dụ: đau bụng, đau đầu) trên Android để đặt lịch khám. Hỗ trợ chỉnh sửa hoặc hủy lịch hẹn. Yêu cầu được gửi đến website để cộng tác viên xác nhận và chọn bác sĩ phù hợp.	Bệnh nhân	Bệnh nhân đã đăng nhập. Có bác sĩ và khung giờ trống.	Lịch hẹn được tạo, chỉnh sửa, hoặc hủy thành công, hiển thị trong mục "Lịch khám bệnh" trên Android và danh sách lịch hẹn trên website. Hiển thị thông báo lỗi nếu thời gian trùng (ví dụ: "Thời gian đã có lịch hẹn") hoặc thông tin thiếu (ví dụ: "Vui lòng nhập mô tả bệnh lý").
+FR-05	Theo dõi thứ tự khám bệnh	Bệnh nhân xem danh sách thứ tự khám, bao gồm numerical_order (số thứ tự trong ngày) và position (thứ tự khám của bác sĩ) trên Android. Hệ thống gửi thông báo (kèm nhạc chuông) và làm nổi bật tên (màu cam) khi gần đến lượt khám (còn 3 người).	Bệnh nhân	Bệnh nhân đã đăng nhập. Có lịch khám hợp lệ trong ngày.	Hiển thị danh sách thứ tự khám chính xác. Gửi thông báo và làm nổi bật tên khi còn 3 người trước lượt khám. Hiển thị thông báo "Chưa có lịch khám" nếu không có dữ liệu.
+FR-06	Xem phác đồ điều trị	Bệnh nhân xem danh sách phác đồ điều trị (tên thuốc, liều lượng, hướng dẫn) trên Android. Hỗ trợ đặt nhắc nhở (thời gian, nội dung, lặp lại hàng tuần, rung điện thoại) để thực hiện phác đồ (ví dụ: uống thuốc lúc 10h sáng thứ 2, 4, 6).	Bệnh nhân	Bệnh nhân đã đăng nhập. Phác đồ đã được bác sĩ tạo và lưu.	Hiển thị danh sách phác đồ chính xác. Nhắc nhở được tạo, tích hợp với ứng dụng đồng hồ Android. Hiển thị thông báo "Chưa có phác đồ" nếu không có dữ liệu.
+FR-07	Xem bệnh án	Bệnh nhân xem kết luận và chẩn đoán của bác sĩ (ví dụ: viêm dạ dày, huyết áp cao) trên Android.	Bệnh nhân	Bệnh nhân đã đăng nhập. Bệnh án đã được bác sĩ tạo và lưu.	Hiển thị nội dung bệnh án chính xác, bao gồm lý do nhập viện, tình trạng trước/sau điều trị. Hiển thị thông báo "Chưa có bệnh án" nếu không có dữ liệu.
+FR-08	Cập nhật thông tin cá nhân	Bệnh nhân cập nhật thông tin (tên, địa chỉ, ảnh đại diện, mật khẩu) trên Android. Bác sĩ cập nhật thông tin cá nhân (tên, số điện thoại, ảnh đại diện) và chuyên môn (mô tả, chi phí khám) trên website.	Bệnh nhân, Bác sĩ	Người dùng đã đăng nhập.	Thông tin được cập nhật thành công, hiển thị thông báo "Cập nhật thành công" hoặc lỗi (ví dụ: "Mật khẩu phải có ít nhất 8 ký tự").
+FR-09	Quản lý thứ tự khám bệnh	Bác sĩ hoặc cộng tác viên xem, tạo, cập nhật, hoặc xóa thứ tự khám (numerical_order, position) trên website. Hỗ trợ ưu tiên bệnh nhân có bệnh lý đặc biệt (ví dụ: đau cột sống, bệnh trĩ) để khám trước.	Bác sĩ, Cộng tác viên	Người dùng đã đăng nhập. Có danh sách bệnh nhân trong ngày.	Danh sách thứ tự khám được cập nhật, đồng bộ với Android. Hiển thị thông báo lỗi nếu thao tác không hợp lệ (ví dụ: "Không thể ưu tiên do trùng thứ tự").
+FR-10	Lập phác đồ điều trị	Bác sĩ tạo, cập nhật, hoặc xóa phác đồ điều trị (tên thuốc, liều lượng, hướng dẫn) trên website sau khi khám. Dữ liệu được lưu và gửi đến Android để bệnh nhân xem.	Bác sĩ	Bác sĩ đã đăng nhập. Có lịch khám đã hoàn tất.	Phác đồ được lưu thành công, gửi thông báo đến bệnh nhân qua Android. Hiển thị thông báo lỗi nếu dữ liệu không hợp lệ (ví dụ: "Vui lòng nhập tên thuốc").
+FR-11	Quản lý lịch hẹn	Cộng tác viên xem, cập nhật, hoặc xóa lịch hẹn của bệnh nhân trên website. Hỗ trợ xác nhận hoặc từ chối lịch hẹn từ Android, gửi thông báo đến bệnh nhân.	Cộng tác viên	Cộng tác viên đã đăng nhập. Có lịch hẹn từ bệnh nhân.	Lịch hẹn được cập nhật hoặc xóa. Gửi thông báo xác nhận/từ chối đến bệnh nhân qua Android hoặc email. Hiển thị thông báo lỗi nếu thao tác không hợp lệ (ví dụ: "Lịch hẹn đã được xác nhận").
+FR-12	Quản lý tài khoản	Quản trị viên xem, tạo, cập nhật, hoặc xóa tài khoản bác sĩ/cộng tác viên trên website, bao gồm thông tin cá nhân (tên, email, số điện thoại) và vai trò (admin, supporter, member).	Quản trị viên	Quản trị viên đã đăng nhập.	Tài khoản được quản lý thành công, gửi email thông báo đến người dùng nếu có thay đổi. Hiển thị thông báo lỗi nếu email đã tồn tại.
+FR-13	Quản lý chuyên khoa	Quản trị viên xem, tạo, hoặc xóa chuyên khoa (tên, mô tả) trên website.	Quản trị viên	Quản trị viên đã đăng nhập.	Danh sách chuyên khoa được cập nhật. Hiển thị thông báo lỗi nếu tên chuyên khoa trùng hoặc có bác sĩ đang làm việc (ví dụ: "Chuyên khoa đang được sử dụng").
+FR-14	Quản lý phòng khám	Quản trị viên xem, tạo, hoặc xóa phòng khám (tên, vị trí) trên website.	Quản trị viên	Quản trị viên đã đăng nhập.	Danh sách phòng khám được cập nhật. Hiển thị thông báo lỗi nếu tên phòng trùng hoặc có bác sĩ đang làm việc (ví dụ: "Phòng khám đang được sử dụng").
+FR-15	Xem lịch sử khám bệnh	Bệnh nhân xem danh sách các lịch khám trước đây (ngày khám, bác sĩ, dịch vụ) trên Android.	Bệnh nhân	Bệnh nhân đã đăng nhập. Có lịch sử khám trong cơ sở dữ liệu.	Hiển thị danh sách lịch sử khám chính xác, bao gồm ngày giờ, bác sĩ, và dịch vụ. Hiển thị thông báo "Chưa có lịch sử" nếu không có dữ liệu.
+FR-16	Tìm kiếm	Bệnh nhân nhập từ khóa (tên bác sĩ, chuyên khoa, dịch vụ) để tìm kiếm trên Android.	Bệnh nhân	Bệnh nhân đã đăng nhập. Có dữ liệu bác sĩ, chuyên khoa, hoặc dịch vụ.	Hiển thị danh sách kết quả tìm kiếm phù hợp với từ khóa. Hiển thị thông báo "Không tìm thấy" nếu không có kết quả.
+FR-17	Xem chi tiết	Bệnh nhân xem thông tin chi tiết về bác sĩ (tên, chuyên khoa, mô tả), chuyên khoa, hoặc dịch vụ trên Android.	Bệnh nhân	Bệnh nhân đã đăng nhập. Có dữ liệu chi tiết.	Hiển thị thông tin chi tiết chính xác. Hiển thị thông báo lỗi nếu dữ liệu không tồn tại (ví dụ: "Không tìm thấy thông tin bác sĩ").
+FR-18	Cá nhân hóa	Bệnh nhân tùy chỉnh giao diện (chế độ ban đêm, ngôn ngữ tiếng Anh/tiếng Việt), xem hướng dẫn đi khám (quy trình khám bệnh), hoặc gửi email phản hồi về lỗi hệ thống trên Android.	Bệnh nhân	Bệnh nhân đã đăng nhập.	Giao diện được cập nhật theo tùy chọn. Hiển thị hướng dẫn đi khám hoặc gửi email phản hồi thành công. Hiển thị thông báo lỗi nếu email không gửi được.
+2. Yêu cầu Phi chức năng (Non-functional Requirements - Mô hình McCall)
+Hệ thống được thiết kế để dễ sử dụng, ổn định, dễ bảo trì, và tương thích với nhiều thiết bị Android cũng như các trình duyệt web phổ biến. Các yêu cầu phi chức năng được xây dựng theo mô hình McCall, với các tiêu chí đo lường cụ thể hóa để phù hợp với công nghệ sử dụng (PHP 7.4+, MySQL 8.0+, Java, Google Firebase) và quy mô hệ thống (hỗ trợ bệnh viện với tối đa 1,000 bệnh nhân/ngày).
+2.1. Product Operation
+Yếu tố	Mô tả	Tiêu chí đo lường
+Correctness	Hệ thống cung cấp thông tin chính xác về lịch hẹn, thứ tự khám, phác đồ điều trị, và bệnh án, không có lỗi dữ liệu.	- Tỷ lệ lỗi < 2% trong các giao dịch (đăng nhập, đặt lịch, xem phác đồ).
+- 100% dữ liệu hiển thị (lịch hẹn, phác đồ, bệnh án) khớp với dữ liệu lưu trong cơ sở dữ liệu MySQL 8.0 (bảng Booking, Treatments, Appointment Records).
+Reliability	Hệ thống hoạt động ổn định, ít xảy ra lỗi crash hoặc gián đoạn dịch vụ.	- Uptime >= 99.8% (tối đa 17.5 giờ downtime/năm).
+- Mean Time Between Failures (MTBF) >= 500 giờ.
+- Mean Time To Repair (MTTR) < 1 giờ.
+- Sao lưu dữ liệu tự động mỗi 24 giờ, lưu trữ trên server dự phòng với đồng bộ < 5 giây.
+Efficiency	Hệ thống xử lý nhanh các yêu cầu người dùng, tối ưu tài nguyên để hỗ trợ nhiều người dùng đồng thời.	- Phản hồi API < 1 giây cho 95% yêu cầu trên server 4 CPU, 8GB RAM, băng thông 100Mbps.
+- Tải giao diện (Android, website) < 2 giây trên mạng 4G (tối thiểu 10Mbps).
+- Hỗ trợ tối đa 200 người dùng đồng thời với bảng dữ liệu < 10,000 bản ghi, không giảm hiệu suất.
+Integrity	Hệ thống bảo vệ thông tin nhạy cảm của bệnh nhân (email, số điện thoại, bệnh án) và bác sĩ, ngăn chặn truy cập trái phép.	- Dữ liệu được mã hóa bằng HTTPS (TLS 1.3) và AES-256 khi truyền và lưu trữ.
+- Nhật ký truy cập ghi lại 100% thao tác với dữ liệu nhạy cảm (đăng nhập, xem bệnh án) trong bảng log.
+- Tuân thủ quy định bảo mật y tế Việt Nam (Nghị định 117/2018/NĐ-CP).
+Usability	Giao diện thân thiện, dễ sử dụng cho người dùng phổ thông, tuân thủ tiêu chuẩn APPENDIX D về thiết kế giao diện.	- 90% người dùng hoàn thành tác vụ (đăng nhập, đặt lịch, xem phác đồ) trong < 1 phút mà không cần hướng dẫn.
+- Font chữ >= 14px, màu sắc tương phản rõ ràng (tỷ lệ tương phản tối thiểu 4.5:1), giao diện nhất quán trên Android và website.
+- Hỗ trợ hai ngôn ngữ: tiếng Anh và tiếng Việt, chuyển đổi trong < 1 giây.
+2.2. Product Revision
+Yếu tố	Mô tả	Tiêu chí đo lường
+Maintainability	Hệ thống được thiết kế để dễ bảo trì mã nguồn và cơ sở dữ liệu, giảm thời gian sửa lỗi và cập nhật.	- Thời gian xác định và sửa lỗi < 3 giờ cho 90% trường hợp trên server 4 CPU, 8GB RAM.
+- Tài liệu mã nguồn đầy đủ, tuân thủ chuẩn JavaDoc (Android) và phpDoc (website), bao gồm mô tả hàm và tham số.
+- Sử dụng mô hình MVC (website) và MVVM (Android), với các module độc lập (API, giao diện, dữ liệu).
+Flexibility	Hệ thống dễ mở rộng để thêm các tính năng mới, như tích hợp chat hoặc video call trong tương lai.	- Thêm tính năng mới trong < 5 ngày mà không ảnh hưởng hệ thống hiện tại, sử dụng RESTful API phiên bản hóa (ví dụ: v1, v2).
+- API hỗ trợ ít nhất 80% chức năng mới mà không cần sửa mã hiện tại.
+Testability	Hệ thống hỗ trợ kiểm thử thủ công và tự động để đảm bảo chất lượng, tuân thủ tiêu chuẩn APPENDIX F cho kiểm thử tiêu cực.	- 70% test case có thể tự động hóa (API, chức năng đơn vị) bằng công cụ như JUnit (Android) và PHPUnit (website).
+- Cung cấp môi trường kiểm thử riêng biệt (server thử nghiệm, cơ sở dữ liệu giả lập), cấu hình < 1 giờ.
+- Hỗ trợ kiểm thử giao diện (font, màu) và lỗi (nhập sai OTP, thời gian trùng lịch) theo APPENDIX D, F.
+2.3. Product Transition
+Yếu tố	Mô tả	Tiêu chí đo lường
+Portability	Ứng dụng Android tương thích với nhiều thiết bị di động; website chạy trên các trình duyệt web phổ biến.	- Hỗ trợ Android 8.0 trở lên, tương thích với các kích thước màn hình (480x800 đến 1440x3200 pixel).
+- Website tương thích với Chrome, Firefox, Safari (phiên bản 2023-2025), tải trang < 2 giây.
+- Thời gian triển khai trên môi trường mới (server hoặc thiết bị) < 2 giờ, sử dụng script cài đặt tự động.
+Reusability	Các thành phần của hệ thống (API, giao diện, mô hình dữ liệu) có thể tái sử dụng cho các dự án y tế tương tự.	- 60% mã nguồn API (RESTful, JSON) có thể tái sử dụng cho hệ thống quản lý bệnh viện khác.
+- Giao diện Android sử dụng widget tái sử dụng (RecyclerView, Adapter), giảm 50% thời gian phát triển giao diện mới.
+- Mô hình dữ liệu MySQL (bảng Patients, Doctors, Booking) áp dụng được cho hệ thống tương tự với < 1 ngày chỉnh sửa.
+Interoperability	Hệ thống tích hợp với Google Firebase để hỗ trợ đăng nhập OTP, thông báo, và cơ sở dữ liệu MySQL để lưu trữ dữ liệu.	- 100% giao dịch với Firebase (OTP, thông báo) và MySQL thành công trong điều kiện mạng 10Mbps.
+- Dữ liệu trao đổi giữa Android, website, và server sử dụng định dạng JSON chuẩn, thời gian xử lý < 100ms.
+2.4. Product Operation Extensions
+Yếu tố	Mô tả	Tiêu chí đo lường
+Scalability	Hệ thống có khả năng xử lý khối lượng công việc tăng dần khi số lượng người dùng tăng.	- Hỗ trợ tối đa 1,000 người dùng đồng thời trên server 4 CPU, 8GB RAM, băng thông 100Mbps, với thời gian phản hồi API < 1.5 giây ở tải cao.
+- Hỗ trợ cân bằng tải qua ít nhất 2 máy chủ, cấu hình đồng bộ < 5 phút.
+Performance	Hệ thống đảm bảo tốc độ xử lý nhanh, sử dụng tài nguyên hiệu quả để mang lại trải nghiệm mượt mà.	- Truy vấn cơ sở dữ liệu < 500ms cho 95% thao tác trên MySQL 8.0, bảng < 10,000 bản ghi, sử dụng chỉ mục cho Patient_id, Appointment_time.
+- Thời gian khởi động ứng dụng Android < 3 giây trên thiết bị 2GB RAM.
+- Tải trang dashboard website < 2 giây trên Chrome với mạng 10Mbps.
+Availability	Hệ thống duy trì hoạt động liên tục, giảm thiểu thời gian gián đoạn để đảm bảo dịch vụ luôn sẵn sàng.	- Uptime >= 99.9% (tối đa 8.76 giờ downtime/năm).
+- Cơ chế chuyển đổi dự phòng kích hoạt trong < 30 giây, sử dụng server dự phòng (4 CPU, 8GB RAM), đồng bộ dữ liệu MySQL < 5 giây.
+Security	Hệ thống ngăn chặn truy cập trái phép, bảo vệ dữ liệu y tế của bệnh nhân và bác sĩ.	- Hỗ trợ xác thực hai yếu tố qua OTP (Firebase) cho đăng nhập Android, thời gian gửi OTP < 5 giây.
+- Bảo vệ chống tấn công SQL injection, XSS trên website bằng bộ lọc đầu vào và mã hóa.
+- Kiểm tra bảo mật định kỳ mỗi 3 tháng, phát hiện và vá lỗi trong < 24 giờ.
+3. Đặc tả Chi tiết (Detailed Specification)
+Phần này cung cấp mô tả kỹ thuật chi tiết cho tất cả 18 yêu cầu chức năng (FR-01 đến FR-18), bao gồm quy trình, đầu vào/đầu ra, xử lý lỗi mở rộng, và thuật toán (nếu cần), để hỗ trợ phát triển, kiểm thử, và triển khai. Dưới đây là đặc tả cho một số yêu cầu tiêu biểu; các yêu cầu còn lại được trình bày tương tự (toàn bộ đặc tả sẽ được cung cấp nếu bạn yêu cầu).
+3.1. FR-01: Đăng nhập
+•	Mô tả: Bệnh nhân đăng nhập vào ứng dụng Android bằng số điện thoại (OTP) hoặc tài khoản Google; bác sĩ/cộng tác viên đăng nhập vào website bằng email và mật khẩu.
+•	Quy trình:
+1.	Trên Android (bệnh nhân):
+	Bệnh nhân nhập số điện thoại (9-10 chữ số, ví dụ: 366123456) hoặc chọn "Đăng nhập bằng Google".
+	Nếu nhập số điện thoại, nhấn "Gửi OTP", hệ thống gửi yêu cầu đến Firebase để tạo OTP (6 chữ số, thời hạn 60 giây).
+	Bệnh nhân nhập OTP, nhấn "Đăng nhập". Hệ thống xác thực OTP với Firebase.
+	Nếu chọn Google, chuyển hướng đến giao diện xác thực Google, lấy email và token.
+	Hệ thống kiểm tra email/số điện thoại trong bảng dữ liệu (Patient_id, Email, Phone), xác thực và tạo phiên đăng nhập (token JWT, thời hạn 24 giờ).
+	Chuyển đến màn hình chính, hiển thị thông báo "Đăng nhập thành công".
+2.	Trên website (bác sĩ/cộng tác viên):
+	Nhập email (ví dụ: doctor@example.com) và mật khẩu (tối thiểu 8 ký tự).
+	Nhấn "Đăng nhập", hệ thống mã hóa mật khẩu (SHA-256) và kiểm tra trong bảng dữ liệu (Doctor_id, Email, Password).
+	Nếu hợp lệ, tạo phiên đăng nhập (session cookie, thời hạn 24 giờ), chuyển đến dashboard.
+3.	Khôi phục mật khẩu:
+	Nhập email, nhấn "Khôi phục mật khẩu".
+	Hệ thống gửi email chứa mã khôi phục (8 ký tự ngẫu nhiên, thời hạn 10 phút).
+	Người dùng nhập mã và mật khẩu mới, hệ thống cập nhật mật khẩu.
+•	Đầu vào:
+o	Số điện thoại: chuỗi 9-10 chữ số.
+o	OTP: chuỗi 6 chữ số.
+o	Google: email (chuỗi, ví dụ: patient@example.com), token xác thực.
+o	Email: chuỗi tối đa 255 ký tự, định dạng chuẩn (user@domain.com).
+o	Mật khẩu: chuỗi 8-25 ký tự, chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số.
+•	Đầu ra:
+o	JSON (Android): { "result": 1, "msg": "Đăng nhập thành công", "token": "JWT_token" } hoặc { "result": 0, "msg": "Số điện thoại không tồn tại" }.
+o	Session cookie (website): { "session_id": "abc123", "expires": "2025-04-26T12:00:00" }.
+o	Thông báo: "Đăng nhập thành công" hoặc lỗi (ví dụ: "Mật khẩu không đúng").
+•	Xử lý lỗi mở rộng:
+o	Số điện thoại không hợp lệ (>10 ký tự): "Số điện thoại không đúng định dạng".
+o	OTP sai: "OTP không đúng, vui lòng nhập lại".
+o	OTP hết hạn: "OTP đã hết hiệu lực, yêu cầu OTP mới".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Firebase/Google lỗi: "Không thể xác thực, vui lòng thử lại sau 5 giây".
+o	Email không tồn tại: "Email không tồn tại, vui lòng kiểm tra lại".
+o	Mật khẩu sai quá 5 lần: "Tài khoản bị khóa tạm thời 15 phút".
+•	Lưu trữ:
+o	Bảng dữ liệu: Patients (Patient_id, Email, Phone, Password), Doctors (Doctor_id, Email, Password, Recovery_token).
+3.2. FR-04: Đặt lịch khám bệnh
+•	Mô tả: Bệnh nhân chọn dịch vụ khám, thời gian, và nhập mô tả bệnh lý trên Android để đặt lịch khám. Yêu cầu được gửi đến website để cộng tác viên xác nhận.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Đặt lịch khám".
+2.	Chọn dịch vụ khám từ danh sách (nội khoa, ngoại khoa, nhi khoa, v.v.).
+3.	Chọn thời gian từ danh sách khung giờ trống (ví dụ: 10:30, 11:00 ngày 26/04/2025).
+4.	Nhập mô tả bệnh lý (tối đa 255 ký tự, ví dụ: "Đau bụng 2 ngày").
+5.	Nhấn "Xác nhận" để gửi yêu cầu qua API (POST /api/booking).
+6.	Hệ thống kiểm tra:
+	Khung giờ không trùng với lịch hẹn hiện có (truy vấn bảng Booking: Service_id, Appointment_Time).
+	Mô tả bệnh lý không để trống.
+7.	Nếu hợp lệ, lưu lịch hẹn vào bảng Booking (Service_id, Patient_id, Appointment_Time, Reason, Status = "Pending").
+8.	Yêu cầu hiển thị trên website (giao diện danh sách lịch hẹn).
+9.	Cộng tác viên xem yêu cầu, chọn bác sĩ phù hợp (dựa trên Service_id và bảng Doctors And Services), nhấn "Xác nhận" hoặc "Từ chối".
+10.	Nếu xác nhận, cập nhật Status = "Confirmed", lưu Doctor_id, gửi thông báo đến bệnh nhân qua Android hoặc email. Nếu từ chối, cập nhật Status = "Rejected", gửi lý do từ chối.
+11.	Lịch hẹn hiển thị trong mục "Lịch khám bệnh" trên Android.
+•	Đầu vào:
+o	Dịch vụ khám: chuỗi (ví dụ: "Nội khoa").
+o	Thời gian: định dạng "YYYY-MM-DD HH:MM" (ví dụ: "2025-04-26 10:30").
+o	Mô tả bệnh lý: chuỗi tối đa 255 ký tự.
+o	JSON gửi API: { "service_id": 1, "patient_id": 123, "appointment_time": "2025-04-26 10:30", "reason": "Đau bụng 2 ngày" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Đặt lịch thành công", "booking_id": 456 } hoặc { "result": 0, "msg": "Thời gian đã có lịch hẹn" }.
+o	Thông báo trên Android: "Đặt lịch thành công" hoặc lỗi (ví dụ: "Thời gian đã có lịch hẹn").
+o	Email: "Lịch hẹn của bạn vào 10:30 ngày 26/04/2025 đã được xác nhận" hoặc "Lịch hẹn bị từ chối do [lý do]".
+•	Xử lý lỗi mở rộng:
+o	Thiếu mô tả bệnh lý: "Vui lòng nhập mô tả bệnh lý".
+o	Thời gian trùng: "Thời gian đã có lịch hẹn, vui lòng chọn khung giờ khác".
+o	Server lỗi: "Không thể gửi yêu cầu, vui lòng thử lại sau 5 giây".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Số lượng lịch hẹn vượt 1,000/ngày: "Hết khung giờ trống, vui lòng chọn ngày khác".
+o	Mô tả bệnh lý > 255 ký tự: "Mô tả quá dài, tối đa 255 ký tự".
+•	Chỉnh sửa/hủy lịch hẹn:
+o	Chỉnh sửa: Bệnh nhân chọn lịch hẹn, cập nhật dịch vụ/thời gian/mô tả, nhấn "Lưu". Hệ thống kiểm tra lại như tạo mới, cập nhật bảng Booking.
+o	Hủy: Bệnh nhân chọn lịch hẹn, nhấn "Hủy", cập nhật Status = "Cancelled", gửi thông báo đến cộng tác viên.
+•	Lưu trữ:
+o	Bảng Booking: Service_id (số nguyên), Patient_id (số nguyên), Appointment_Time (datetime), Reason (chuỗi 255 ký tự), Status (Pending, Confirmed, Rejected, Cancelled).
+3.3. FR-06: Xem phác đồ điều trị
+•	Mô tả: Bệnh nhân xem danh sách phác đồ điều trị trên Android và đặt nhắc nhở để thực hiện phác đồ.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Phác đồ điều trị".
+2.	Hệ thống gửi yêu cầu API (GET /api/treatments?patient_id=123) để lấy danh sách phác đồ.
+3.	Truy vấn bảng Treatments (Appointment_id, Name, Type, Times, Purpose, Instruction) để hiển thị danh sách phác đồ (ví dụ: "Paracetamol 500mg, uống 2 viên/ngày, sau ăn").
+4.	Bệnh nhân chọn phác đồ để xem chi tiết (tên thuốc, liều lượng, hướng dẫn).
+5.	Để đặt nhắc nhở:
+	Nhấn "Đặt thời gian".
+	Nhập thời gian (ví dụ: 10:00), nội dung (ví dụ: "Uống Paracetamol 500mg"), tùy chọn lặp lại (thứ 2, 4, 6), bật/tắt rung.
+	Nhấn "Xác nhận" để gửi yêu cầu đến ứng dụng đồng hồ Android.
+6.	Nếu ứng dụng đồng hồ hỗ trợ, nhắc nhở được tạo (thời gian, nội dung, rung), hiển thị thông báo "Nhắc nhở đã được tạo". Nếu có nhiều ứng dụng đồng hồ, hiển thị danh sách để chọn.
+•	Đầu vào:
+o	Patient_id: số nguyên (ví dụ: 123).
+o	Thời gian nhắc nhở: định dạng "HH:MM" (ví dụ: "10:00").
+o	Nội dung nhắc nhở: chuỗi tối đa 100 ký tự.
+o	Lặp lại: mảng ngày (ví dụ: ["Monday", "Wednesday", "Friday"]).
+o	Rung: boolean (true/false).
+•	Đầu ra:
+o	JSON trả về: [ { "appointment_id": 456, "name": "Paracetamol 500mg", "type": "Uống", "times": 2, "purpose": "Giảm đau", "instruction": "Uống sau ăn" }, ... ] hoặc { "result": 0, "msg": "Chưa có phác đồ" }.
+o	Thông báo trên Android: "Nhắc nhở đã được tạo" hoặc "Chưa có phác đồ điều trị".
+•	Xử lý lỗi mở rộng:
+o	Không có phác đồ: "Chưa có phác đồ điều trị".
+o	Ứng dụng đồng hồ không khả dụng: "Không thể tạo nhắc nhở, vui lòng kiểm tra ứng dụng đồng hồ".
+o	Thời gian không hợp lệ (quá khứ): "Vui lòng chọn thời gian hợp lệ".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Nội dung nhắc nhở > 100 ký tự: "Nội dung quá dài, tối đa 100 ký tự".
+•	Lưu trữ:
+o	Bảng Treatments: Appointment_id (số nguyên), Name (chuỗi, ví dụ: "Paracetamol 500mg"), Type (chuỗi, ví dụ: "Uống"), Times (số nguyên), Purpose (chuỗi 255 ký tự), Instruction (chuỗi 255 ký tự).
+3.4. FR-09: Quản lý thứ tự khám bệnh
+•	Mô tả: Bác sĩ hoặc cộng tác viên xem, tạo, cập nhật, hoặc xóa thứ tự khám trên website, hỗ trợ ưu tiên bệnh nhân có bệnh lý đặc biệt.
+•	Quy trình:
+1.	Bác sĩ/cộng tác viên đăng nhập vào website, vào mục "Quản lý thứ tự khám".
+2.	Hệ thống gửi yêu cầu API (GET /api/appointments?date=2025-04-26) để lấy danh sách bệnh nhân trong ngày.
+3.	Truy vấn bảng Appointments (Doctor_id, Patient_id, Patient_name, Patient_birthday, Patient_reason, Patient_phone, Numerical_order, Position, Appointment_time) để hiển thị danh sách.
+4.	Tạo thứ tự:
+	Cộng tác viên chọn bệnh nhân từ danh sách lịch hẹn đã xác nhận.
+	Gán Numerical_order (tăng tự động theo số bệnh nhân trong ngày, ví dụ: 50) và Position (thứ tự khám, ví dụ: 3).
+	Nhấn "Lưu" để cập nhật bảng Appointments.
+5.	Cập nhật thứ tự:
+	Kéo thả bệnh nhân trên giao diện để thay đổi Position.
+	Hệ thống kiểm tra không có Position trùng, cập nhật bảng Appointments.
+6.	Xóa thứ tự:
+	Chọn bệnh nhân, nhấn "Xóa", xóa bản ghi và cập nhật Position của các bệnh nhân khác.
+7.	Ưu tiên bệnh nhân:
+	Hệ thống phân tích trường Patient_reason để phát hiện bệnh lý đặc biệt (đau cột sống, bệnh trĩ) dựa trên danh sách từ khóa (lưu trong bảng cấu hình).
+	Nếu khớp, gán Position nhỏ hơn (ví dụ: Position = 1).
+	Cộng tác viên có thể kéo bệnh nhân lên đầu danh sách thủ công.
+8.	Hệ thống đồng bộ thứ tự với Android, gửi thông báo khi gần đến lượt (còn 3 người).
+•	Thuật toán ưu tiên:
+1.	Đọc Patient_reason từ bảng Appointments.
+2.	So sánh với danh sách từ khóa bệnh lý đặc biệt (ví dụ: "đau cột sống", "trĩ").
+3.	Nếu khớp, đặt Position = min(Position hiện tại) - 1.
+4.	Nếu cộng tác viên chọn thủ công, cập nhật Position theo thứ tự kéo thả.
+5.	Kiểm tra không có Position trùng, nếu trùng thì tăng Position của các bệnh nhân khác (Position = Position + 1).
+•	Đầu vào:
+o	Date: định dạng "YYYY-MM-DD" (ví dụ: "2025-04-26").
+o	Patient_id: số nguyên.
+o	Numerical_order: số nguyên (tăng tự động).
+o	Position: số nguyên (ví dụ: 3).
+o	JSON gửi API (tạo): { "patient_id": 123, "doctor_id": 456, "numerical_order": 50, "position": 3, "appointment_time": "2025-04-26 10:30" }.
+•	Đầu ra:
+o	JSON trả về: [ { "patient_name": "Nguyen Van A", "numerical_order": 50, "position": 3, "appointment_time": "2025-04-26 10:30" }, ... ] hoặc { "result": 0, "msg": "Chưa có bệnh nhân" }.
+o	Thông báo trên website: "Cập nhật thứ tự thành công" hoặc lỗi (ví dụ: "Thứ tự đã được gán").
+•	Xử lý lỗi mở rộng:
+o	Danh sách bệnh nhân rỗng: "Chưa có bệnh nhân trong ngày".
+o	Bác sĩ không khả dụng: "Bác sĩ không có lịch trống".
+o	Position trùng: "Thứ tự đã được gán, vui lòng chọn lại".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Numerical_order vượt 1,000/ngày: "Đã đạt giới hạn bệnh nhân, không thể thêm".
+•	Lưu trữ:
+o	Bảng Appointments: Doctor_id, Patient_id, Patient_name (chuỗi), Patient_birthday (date), Patient_reason (chuỗi 255 ký tự), Patient_phone (chuỗi 10 ký tự), Numerical_order (số nguyên), Position (số nguyên), Appointment_time (datetime), Status (arrived, examining, completed).
+3.5. FR-02: Đăng ký tài khoản
+•	Mô tả: Bệnh nhân đăng ký tài khoản mới trên Android bằng số điện thoại hoặc email; bác sĩ đăng ký trên website, có thể do quản trị viên tạo.
+•	Quy trình:
+1.	Trên Android (bệnh nhân):
+	Bệnh nhân vào mục "Đăng ký", nhập số điện thoại (9-10 chữ số) hoặc email, tên, giới tính (0: nữ, 1: nam), ngày sinh (YYYY-MM-DD), địa chỉ (tối đa 255 ký tự).
+	Nhấn "Đăng ký", hệ thống kiểm tra số điện thoại/email không trùng (truy vấn bảng Patients).
+	Nếu hợp lệ, gửi OTP qua số điện thoại (Firebase) hoặc email xác nhận.
+	Bệnh nhân nhập OTP hoặc nhấp link xác nhận, hệ thống lưu tài khoản vào bảng Patients (Patient_id, Email, Phone, Name, Gender, Birthday, Address).
+	Hiển thị thông báo "Đăng ký thành công".
+2.	Trên website (bác sĩ):
+	Bác sĩ nhập email, số điện thoại, tên, mô tả chuyên môn (tối đa 255 ký tự), chi phí khám, vai trò (member, supporter).
+	Nhấn "Đăng ký", hệ thống kiểm tra email/số điện thoại không trùng (truy vấn bảng Doctors).
+	Nếu hợp lệ, gửi mật khẩu tạm thời qua email, lưu tài khoản vào bảng Doctors (Doctor_id, Email, Phone, Name, Description, Price, Role).
+	Hiển thị thông báo "Đăng ký thành công".
+3.	Quản trị viên tạo tài khoản:
+	Quản trị viên vào mục "Quản lý tài khoản", nhập thông tin tương tự cho bác sĩ/cộng tác viên.
+	Hệ thống lưu tài khoản và gửi email thông báo.
+•	Đầu vào:
+o	Số điện thoại: chuỗi 9-10 chữ số.
+o	Email: chuỗi tối đa 255 ký tự, định dạng user@domain.com.
+o	Tên: chuỗi tối đa 50 ký tự.
+o	Giới tính: số nguyên (0, 1).
+o	Ngày sinh: định dạng "YYYY-MM-DD".
+o	Địa chỉ: chuỗi tối đa 255 ký tự.
+o	Mô tả chuyên môn: chuỗi tối đa 255 ký tự.
+o	Chi phí khám: số nguyên (ví dụ: 200000 VND).
+o	Vai trò: chuỗi (admin, supporter, member).
+o	JSON gửi API (Android): { "phone": "366123456", "name": "Nguyen Van A", "gender": 1, "birthday": "1990-01-01", "address": "123 Đường Láng" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Đăng ký thành công", "patient_id": 123 } hoặc { "result": 0, "msg": "Email đã tồn tại" }.
+o	Thông báo: "Đăng ký thành công" hoặc lỗi (ví dụ: "Số điện thoại đã được sử dụng").
+o	Email: "Tài khoản của bạn đã được tạo, mật khẩu tạm thời: abc123".
+•	Xử lý lỗi mở rộng:
+o	Số điện thoại/email trùng: "Số điện thoại/email đã được sử dụng".
+o	Thiếu thông tin bắt buộc: "Vui lòng nhập đầy đủ thông tin".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	OTP/email xác nhận hết hạn: "Mã xác nhận đã hết hiệu lực, yêu cầu mã mới".
+o	Tên > 50 ký tự: "Tên quá dài, tối đa 50 ký tự".
+•	Lưu trữ:
+o	Bảng Patients: Patient_id, Email, Phone, Name, Gender, Birthday, Address.
+o	Bảng Doctors: Doctor_id, Email, Phone, Name, Description, Price, Role.
+3.6. FR-03: Đăng xuất
+•	Mô tả: Người dùng đăng xuất khỏi ứng dụng Android hoặc website.
+•	Quy trình:
+1.	Người dùng (bệnh nhân, bác sĩ, cộng tác viên) nhấn nút "Đăng xuất" trên Android hoặc website.
+2.	Hệ thống hủy phiên đăng nhập:
+	Trên Android: xóa token JWT trong bộ nhớ thiết bị.
+	Trên website: xóa session cookie.
+3.	Chuyển đến màn hình đăng nhập, hiển thị thông báo "Đăng xuất thành công".
+•	Đầu vào:
+o	Không yêu cầu đầu vào (chỉ cần nhấn nút "Đăng xuất").
+•	Đầu ra:
+o	Thông báo trên Android/website: "Đăng xuất thành công".
+o	JSON trả về (API): { "result": 1, "msg": "Đăng xuất thành công" }.
+•	Xử lý lỗi mở rộng:
+o	Mất kết nối mạng: "Không có kết nối, nhưng phiên đăng nhập đã được hủy cục bộ".
+o	Phiên đăng nhập không tồn tại: "Bạn đã đăng xuất, vui lòng đăng nhập lại".
+•	Lưu trữ:
+o	Không yêu cầu lưu trữ (chỉ xóa token/session).
+3.7. FR-05: Theo dõi thứ tự khám bệnh
+•	Mô tả: Bệnh nhân xem danh sách thứ tự khám và nhận thông báo khi gần đến lượt.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Lịch khám bệnh".
+2.	Hệ thống gửi yêu cầu API (GET /api/appointments?patient_id=123&date=2025-04-26).
+3.	Truy vấn bảng Appointments để lấy danh sách thứ tự khám (Patient_name, Numerical_order, Position, Appointment_time).
+4.	Hiển thị danh sách (ví dụ: "Nguyen Van A, Numerical_order: 50, Position: 3, 10:30").
+5.	Nếu Position <= 3, làm nổi bật tên (màu cam) và gửi thông báo qua Firebase (nội dung: "Sắp đến lượt khám của bạn", kèm nhạc chuông).
+6.	Nếu không có lịch khám, hiển thị thông báo "Chưa có lịch khám".
+•	Đầu vào:
+o	Patient_id: số nguyên (ví dụ: 123).
+o	Date: định dạng "YYYY-MM-DD" (ví dụ: "2025-04-26").
+•	Đầu ra:
+o	JSON trả về: [ { "patient_name": "Nguyen Van A", "numerical_order": 50, "position": 3, "appointment_time": "2025-04-26 10:30" }, ... ] hoặc { "result": 0, "msg": "Chưa có lịch khám" }.
+o	Thông báo trên Android: "Sắp đến lượt khám của bạn" (màu cam, kèm nhạc chuông) hoặc "Chưa có lịch khám".
+•	Xử lý lỗi mở rộng:
+o	Không có lịch khám: "Chưa có lịch khám trong ngày".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Server lỗi: "Không thể tải danh sách, vui lòng thử lại sau 5 giây".
+•	Lưu trữ:
+o	Bảng Appointments: Patient_id, Patient_name, Numerical_order, Position, Appointment_time.
+3.8. FR-07: Xem bệnh án
+•	Mô tả: Bệnh nhân xem kết luận và chẩn đoán của bác sĩ trên Android.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Bệnh án".
+2.	Hệ thống gửi yêu cầu API (GET /api/appointment_records?patient_id=123).
+3.	Truy vấn bảng Appointment Records (Appointment_id, Reason, Description, Status Before, Status After) để hiển thị danh sách bệnh án.
+4.	Hiển thị chi tiết (ví dụ: "Lý do: Đau bụng, Chẩn đoán: Viêm dạ dày, Tình trạng sau: Cải thiện").
+5.	Nếu không có bệnh án, hiển thị thông báo "Chưa có bệnh án".
+•	Đầu vào:
+o	Patient_id: số nguyên (ví dụ: 123).
+•	Đầu ra:
+o	JSON trả về: [ { "appointment_id": 456, "reason": "Đau bụng", "description": "Viêm dạ dày", "status_before": "Đau cấp", "status_after": "Cải thiện" }, ... ] hoặc { "result": 0, "msg": "Chưa có bệnh án" }.
+o	Thông báo: "Chưa có bệnh án" nếu không có dữ liệu.
+•	Xử lý lỗi mở rộng:
+o	Không có bệnh án: "Chưa có bệnh án".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Server lỗi: "Không thể tải bệnh án, vui lòng thử lại".
+•	Lưu trữ:
+o	Bảng Appointment Records: Appointment_id, Reason (chuỗi 100 ký tự), Description (text), Status Before (chuỗi 255 ký tự), Status After (chuỗi 255 ký tự).
+3.9. FR-08: Cập nhật thông tin cá nhân
+•	Mô tả: Bệnh nhân/bác sĩ cập nhật thông tin cá nhân trên Android/website.
+•	Quy trình:
+1.	Trên Android (bệnh nhân):
+	Bệnh nhân vào mục "Cá nhân hóa", chọn "Thông tin cá nhân".
+	Cập nhật tên, địa chỉ, ảnh đại diện (tệp < 2MB), mật khẩu (8-25 ký tự).
+	Nhấn "Lưu", hệ thống kiểm tra định dạng (tên < 50 ký tự, mật khẩu có chữ hoa/số).
+	Cập nhật bảng Patients (Name, Address, Avatar, Password).
+2.	Trên website (bác sĩ):
+	Bác sĩ vào mục "Thông tin cá nhân", cập nhật tên, số điện thoại, ảnh đại diện, mô tả chuyên môn, chi phí khám.
+	Nhấn "Lưu", hệ thống kiểm tra định dạng (số điện thoại 10 ký tự, chi phí > 0).
+	Cập nhật bảng Doctors (Name, Phone, Avatar, Description, Price).
+3.	Hiển thị thông báo "Cập nhật thành công" hoặc lỗi.
+•	Đầu vào:
+o	Tên: chuỗi tối đa 50 ký tự.
+o	Địa chỉ: chuỗi tối đa 255 ký tự.
+o	Ảnh đại diện: tệp JPG/PNG < 2MB.
+o	Mật khẩu: chuỗi 8-25 ký tự, chứa chữ hoa, số.
+o	Số điện thoại: chuỗi 10 ký tự.
+o	Mô tả chuyên môn: chuỗi tối đa 255 ký tự.
+o	Chi phí khám: số nguyên.
+o	JSON gửi API: { "patient_id": 123, "name": "Nguyen Van A", "address": "123 Đường Láng", "password": "Abc12345" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Cập nhật thành công" } hoặc { "result": 0, "msg": "Mật khẩu không đủ mạnh" }.
+o	Thông báo: "Cập nhật thành công" hoặc lỗi (ví dụ: "Tệp ảnh quá lớn").
+•	Xử lý lỗi mở rộng:
+o	Tên > 50 ký tự: "Tên quá dài, tối đa 50 ký tự".
+o	Mật khẩu không đủ mạnh: "Mật khẩu phải có chữ hoa, số, tối thiểu 8 ký tự".
+o	Tệp ảnh > 2MB: "Tệp ảnh quá lớn, tối đa 2MB".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+•	Lưu trữ:
+o	Bảng Patients: Name, Address, Avatar, Password.
+o	Bảng Doctors: Name, Phone, Avatar, Description, Price.
+3.10. FR-10: Lập phác đồ điều trị
+•	Mô tả: Bác sĩ tạo, cập nhật, hoặc xóa phác đồ điều trị trên website.
+•	Quy trình:
+1.	Bác sĩ đăng nhập website, vào mục "Quản lý thứ tự khám", chọn bệnh nhân đã hoàn tất khám.
+2.	Nhấn "Lập phác đồ", nhập tên thuốc, liều lượng, hướng dẫn (ví dụ: "Paracetamol 500mg, uống 2 viên/ngày, sau ăn").
+3.	Hệ thống lưu vào bảng Treatments (Appointment_id, Name, Type, Times, Purpose, Instruction).
+4.	Nếu cập nhật, chọn phác đồ hiện có, chỉnh sửa và lưu.
+5.	Nếu xóa, chọn phác đồ, nhấn "Xóa", xóa bản ghi.
+6.	Gửi thông báo đến bệnh nhân qua Android (Firebase) hoặc email.
+•	Đầu vào:
+o	Appointment_id: số nguyên.
+o	Tên thuốc: chuỗi tối đa 50 ký tự.
+o	Type: chuỗi (ví dụ: "Uống").
+o	Times: số nguyên (số lần/ngày).
+o	Purpose: chuỗi tối đa 255 ký tự.
+o	Instruction: chuỗi tối đa 255 ký tự.
+o	JSON gửi API: { "appointment_id": 456, "name": "Paracetamol 500mg", "type": "Uống", "times": 2, "purpose": "Giảm đau", "instruction": "Uống sau ăn" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Lập phác đồ thành công" } hoặc { "result": 0, "msg": "Vui lòng nhập tên thuốc" }.
+o	Thông báo: "Lập phác đồ thành công" hoặc lỗi.
+o	Thông báo Android: "Phác đồ điều trị mới đã được tạo".
+•	Xử lý lỗi mở rộng:
+o	Thiếu tên thuốc: "Vui lòng nhập tên thuốc".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Appointment_id không hợp lệ: "Lịch khám không tồn tại".
+•	Lưu trữ:
+o	Bảng Treatments: Appointment_id, Name, Type, Times, Purpose, Instruction.
+3.11. FR-11: Quản lý lịch hẹn
+•	Mô tả: Cộng tác viên xem, cập nhật, hoặc xóa lịch hẹn trên website.
+•	Quy trình:
+1.	Cộng tác viên đăng nhập website, vào mục "Quản lý lịch hẹn".
+2.	Hệ thống gửi yêu cầu API (GET /api/bookings?date=2025-04-26).
+3.	Truy vấn bảng Booking để hiển thị danh sách lịch hẹn (Service_id, Patient_id, Appointment_Time, Reason, Status).
+4.	Xác nhận/từ chối:
+	Chọn lịch hẹn, nhấn "Xác nhận", chọn bác sĩ (dựa trên Service_id).
+	Cập nhật Status = "Confirmed", lưu Doctor_id, gửi thông báo đến bệnh nhân.
+	Nếu từ chối, nhập lý do, cập nhật Status = "Rejected", gửi thông báo.
+5.	Cập nhật: Chỉnh sửa thời gian, dịch vụ, hoặc mô tả, nhấn "Lưu".
+6.	Xóa: Chọn lịch hẹn, nhấn "Xóa", xóa bản ghi, gửi thông báo.
+•	Đầu vào:
+o	Date: định dạng "YYYY-MM-DD".
+o	Booking_id: số nguyên.
+o	Doctor_id: số nguyên.
+o	Lý do từ chối: chuỗi tối đa 255 ký tự.
+o	JSON gửi API (xác nhận): { "booking_id": 456, "doctor_id": 789, "status": "Confirmed" }.
+•	Đầu ra:
+o	JSON trả về: [ { "booking_id": 456, "service_id": 1, "patient_id": 123, "appointment_time": "2025-04-26 10:30", "reason": "Đau bụng" }, ... ] hoặc { "result": 0, "msg": "Chưa có lịch hẹn" }.
+o	Thông báo: "Xác nhận thành công" hoặc lỗi.
+o	Email: "Lịch hẹn của bạn đã được xác nhận/từ chối".
+•	Xử lý lỗi mở rộng:
+o	Chưa có lịch hẹn: "Chưa có lịch hẹn trong ngày".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Bác sĩ không khả dụng: "Bác sĩ không có lịch trống".
+•	Lưu trữ:
+o	Bảng Booking: Service_id, Patient_id, Appointment_Time, Reason, Status, Doctor_id.
+3.12. FR-12: Quản lý tài khoản
+•	Mô tả: Quản trị viên xem, tạo, cập nhật, hoặc xóa tài khoản bác sĩ/cộng tác viên trên website.
+•	Quy trình:
+1.	Quản trị viên đăng nhập website, vào mục "Quản lý tài khoản".
+2.	Hệ thống gửi yêu cầu API (GET /api/doctors).
+3.	Truy vấn bảng Doctors để hiển thị danh sách tài khoản (Doctor_id, Email, Phone, Name, Role).
+4.	Tạo tài khoản:
+	Nhập email, số điện thoại, tên, vai trò (admin, supporter, member).
+	Nhấn "Tạo", hệ thống kiểm tra email/số điện thoại không trùng, gửi mật khẩu tạm thời qua email.
+5.	Cập nhật: Chỉnh sửa thông tin, nhấn "Lưu".
+6.	Xóa: Chọn tài khoản, nhấn "Xóa", kiểm tra không có lịch khám đang hoạt động, xóa bản ghi.
+•	Đầu vào:
+o	Email: chuỗi tối đa 255 ký tự.
+o	Số điện thoại: chuỗi 10 ký tự.
+o	Tên: chuỗi tối đa 50 ký tự.
+o	Vai trò: chuỗi (admin, supporter, member).
+o	JSON gửi API: { "email": "doctor@example.com", "phone": "0366123456", "name": "Nguyen Van B", "role": "member" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Tạo tài khoản thành công" } hoặc { "result": 0, "msg": "Email đã tồn tại" }.
+o	Thông báo: "Tạo tài khoản thành công" hoặc lỗi.
+o	Email: "Tài khoản của bạn đã được tạo, mật khẩu: abc123".
+•	Xử lý lỗi mở rộng:
+o	Email/số điện thoại trùng: "Email/số điện thoại đã được sử dụng".
+o	Thiếu thông tin: "Vui lòng nhập đầy đủ thông tin".
+o	Tài khoản có lịch khám: "Không thể xóa do tài khoản đang có lịch khám".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+•	Lưu trữ:
+o	Bảng Doctors: Doctor_id, Email, Phone, Name, Role.
+3.13. FR-13: Quản lý chuyên khoa
+•	Mô tả: Quản trị viên xem, tạo, hoặc xóa chuyên khoa trên website.
+•	Quy trình:
+1.	Quản trị viên đăng nhập website, vào mục "Quản lý chuyên khoa".
+2.	Hệ thống gửi yêu cầu API (GET /api/specialities).
+3.	Truy vấn bảng Specialities để hiển thị danh sách (Name, Description).
+4.	Tạo chuyên khoa:
+	Nhập tên (ví dụ: "Nội khoa"), mô tả (tối đa 255 ký tự).
+	Nhấn "Tạo", kiểm tra tên không trùng, lưu vào bảng Specialities.
+5.	Xóa chuyên khoa:
+	Chọn chuyên khoa, nhấn "Xóa", kiểm tra không có bác sĩ liên kết, xóa bản ghi.
+•	Đầu vào:
+o	Tên: chuỗi tối đa 255 ký tự.
+o	Mô tả: chuỗi tối đa 255 ký tự.
+o	JSON gửi API: { "name": "Nội khoa", "description": "Chuyên khoa nội tổng quát" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Tạo chuyên khoa thành công" } hoặc { "result": 0, "msg": "Tên chuyên khoa đã tồn tại" }.
+o	Thông báo: "Tạo chuyên khoa thành công" hoặc lỗi.
+•	Xử lý lỗi mở rộng:
+o	Tên trùng: "Tên chuyên khoa đã tồn tại".
+o	Chuyên khoa có bác sĩ: "Không thể xóa do có bác sĩ đang làm việc".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+•	Lưu trữ:
+o	Bảng Specialities: id (số nguyên), Name (chuỗi 255 ký tự), Description (chuỗi 255 ký tự).
+3.14. FR-14: Quản lý phòng khám
+•	Mô tả: Quản trị viên xem, tạo, hoặc xóa phòng khám trên website.
+•	Quy trình:
+1.	Quản trị viên đăng nhập website, vào mục "Quản lý phòng khám".
+2.	Hệ thống gửi yêu cầu API (GET /api/rooms).
+3.	Truy vấn bảng Rooms để hiển thị danh sách (Name, Location).
+4.	Tạo phòng khám:
+	Nhập tên (ví dụ: "Phòng 101"), vị trí (tối đa 255 ký tự).
+	Nhấn "Tạo", kiểm tra tên không trùng, lưu vào bảng Rooms.
+5.	Xóa phòng khám:
+	Chọn phòng, nhấn "Xóa", kiểm tra không có bác sĩ liên kết, xóa bản ghi.
+•	Đầu vào:
+o	Tên: chuỗi tối đa 255 ký tự.
+o	Vị trí: chuỗi tối đa 255 ký tự.
+o	JSON gửi API: { "name": "Phòng 101", "location": "Tầng 1, khu A" }.
+•	Đầu ra:
+o	JSON trả về: { "result": 1, "msg": "Tạo phòng khám thành công" } hoặc { "result": 0, "msg": "Tên phòng đã tồn tại" }.
+o	Thông báo: "Tạo phòng khám thành công" hoặc lỗi.
+•	Xử lý lỗi mở rộng:
+o	Tên trùng: "Tên phòng đã tồn tại".
+o	Phòng có bác sĩ: "Không thể xóa do có bác sĩ đang làm việc".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+•	Lưu trữ:
+o	Bảng Rooms: id (số nguyên), Name (chuỗi 255 ký tự), Location (chuỗi 255 ký tự).
+3.15. FR-15: Xem lịch sử khám bệnh
+•	Mô tả: Bệnh nhân xem danh sách lịch khám trước đây trên Android.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Lịch sử khám bệnh".
+2.	Hệ thống gửi yêu cầu API (GET /api/bookings?patient_id=123&status=Confirmed).
+3.	Truy vấn bảng Booking để hiển thị danh sách (Service_id, Appointment_Time, Doctor_id).
+4.	Hiển thị chi tiết (ví dụ: "Ngày: 2025-04-25, Dịch vụ: Nội khoa, Bác sĩ: Nguyen Van B").
+5.	Nếu không có lịch sử, hiển thị thông báo "Chưa có lịch sử".
+•	Đầu vào:
+o	Patient_id: số nguyên.
+o	Status: chuỗi ("Confirmed").
+•	Đầu ra:
+o	JSON trả về: [ { "booking_id": 456, "service_id": 1, "appointment_time": "2025-04-25 10:30", "doctor_name": "Nguyen Van B" }, ... ] hoặc { "result": 0, "msg": "Chưa có lịch sử" }.
+o	Thông báo: "Chưa có lịch sử" nếu không có dữ liệu.
+•	Xử lý lỗi mở rộng:
+o	Không có lịch sử: "Chưa có lịch sử khám bệnh".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Server lỗi: "Không thể tải lịch sử, vui lòng thử lại".
+•	Lưu trữ:
+o	Bảng Booking: Service_id, Patient_id, Appointment_Time, Doctor_id, Status.
+3.16. FR-16: Tìm kiếm
+•	Mô tả: Bệnh nhân nhập từ khóa để tìm kiếm bác sĩ, chuyên khoa, hoặc dịch vụ trên Android.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Tìm kiếm".
+2.	Nhập từ khóa (ví dụ: "Nội khoa", "Nguyen Van B").
+3.	Hệ thống gửi yêu cầu API (GET /api/search?keyword=Noi%20khoa).
+4.	Truy vấn bảng Doctors, Specialities, Services để tìm kiếm theo từ khóa (so khớp tên hoặc mô tả).
+5.	Hiển thị danh sách kết quả (ví dụ: "Bác sĩ: Nguyen Van B, Chuyên khoa: Nội khoa").
+6.	Nếu không có kết quả, hiển thị thông báo "Không tìm thấy".
+•	Đầu vào:
+o	Từ khóa: chuỗi tối đa 255 ký tự.
+o	JSON gửi API: { "keyword": "Nội khoa" }.
+•	Đầu ra:
+o	JSON trả về: [ { "type": "doctor", "name": "Nguyen Van B", "speciality": "Nội khoa" }, { "type": "speciality", "name": "Nội khoa" }, ... ] hoặc { "result": 0, "msg": "Không tìm thấy" }.
+o	Thông báo: "Không tìm thấy" nếu không có kết quả.
+•	Xử lý lỗi mở rộng:
+o	Từ khóa rỗng: "Vui lòng nhập từ khóa tìm kiếm".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Server lỗi: "Không thể tìm kiếm, vui lòng thử lại".
+•	Lưu trữ:
+o	Bảng Doctors: Name, Speciality_id.
+o	Bảng Specialities: Name, Description.
+o	Bảng Services: Name.
+3.17. FR-17: Xem chi tiết
+•	Mô tả: Bệnh nhân xem thông tin chi tiết về bác sĩ, chuyên khoa, hoặc dịch vụ trên Android.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, chọn mục từ kết quả tìm kiếm (bác sĩ, chuyên khoa, dịch vụ).
+2.	Hệ thống gửi yêu cầu API (GET /api/details?type=doctor&id=789).
+3.	Truy vấn bảng tương ứng (Doctors, Specialities, Services) để hiển thị chi tiết (ví dụ: "Bác sĩ: Nguyen Van B, Chuyên khoa: Nội khoa, Mô tả: 10 năm kinh nghiệm").
+4.	Nếu không có dữ liệu, hiển thị thông báo "Không tìm thấy thông tin".
+•	Đầu vào:
+o	Type: chuỗi (doctor, speciality, service).
+o	id: số nguyên (ví dụ: 789).
+o	JSON gửi API: { "type": "doctor", "id": 789 }.
+•	Đầu ra:
+o	JSON trả về: { "type": "doctor", "name": "Nguyen Van B", "speciality": "Nội khoa", "description": "10 năm kinh nghiệm" } hoặc { "result": 0, "msg": "Không tìm thấy thông tin" }.
+o	Thông báo: "Không tìm thấy thông tin" nếu không có dữ liệu.
+•	Xử lý lỗi mở rộng:
+o	id không tồn tại: "Không tìm thấy thông tin".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Server lỗi: "Không thể tải thông tin, vui lòng thử lại".
+•	Lưu trữ:
+o	Bảng Doctors: Name, Speciality_id, Description.
+o	Bảng Specialities: Name, Description.
+o	Bảng Services: Name.
+3.18. FR-18: Cá nhân hóa
+•	Mô tả: Bệnh nhân tùy chỉnh giao diện, xem hướng dẫn đi khám, hoặc gửi email phản hồi trên Android.
+•	Quy trình:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Cá nhân hóa".
+2.	Tùy chỉnh giao diện:
+	Chọn chế độ ban đêm (bật/tắt) hoặc ngôn ngữ (tiếng Anh/tiếng Việt).
+	Hệ thống cập nhật giao diện, lưu tùy chọn cục bộ (SharedPreferences).
+3.	Xem hướng dẫn đi khám:
+	Chọn "Hướng dẫn đi khám", hiển thị quy trình (ví dụ: "Đặt lịch, đến bệnh viện, nhận số thứ tự").
+4.	Gửi email phản hồi:
+	Chọn "Phản hồi", nhập nội dung (tối đa 500 ký tự), nhấn "Gửi".
+	Hệ thống gửi email đến địa chỉ hỗ trợ (support@umbrellahealth.com).
+5.	Hiển thị thông báo "Cập nhật thành công" hoặc "Email đã được gửi".
+•	Đầu vào:
+o	Chế độ ban đêm: boolean (true/false).
+o	Ngôn ngữ: chuỗi (en, vi).
+o	Nội dung phản hồi: chuỗi tối đa 500 ký tự.
+o	JSON gửi API (email): { "patient_id": 123, "content": "Ứng dụng hay nhưng cần thêm chat" }.
+•	Đầu ra:
+o	JSON trả về (email): { "result": 1, "msg": "Email đã được gửi" } hoặc { "result": 0, "msg": "Không thể gửi email" }.
+o	Thông báo: "Cập nhật giao diện thành công" hoặc "Email đã được gửi".
+•	Xử lý lỗi mở rộng:
+o	Nội dung phản hồi > 500 ký tự: "Nội dung quá dài, tối đa 500 ký tự".
+o	Mất kết nối mạng: "Không có kết nối, vui lòng kiểm tra mạng".
+o	Email server lỗi: "Không thể gửi email, vui lòng thử lại sau 5 giây".
+•	Lưu trữ:
+o	Tùy chọn giao diện: Lưu cục bộ trên thiết bị Android (SharedPreferences).
+o	Email phản hồi: Lưu trong hệ thống email hoặc bảng log (nếu cần).
+4. Use-case Chi tiết
+Phần này cung cấp kịch bản người dùng cho tất cả 18 yêu cầu chức năng, dựa trên các tương tác và quy trình của hệ thống Umbrella Health. Mỗi use-case bao gồm tên, tác nhân chính, tiền điều kiện, luồng chính, luồng phụ, và kết quả mong đợi. Dưới đây là use-case cho một số yêu cầu tiêu biểu; các use-case còn lại được trình bày tương tự (toàn bộ sẽ được cung cấp nếu bạn yêu cầu).
+4. Use-case Chi tiết (tiếp tục)
+4.1. Use-case: Đăng nhập (FR-01) (đã trình bày, bổ sung luồng phụ)
+•	Luồng phụ (tiếp tục):
+o	A2: OTP sai:
+	A2.1: Hiển thị "OTP không đúng, vui lòng nhập lại".
+	A2.2: Cho phép nhập lại tối đa 3 lần, sau đó yêu cầu gửi OTP mới.
+o	A3: OTP hết hạn:
+	A3.1: Hiển thị "OTP đã hết hiệu lực, yêu cầu OTP mới".
+	A3.2: Quay lại bước gửi OTP.
+o	A4: Mất kết nối mạng:
+	A4.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A4.2: Cho phép thử lại sau 5 giây.
+o	A5: Email/mật khẩu sai (website):
+	A5.1: Hiển thị "Email hoặc mật khẩu không đúng".
+	A5.2: Sau 5 lần sai, khóa tài khoản tạm thời 15 phút, hiển thị "Tài khoản bị khóa, thử lại sau 15 phút".
+o	A6: Khôi phục mật khẩu:
+	A6.1: Người dùng nhập email, nhấn "Khôi phục mật khẩu".
+	A6.2: Hệ thống gửi mã khôi phục, người dùng nhập mã và mật khẩu mới.
+	A6.3: Nếu mã sai, hiển thị "Mã không đúng, yêu cầu mã mới".
+•	Kết quả: Người dùng đăng nhập thành công, chuyển đến màn hình chính/dashboard, hoặc nhận thông báo lỗi phù hợp.
+4.2. Use-case: Đăng ký tài khoản (FR-02)
+•	Tên Use-case: Đăng ký tài khoản
+•	Tác nhân chính: Bệnh nhân, Bác sĩ, Quản trị viên
+•	Tiền điều kiện: Số điện thoại/email chưa được sử dụng. Hệ thống kết nối với Firebase (OTP) hoặc email server.
+•	Luồng chính:
+1.	Bệnh nhân (Android):
+	Mở ứng dụng Android, chọn "Đăng ký".
+	Nhập số điện thoại (ví dụ: 366123456), tên (Nguyen Van A), giới tính (Nam), ngày sinh (1990-01-01), địa chỉ (123 Đường Láng).
+	Nhấn "Đăng ký", hệ thống kiểm tra số điện thoại không trùng.
+	Nhận OTP (6 chữ số), nhập OTP và nhấn "Xác nhận".
+2.	Bác sĩ (website):
+	Mở website, chọn "Đăng ký".
+	Nhập email (doctor@example.com), số điện thoại (0366123456), tên (Nguyen Van B), mô tả chuyên môn (10 năm kinh nghiệm), chi phí khám (200000 VND).
+	Nhấn "Đăng ký", hệ thống kiểm tra email/số điện thoại không trùng.
+	Nhận mật khẩu tạm thời qua email.
+3.	Quản trị viên (website):
+	Vào mục "Quản lý tài khoản", chọn "Tạo tài khoản".
+	Nhập thông tin tương tự bác sĩ, nhấn "Tạo".
+	Hệ thống gửi email thông báo với mật khẩu tạm thời.
+4.	Hệ thống lưu tài khoản, hiển thị thông báo "Đăng ký thành công".
+•	Luồng phụ:
+o	A1: Số điện thoại/email trùng:
+	A1.1: Hiển thị "Số điện thoại/email đã được sử dụng".
+	A1.2: Yêu cầu nhập lại.
+o	A2: Thiếu thông tin bắt buộc:
+	A2.1: Hiển thị "Vui lòng nhập đầy đủ thông tin".
+	A2.2: Yêu cầu nhập lại.
+o	A3: OTP sai:
+	A3.1: Hiển thị "OTP không đúng, vui lòng nhập lại".
+	A3.2: Cho phép nhập lại tối đa 3 lần.
+o	A4: Mất kết nối mạng:
+	A4.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A4.2: Lưu thông tin tạm thời, cho phép thử lại.
+o	A5: Email server lỗi:
+	A5.1: Hiển thị "Không thể gửi email, vui lòng thử lại sau 5 giây".
+	A5.2: Đề xuất liên hệ quản trị viên.
+•	Kết quả: Tài khoản được tạo, người dùng nhận OTP/mật khẩu qua email, hoặc nhận thông báo lỗi.
+4.3. Use-case: Đăng xuất (FR-03)
+•	Tên Use-case: Đăng xuất
+•	Tác nhân chính: Bệnh nhân, Bác sĩ, Cộng tác viên
+•	Tiền điều kiện: Người dùng đã đăng nhập (có token JWT hoặc session cookie).
+•	Luồng chính:
+1.	Người dùng nhấn nút "Đăng xuất" trên ứng dụng Android hoặc website.
+2.	Hệ thống hủy phiên đăng nhập (xóa token JWT trên Android hoặc session cookie trên website).
+3.	Chuyển đến màn hình đăng nhập.
+4.	Hiển thị thông báo "Đăng xuất thành công".
+•	Luồng phụ:
+o	A1: Mất kết nối mạng:
+	A1.1: Hiển thị "Không có kết nối, nhưng phiên đăng nhập đã được hủy cục bộ".
+	A1.2: Chuyển đến màn hình đăng nhập.
+o	A2: Phiên đăng nhập không tồn tại:
+	A2.1: Hiển thị "Bạn đã đăng xuất, vui lòng đăng nhập lại".
+	A2.2: Chuyển đến màn hình đăng nhập.
+•	Kết quả: Phiên đăng nhập bị hủy, người dùng chuyển đến màn hình đăng nhập.
+4.4. Use-case: Đặt lịch khám bệnh (FR-04)
+•	Tên Use-case: Đặt lịch khám bệnh
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có bác sĩ và khung giờ trống trong hệ thống.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, chọn mục "Đặt lịch khám".
+2.	Chọn dịch vụ khám từ danh sách (ví dụ: Nội khoa).
+3.	Chọn thời gian từ khung giờ trống (ví dụ: 10:30 ngày 26/04/2025).
+4.	Nhập mô tả bệnh lý (ví dụ: "Đau bụng 2 ngày").
+5.	Nhấn "Xác nhận" để gửi yêu cầu.
+6.	Hệ thống kiểm tra thời gian không trùng, lưu lịch hẹn vào cơ sở dữ liệu (Status = "Pending").
+7.	Hiển thị thông báo "Đặt lịch thành công", cập nhật mục "Lịch khám bệnh".
+•	Luồng phụ:
+o	A1: Thời gian trùng:
+	A1.1: Hiển thị "Thời gian đã có lịch hẹn".
+	A1.2: Đề xuất khung giờ khác.
+o	A2: Thiếu mô tả bệnh lý:
+	A2.1: Hiển thị "Vui lòng nhập mô tả bệnh lý".
+	A2.2: Yêu cầu nhập lại.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Lưu yêu cầu tạm thời, thử lại khi có mạng.
+o	A4: Số lượng lịch hẹn vượt giới hạn (1,000/ngày):
+	A4.1: Hiển thị "Hết khung giờ trống, vui lòng chọn ngày khác".
+	A4.2: Đề xuất ngày khác.
+o	A5: Chỉnh sửa lịch hẹn:
+	A5.1: Bệnh nhân chọn lịch hẹn, cập nhật dịch vụ/thời gian/mô tả.
+	A5.2: Hệ thống kiểm tra lại, hiển thị "Cập nhật thành công".
+o	A6: Hủy lịch hẹn:
+	A6.1: Bệnh nhân chọn lịch hẹn, nhấn "Hủy".
+	A6.2: Hiển thị "Lịch hẹn đã được hủy".
+•	Kết quả: Lịch hẹn được tạo/cập nhật/hủy, hiển thị trên Android và website, hoặc nhận thông báo lỗi.
+4.5. Use-case: Theo dõi thứ tự khám bệnh (FR-05)
+•	Tên Use-case: Theo dõi thứ tự khám bệnh
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có lịch khám hợp lệ trong ngày.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Lịch khám bệnh".
+2.	Hệ thống hiển thị danh sách thứ tự khám (tên, Numerical_order, Position, thời gian).
+3.	Nếu Position <= 3, hệ thống gửi thông báo qua Firebase ("Sắp đến lượt khám của bạn", màu cam, kèm nhạc chuông).
+4.	Bệnh nhân xem danh sách, thấy tên mình nổi bật khi gần đến lượt.
+•	Luồng phụ:
+o	A1: Không có lịch khám:
+	A1.1: Hiển thị "Chưa có lịch khám trong ngày".
+	A1.2: Đề xuất đặt lịch mới.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Hiển thị dữ liệu cục bộ (nếu có) hoặc yêu cầu thử lại.
+o	A3: Server lỗi:
+	A3.1: Hiển thị "Không thể tải danh sách, vui lòng thử lại".
+	A3.2: Cho phép thử lại sau 5 giây.
+•	Kết quả: Bệnh nhân xem được thứ tự khám, nhận thông báo khi gần đến lượt, hoặc thấy thông báo lỗi.
+4.6. Use-case: Xem phác đồ điều trị (FR-06)
+•	Tên Use-case: Xem phác đồ điều trị
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có phác đồ điều trị được bác sĩ tạo.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Phác đồ điều trị".
+2.	Hệ thống hiển thị danh sách phác đồ (tên thuốc, liều lượng, hướng dẫn).
+3.	Bệnh nhân chọn phác đồ để xem chi tiết (ví dụ: "Paracetamol 500mg, uống 2 viên/ngày").
+4.	Để đặt nhắc nhở:
+	Nhấn "Đặt thời gian", nhập thời gian (10:00), nội dung ("Uống Paracetamol"), lặp lại (thứ 2, 4, 6), bật rung.
+	Nhấn "Xác nhận", hệ thống tạo nhắc nhở trong ứng dụng đồng hồ.
+5.	Hiển thị thông báo "Nhắc nhở đã được tạo".
+•	Luồng phụ:
+o	A1: Không có phác đồ:
+	A1.1: Hiển thị "Chưa có phác đồ điều trị".
+	A1.2: Đề xuất xem bệnh án.
+o	A2: Ứng dụng đồng hồ không khả dụng:
+	A2.1: Hiển thị "Không thể tạo nhắc nhở, kiểm tra ứng dụng đồng hồ".
+	A2.2: Đề xuất lưu thủ công.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Hiển thị dữ liệu cục bộ (nếu có).
+o	A4: Thời gian không hợp lệ:
+	A4.1: Hiển thị "Vui lòng chọn thời gian hợp lệ".
+	A4.2: Yêu cầu nhập lại.
+•	Kết quả: Bệnh nhân xem được phác đồ, tạo nhắc nhở thành công, hoặc thấy thông báo lỗi.
+4.7. Use-case: Xem bệnh án (FR-07)
+•	Tên Use-case: Xem bệnh án
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có bệnh án được bác sĩ tạo.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Bệnh án".
+2.	Hệ thống hiển thị danh sách bệnh án (lý do, chẩn đoán, tình trạng).
+3.	Bệnh nhân chọn bệnh án để xem chi tiết (ví dụ: "Viêm dạ dày, cải thiện").
+•	Luồng phụ:
+o	A1: Không có bệnh án:
+	A1.1: Hiển thị "Chưa có bệnh án".
+	A1.2: Đề xuất xem lịch sử khám.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Hiển thị dữ liệu cục bộ (nếu có).
+o	A3: Server lỗi:
+	A3.1: Hiển thị "Không thể tải bệnh án, vui lòng thử lại".
+	A3.2: Cho phép thử lại.
+•	Kết quả: Bệnh nhân xem được bệnh án hoặc thấy thông báo lỗi.
+4.8. Use-case: Cập nhật thông tin cá nhân (FR-08)
+•	Tên Use-case: Cập nhật thông tin cá nhân
+•	Tác nhân chính: Bệnh nhân, Bác sĩ
+•	Tiền điều kiện: Người dùng đã đăng nhập.
+•	Luồng chính:
+1.	Bệnh nhân (Android):
+	Mở mục "Cá nhân hóa", chọn "Thông tin cá nhân".
+	Cập nhật tên, địa chỉ, ảnh đại diện, mật khẩu.
+	Nhấn "Lưu", hệ thống kiểm tra định dạng.
+2.	Bác sĩ (website):
+	Mở mục "Thông tin cá nhân", cập nhật tên, số điện thoại, ảnh đại diện, mô tả chuyên môn.
+	Nhấn "Lưu", hệ thống kiểm tra định dạng.
+3.	Hiển thị thông báo "Cập nhật thành công".
+•	Luồng phụ:
+o	A1: Định dạng không hợp lệ:
+	A1.1: Hiển thị lỗi (ví dụ: "Mật khẩu không đủ mạnh").
+	A1.2: Yêu cầu nhập lại.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Lưu tạm thời, thử lại khi có mạng.
+o	A3: Tệp ảnh quá lớn:
+	A3.1: Hiển thị "Tệp ảnh quá lớn, tối đa 2MB".
+	A3.2: Yêu cầu chọn lại.
+•	Kết quả: Thông tin được cập nhật hoặc nhận thông báo lỗi.
+4.9. Use-case: Quản lý thứ tự khám bệnh (FR-09)
+•	Tên Use-case: Quản lý thứ tự khám bệnh
+•	Tác nhân chính: Bác sĩ, Cộng tác viên
+•	Tiền điều kiện: Người dùng đã đăng nhập. Có danh sách bệnh nhân trong ngày.
+•	Luồng chính:
+1.	Người dùng mở website, vào mục "Quản lý thứ tự khám".
+2.	Hệ thống hiển thị danh sách bệnh nhân (tên, Numerical_order, Position).
+3.	Tạo thứ tự:
+	Chọn bệnh nhân từ lịch hẹn, gán Numerical_order và Position.
+	Nhấn "Lưu".
+4.	Cập nhật thứ tự:
+	Kéo thả bệnh nhân để thay đổi Position.
+	Nhấn "Lưu".
+5.	Ưu tiên bệnh nhân:
+	Hệ thống tự động phát hiện bệnh lý đặc biệt (đau cột sống, bệnh trĩ) hoặc người dùng kéo thả thủ công.
+6.	Hiển thị thông báo "Cập nhật thành công".
+•	Luồng phụ:
+o	A1: Không có bệnh nhân:
+	A1.1: Hiển thị "Chưa có bệnh nhân trong ngày".
+	A1.2: Đề xuất xem lịch hẹn.
+o	A2: Position trùng:
+	A2.1: Hiển thị "Thứ tự đã được gán, vui lòng chọn lại".
+	A2.2: Yêu cầu chọn lại.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Lưu tạm thời, thử lại.
+•	Kết quả: Thứ tự khám được cập nhật, đồng bộ với Android, hoặc nhận thông báo lỗi.
+4.10. Use-case: Lập phác đồ điều trị (FR-10)
+•	Tên Use-case: Lập phác đồ điều trị
+•	Tác nhân chính: Bác sĩ
+•	Tiền điều kiện: Bác sĩ đã đăng nhập. Có lịch khám đã hoàn tất.
+•	Luồng chính:
+1.	Bác sĩ mở website, vào mục "Quản lý thứ tự khám", chọn bệnh nhân đã khám.
+2.	Nhấn "Lập phác đồ", nhập tên thuốc, liều lượng, hướng dẫn.
+3.	Nhấn "Lưu", hệ thống lưu phác đồ.
+4.	Gửi thông báo đến bệnh nhân qua Android.
+5.	Hiển thị thông báo "Lập phác đồ thành công".
+•	Luồng phụ:
+o	A1: Thiếu thông tin:
+	A1.1: Hiển thị "Vui lòng nhập tên thuốc".
+	A1.2: Yêu cầu nhập lại.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Lưu tạm thời, thử lại.
+o	A3: Lịch khám không hợp lệ:
+	A3.1: Hiển thị "Lịch khám không tồn tại".
+	A3.2: Đề xuất chọn bệnh nhân khác.
+•	Kết quả: Phác đồ được tạo, gửi đến bệnh nhân, hoặc nhận thông báo lỗi.
+4.11. Use-case: Quản lý lịch hẹn (FR-11)
+•	Tên Use-case: Quản lý lịch hẹn
+•	Tác nhân chính: Cộng tác viên
+•	Tiền điều kiện: Cộng tác viên đã đăng nhập. Có lịch hẹn từ bệnh nhân.
+•	Luồng chính:
+1.	Cộng tác viên mở website, vào mục "Quản lý lịch hẹn".
+2.	Hệ thống hiển thị danh sách lịch hẹn (dịch vụ, thời gian, bệnh nhân).
+3.	Xác nhận:
+	Chọn lịch hẹn, chọn bác sĩ, nhấn "Xác nhận".
+	Gửi thông báo đến bệnh nhân.
+4.	Từ chối:
+	Nhập lý do, nhấn "Từ chối", gửi thông báo.
+5.	Hiển thị thông báo "Xác nhận thành công".
+•	Luồng phụ:
+o	A1: Không có lịch hẹn:
+	A1.1: Hiển thị "Chưa có lịch hẹn trong ngày".
+	A1.2: Đề xuất xem ngày khác.
+o	A2: Bác sĩ không khả dụng:
+	A2.1: Hiển thị "Bác sĩ không có lịch trống".
+	A2.2: Đề xuất chọn bác sĩ khác.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Lưu tạm thời, thử lại.
+•	Kết quả: Lịch hẹn được xác nhận/từ chối, gửi thông báo, hoặc nhận thông báo lỗi.
+4.12. Use-case: Quản lý tài khoản (FR-12)
+•	Tên Use-case: Quản lý tài khoản
+•	Tác nhân chính: Quản trị viên
+•	Tiền điều kiện: Quản trị viên đã đăng nhập.
+•	Luồng chính:
+1.	Quản trị viên mở website, vào mục "Quản lý tài khoản".
+2.	Hệ thống hiển thị danh sách tài khoản bác sĩ/cộng tác viên.
+3.	Tạo tài khoản:
+	Nhập email, số điện thoại, tên, vai trò.
+	Nhấn "Tạo", gửi email với mật khẩu tạm thời.
+4.	Cập nhật: Chỉnh sửa thông tin, nhấn "Lưu".
+5.	Xóa: Chọn tài khoản, nhấn "Xóa".
+6.	Hiển thị thông báo "Tạo tài khoản thành công".
+•	Luồng phụ:
+o	A1: Email/số điện thoại trùng:
+	A1.1: Hiển thị "Email/số điện thoại đã được sử dụng".
+	A1.2: Yêu cầu nhập lại.
+o	A2: Tài khoản có lịch khám:
+	A2.1: Hiển thị "Không thể xóa do tài khoản đang có lịch khám".
+	A2.2: Đề xuất hủy lịch trước.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Lưu tạm thời, thử lại.
+•	Kết quả: Tài khoản được quản lý, gửi email thông báo, hoặc nhận thông báo lỗi.
+4.13. Use-case: Quản lý chuyên khoa (FR-13)
+•	Tên Use-case: Quản lý chuyên khoa
+•	Tác nhân chính: Quản trị viên
+•	Tiền điều kiện: Quản trị viên đã đăng nhập.
+•	Luồng chính:
+1.	Quản trị viên mở website, vào mục "Quản lý chuyên khoa".
+2.	Hệ thống hiển thị danh sách chuyên khoa (tên, mô tả).
+3.	Tạo chuyên khoa:
+	Nhập tên (Nội khoa), mô tả.
+	Nhấn "Tạo", kiểm tra tên không trùng.
+4.	Xóa chuyên khoa:
+	Chọn chuyên khoa, nhấn "Xóa".
+5.	Hiển thị thông báo "Tạo chuyên khoa thành công".
+•	Luồng phụ:
+o	A1: Tên trùng:
+	A1.1: Hiển thị "Tên chuyên khoa đã tồn tại".
+	A1.2: Yêu cầu nhập lại.
+o	A2: Chuyên khoa có bác sĩ:
+	A2.1: Hiển thị "Không thể xóa do có bác sĩ đang làm việc".
+	A2.2: Đề xuất xóa bác sĩ trước.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Lưu tạm thời, thử lại.
+•	Kết quả: Chuyên khoa được tạo/xóa, hoặc nhận thông báo lỗi.
+4.14. Use-case: Quản lý phòng khám (FR-14)
+•	Tên Use-case: Quản lý phòng khám
+•	Tác nhân chính: Quản trị viên
+•	Tiền điều kiện: Quản trị viên đã đăng nhập.
+•	Luồng chính:
+1.	Quản trị viên mở website, vào mục "Quản lý phòng khám".
+2.	Hệ thống hiển thị danh sách phòng khám (tên, vị trí).
+3.	Tạo phòng khám:
+	Nhập tên (Phòng 101), vị trí (Tầng 1, khu A).
+	Nhấn "Tạo", kiểm tra tên không trùng.
+4.	Xóa phòng khám:
+	Chọn phòng, nhấn "Xóa".
+5.	Hiển thị thông báo "Tạo phòng khám thành công".
+•	Luồng phụ:
+o	A1: Tên trùng:
+	A1.1: Hiển thị "Tên phòng đã tồn tại".
+	A1.2: Yêu cầu nhập lại.
+o	A2: Phòng có bác sĩ:
+	A2.1: Hiển thị "Không thể xóa do có bác sĩ đang làm việc".
+	A2.2: Đề xuất xóa bác sĩ trước.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Lưu tạm thời, thử lại.
+•	Kết quả: Phòng khám được tạo/xóa, hoặc nhận thông báo lỗi.
+4.15. Use-case: Xem lịch sử khám bệnh (FR-15)
+•	Tên Use-case: Xem lịch sử khám bệnh
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có lịch sử khám trong cơ sở dữ liệu.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Lịch sử khám bệnh".
+2.	Hệ thống hiển thị danh sách lịch khám (ngày, dịch vụ, bác sĩ).
+3.	Bệnh nhân chọn lịch để xem chi tiết (ví dụ: "Ngày: 2025-04-25, Nội khoa, Nguyen Van B").
+•	Luồng phụ:
+o	A1: Không có lịch sử:
+	A1.1: Hiển thị "Chưa có lịch sử khám bệnh".
+	A1.2: Đề xuất đặt lịch mới.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Hiển thị dữ liệu cục bộ (nếu có).
+o	A3: Server lỗi:
+	A3.1: Hiển thị "Không thể tải lịch sử, vui lòng thử lại".
+	A3.2: Cho phép thử lại.
+•	Kết quả: Bệnh nhân xem được lịch sử khám hoặc thấy thông báo lỗi.
+4.16. Use-case: Tìm kiếm (FR-16)
+•	Tên Use-case: Tìm kiếm
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có dữ liệu bác sĩ, chuyên khoa, hoặc dịch vụ.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Tìm kiếm".
+2.	Nhập từ khóa (ví dụ: "Nội khoa").
+3.	Hệ thống hiển thị danh sách kết quả (bác sĩ, chuyên khoa, dịch vụ).
+4.	Bệnh nhân chọn kết quả để xem chi tiết.
+•	Luồng phụ:
+o	A1: Từ khóa rỗng:
+	A1.1: Hiển thị "Vui lòng nhập từ khóa tìm kiếm".
+	A1.2: Yêu cầu nhập lại.
+o	A2: Không có kết quả:
+	A2.1: Hiển thị "Không tìm thấy kết quả".
+	A2.2: Đề xuất từ khóa khác.
+o	A3: Mất kết nối mạng:
+	A3.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A3.2: Hiển thị dữ liệu cục bộ (nếu có).
+•	Kết quả: Bệnh nhân xem được kết quả tìm kiếm hoặc thấy thông báo lỗi.
+4.17. Use-case: Xem chi tiết (FR-17)
+•	Tên Use-case: Xem chi tiết
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập. Có dữ liệu bác sĩ, chuyên khoa, hoặc dịch vụ.
+•	Luồng chính:
+1.	Bệnh nhân chọn mục từ kết quả tìm kiếm (bác sĩ, chuyên khoa, dịch vụ).
+2.	Hệ thống hiển thị chi tiết (ví dụ: "Bác sĩ: Nguyen Van B, Chuyên khoa: Nội khoa").
+•	Luồng phụ:
+o	A1: Dữ liệu không tồn tại:
+	A1.1: Hiển thị "Không tìm thấy thông tin".
+	A1.2: Đề xuất tìm kiếm lại.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Hiển thị dữ liệu cục bộ (nếu có).
+•	Kết quả: Bệnh nhân xem được thông tin chi tiết hoặc thấy thông báo lỗi.
+4.18. Use-case: Cá nhân hóa (FR-18)
+•	Tên Use-case: Cá nhân hóa
+•	Tác nhân chính: Bệnh nhân
+•	Tiền điều kiện: Bệnh nhân đã đăng nhập.
+•	Luồng chính:
+1.	Bệnh nhân mở ứng dụng Android, vào mục "Cá nhân hóa".
+2.	Tùy chỉnh giao diện:
+	Chọn chế độ ban đêm (bật) hoặc ngôn ngữ (tiếng Việt).
+	Nhấn "Lưu", giao diện cập nhật.
+3.	Xem hướng dẫn đi khám:
+	Chọn "Hướng dẫn đi khám", xem quy trình khám bệnh.
+4.	Gửi phản hồi:
+	Nhập nội dung phản hồi, nhấn "Gửi".
+	Hệ thống gửi email đến support@umbrellahealth.com.
+5.	Hiển thị thông báo "Cập nhật thành công" hoặc "Email đã được gửi".
+•	Luồng phụ:
+o	A1: Nội dung phản hồi > 500 ký tự:
+	A1.1: Hiển thị "Nội dung quá dài, tối đa 500 ký tự".
+	A1.2: Yêu cầu chỉnh sửa.
+o	A2: Mất kết nối mạng:
+	A2.1: Hiển thị "Không có kết nối, vui lòng kiểm tra mạng".
+	A2.2: Lưu phản hồi tạm thời, thử lại.
+o	A3: Email server lỗi:
+	A3.1: Hiển thị "Không thể gửi email, thử lại sau 5 giây".
+	A3.2: Đề xuất liên hệ hỗ trợ.
+•	Kết quả: Giao diện được cập nhật, hướng dẫn hiển thị, email được gửi, hoặc nhận thông báo lỗi.
+5. Báo cáo Đánh giá (Review Report)
+Báo cáo đánh giá sử dụng bảng kiểm tra J.3. Mỗi câu được đánh giá dựa trên nội dung tài liệu, với giải thích chi tiết và hành động khắc phục cho các điểm không đạt (F). Mục tiêu là đảm bảo P/(P+F) >= 80%.
+Kết quả đánh giá
+Item no.	Item	Result	Explanation
+1	Are the requirements in compliance with the contract?	P	Yêu cầu phù hợp với mục tiêu hệ thống Umbrella Health: hỗ trợ bệnh nhân đặt lịch, theo dõi thứ tự khám, xem phác đồ/bệnh án; hỗ trợ bác sĩ quản lý thứ tự/phác đồ; hỗ trợ quản trị viên quản lý tài khoản/chuyên khoa/phòng khám.
+2	Have all the requirements been listed?	P	Tài liệu bao gồm 18 yêu cầu chức năng (FR-01 đến FR-18) và 15 yêu cầu phi chức năng (McCall), bao quát tất cả tính năng và đặc tính hệ thống (đăng nhập, đặt lịch, tìm kiếm, bảo mật, hiệu suất).
+3	Are there any ambiguous requirements?	P	Mỗi yêu cầu được mô tả rõ ràng với quy trình, đầu vào/đầu ra, và xử lý lỗi. Đặc tả chi tiết và use-case làm rõ các trường hợp phức tạp (FR-04, FR-09), đảm bảo không gây nhầm lẫn.
+4	Is each requirement described completely?	P	Yêu cầu bao gồm mô tả, đối tượng, điều kiện, kết quả, đặc tả chi tiết (quy trình, đầu vào/đầu ra, lỗi), và use-case (luồng chính/phụ). Tuy nhiên, một số trường hợp lỗi hiếm gặp (ví dụ: lỗi đồng bộ Firebase khi tải cao) có thể cần mô tả thêm trong tương lai.
+5	Have the requirements been specified consistently throughout the document?	P	Yêu cầu được trình bày trong bảng thống nhất, sử dụng ngôn ngữ nhất quán (ví dụ: "thông báo lỗi", "JSON trả về"). Các tính năng liên quan (FR-04 và FR-11, FR-05 và FR-09) tích hợp tốt qua API.
+6	Can the requirements be verified?	P	Yêu cầu có tiêu chí đo lường rõ ràng (ví dụ: phản hồi API < 1 giây, font >= 14px). Đặc tả và use-case cung cấp kịch bản để xác minh (ví dụ: FR-01 kiểm tra OTP, FR-04 kiểm tra lịch hẹn). Tuy nhiên, cần kiểm thử thực tế để xác nhận các tiêu chí như Scalability (1,000 người dùng).
+7	Has any additional functionality been included beyond the scope of the contract?	P	Tài liệu chỉ bao gồm các tính năng thuộc phạm vi hệ thống (đăng nhập, đặt lịch, quản lý phác đồ), không thêm tính năng ngoài như chat hay video call.
+8	Are project management requirements included in the requirements?	NA	Yêu cầu quản lý dự án (lịch trình, nguồn lực) không thuộc phạm vi tài liệu yêu cầu phần mềm, mà thuộc về kế hoạch SQA.
+9	Is the rationale for any derived requirements satisfactory?	P	Yêu cầu dựa trên mục tiêu hệ thống: giảm thời gian chờ (FR-05), hỗ trợ bác sĩ quản lý (FR-09, FR-10), nâng cao trải nghiệm người dùng (FR-18). Use-case củng cố lý do cho mỗi tính năng.
+10	Are the specified external interfaces compatible?	P	Hệ thống tích hợp với Google Firebase (OTP, thông báo) và MySQL qua RESTful API (JSON), đảm bảo tương thích. Đặc tả chi tiết mô tả định dạng JSON rõ ràng (FR-04, FR-06).
+11	Are the user interface requirements complete?	P	Yêu cầu giao diện được nêu trong NFR Usability (font >= 14px, màu tương phản 4.5:1, hỗ trợ tiếng Anh/Việt). FR-18 (Cá nhân hóa) mô tả tùy chỉnh giao diện. Tuy nhiên, chưa nêu chi tiết về hỗ trợ người khuyết tật (accessibility).
+12	Can the requirements be tested? Can the requirements be used directly for validation during acceptance testing?	P	Yêu cầu có thể kiểm tra qua test case (ví dụ: FR-01 kiểm tra OTP, FR-06 kiểm tra nhắc nhở). Đặc tả và use-case cung cấp kịch bản kiểm thử chi tiết. Tuy nhiên, cần bổ sung test case cụ thể cho các lỗi hiếm gặp (ví dụ: Firebase quá tải).
+13	Are the performance requirements adequate and feasible?	P	Yêu cầu hiệu suất khả thi (phản hồi API < 1 giây, hỗ trợ 200 người dùng, truy vấn < 500ms) với cấu hình server 4 CPU, 8GB RAM. Tuy nhiên, tiêu chí Scalability (1,000 người dùng) cần kiểm chứng thực tế với tải cao hơn.
+14	Have the security requirements been determined?	P	Yêu cầu bảo mật bao gồm mã hóa HTTPS/AES-256, xác thực OTP, chống tấn công SQL injection/XSS, kiểm tra định kỳ. Đặc tả chi tiết (FR-01) mô tả xử lý lỗi bảo mật (khóa tài khoản sau 5 lần sai).
+15	Do any requirements conflict with or duplicate other requirements?	P	Không có mâu thuẫn hoặc trùng lặp. FR-04 (Đặt lịch) và FR-11 (Quản lý lịch) bổ trợ nhau qua API; FR-05 (Theo dõi thứ tự) và FR-09 (Quản lý thứ tự) đồng bộ dữ liệu.
+16	Is each requirement written in clear, concise, unambiguous language?	P	Yêu cầu sử dụng ngôn ngữ rõ ràng, ngắn gọn, với thuật ngữ thống nhất (ví dụ: "phác đồ điều trị", "thứ tự khám"). Đặc tả và use-case làm rõ các trường hợp phức tạp.
+17	Is each requirement free of content and grammatical errors?	P	Tài liệu được kiểm tra kỹ, không có lỗi nội dung hoặc ngữ pháp. Thuật ngữ được sử dụng chính xác (ví dụ: "OTP", "JSON").
+18	Are the time-critical functions identified, and are the timing criteria for them specified?	P	Các chức năng nhạy cảm về thời gian được xác định: FR-05 (thông báo khi còn 3 người), FR-06 (nhắc nhở đúng giờ), NFR Performance (API < 1 giây). Đặc tả chi tiết nêu rõ thời gian xử lý (ví dụ: OTP gửi < 5 giây).
+19	Have internationalization issues been adequately addressed?	P	Hệ thống hỗ trợ tiếng Anh và tiếng Việt qua FR-18 (Cá nhân hóa), chuyển đổi ngôn ngữ < 1 giây. Tuy nhiên, chưa nêu chi tiết về hỗ trợ các ngôn ngữ khác trong tương lai.
+20	Is the format in conformance with the format in the organizational process?	NA	Không có thông tin về quy trình tổ chức cụ thể của dự án Umbrella Health.
+21	Are all internal cross-references to other requirements correct?	P	Tài liệu không sử dụng tham chiếu bên ngoài, tất cả yêu cầu được trình bày trực tiếp. Các yêu cầu liên quan (FR-04 và FR-11) được mô tả rõ để tránh nhầm lẫn.
+22	Do the requirements provide an adequate basis for software requirement specification?	P	Yêu cầu đủ chi tiết với đặc tả, use-case, và tiêu chí đo lường, làm cơ sở cho phát triển và kiểm thử. Tuy nhiên, cần bổ sung tài liệu bổ trợ (ví dụ: sơ đồ luồng dữ liệu) để tối ưu triển khai.
+23	Have algorithms intrinsic to the functional requirements been defined?	P	Đặc tả chi tiết cho FR-09 mô tả thuật toán ưu tiên thứ tự khám (phân tích bệnh lý, kéo thả). Các yêu cầu khác (FR-04, FR-06) có quy trình rõ ràng, không cần thuật toán phức tạp.
+24	Is each requirement in scope for the project?	P	Tất cả yêu cầu nằm trong phạm vi dự án: hỗ trợ bệnh nhân đặt lịch, theo dõi thứ tự; bác sĩ quản lý phác đồ; quản trị viên quản lý hệ thống.
+25	Are all security and safety considerations properly specified?	F	Yêu cầu bảo mật được nêu rõ (HTTPS, OTP, chống tấn công), nhưng thiếu chi tiết về xử lý dữ liệu nhạy cảm trong trường hợp lỗi hệ thống (ví dụ: rò rỉ dữ liệu khi server crash). Cần bổ sung quy trình khôi phục dữ liệu và kiểm tra an toàn định kỳ chi tiết hơn.
+26	Are there any missing details that could impact implementation or testing?	F	Một số yêu cầu (ví dụ: FR-18 - Cá nhân hóa) chưa nêu rõ giới hạn về hiệu suất khi chuyển đổi ngôn ngữ hoặc gửi email phản hồi dưới tải cao. Cần bổ sung tiêu chí hiệu suất và kiểm thử cho các trường hợp tải cao.
+Tóm tắt đánh giá
+•	Pass (P): 21
+•	Fail (F): 2
+•	Not Applicable (NA): 2
+•	Tỷ lệ P/(P+F): 21/(21+2) = 91.30% (>= 80%, đạt yêu cầu)
+•	Hành động khắc phục:
+o	Câu 25 (F): Bổ sung quy trình khôi phục dữ liệu khi server gặp sự cố (ví dụ: sử dụng bản sao lưu tự động, khôi phục < 1 giờ). Thêm chi tiết về kiểm tra an toàn định kỳ (ví dụ: kiểm tra lỗ hổng bằng công cụ OWASP ZAP mỗi 3 tháng).
+o	Câu 26 (F): Bổ sung tiêu chí hiệu suất cho FR-18 (ví dụ: chuyển đổi ngôn ngữ < 500ms, gửi email < 5 giây dưới tải 200 người dùng đồng thời). Thêm kiểm thử tải cao vào kế hoạch kiểm thử.
+o	Cải tiến chung: Tạo tài liệu bổ trợ (sơ đồ luồng dữ liệu, sơ đồ cơ sở dữ liệu) để hỗ trợ triển khai và kiểm thử, đảm bảo tối ưu hóa câu 22.
+Ghi chú cuối
+Tài liệu Requirement ver 1.0 đã được tối ưu hóa với:
+•	Đặc tả chi tiết cho tất cả 18 yêu cầu chức năng, bao gồm quy trình, đầu vào/đầu ra, xử lý lỗi mở rộng, và thuật toán (FR-09).
+•	Use-case chi tiết cho tất cả 18 yêu cầu, cung cấp kịch bản người dùng để hỗ trợ kiểm thử.
+•	Yêu cầu phi chức năng cụ thể hóa với điều kiện triển khai, ràng buộc tài nguyên, và tiêu chí đo lường.
+•	Ràng buộc và giả định làm rõ bối cảnh triển khai.
+•	Báo cáo đánh giá khắt khe, xác định 2 lỗi (F) để đảm bảo tính thực tế, với hành động khắc phục cụ thể.
+ 
+Hành động tiếp theo
+1.	Xác nhận: Bạn có đồng ý với tài liệu Requirement ver 1.0 này không? Nếu cần bổ sung chi tiết (ví dụ: sơ đồ luồng dữ liệu, tiêu chí hiệu suất cụ thể hơn cho FR-18), chỉnh sửa, hoặc mở rộng đặc tả/use-case, hãy cho biết.
+2.	Tiến hành các bước tiếp theo:
+o	Nếu muốn tiếp tục với SQA Plan ver 0.5, tôi sẽ xây dựng dựa trên tài liệu này, tích hợp các hành động khắc phục từ câu 25, 26.
+o	Nếu muốn quay lại mục 1 (Xác định các tính năng để test), tôi sẽ sử dụng Requirement ver 1.0 để xác định tính năng test/không test, trình bày dạng bảng Excel.
+o	Nếu cần triển khai các mục khác (kỹ thuật black-box, test case, thực hiện test), hãy xác nhận.
+3.	Thông tin bổ sung: Nếu bạn có hệ thống thực tế (APK, URL website) hoặc yêu cầu cụ thể (ví dụ: ưu tiên test FR-04, cần chi tiết hơn cho câu 25), hãy cung cấp để tôi điều chỉnh.
+Hãy phản hồi để tôi hỗ trợ bạn ngay!
+

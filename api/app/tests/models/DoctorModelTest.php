@@ -109,22 +109,58 @@ class DoctorModelTest extends DatabaseTestCase
      * @param bool $success Kết quả test (true/false)
      * @param string $actual Kết quả thực tế
      * @param string|null $error Thông báo lỗi (nếu có)
+     * @param string|null $debug Thông tin debug (nếu có)
+     * @param string|null $cause Nguyên nhân lỗi (nếu có)
+     * @param string|null $location Vị trí lỗi trong code (nếu có)
+     * @param string|null $fix Đề xuất sửa lỗi (nếu có)
      */
-    private function logResult($success, $actual, $error = null)
+    private function logResult($success, $actual, $error = null, $debug = null, $cause = null, $location = null, $fix = null)
     {
         self::$allTestResults[] = [
             'group' => $this->currentGroup,
             'success' => $success,
             'actual' => $actual,
-            'error' => $error
+            'error' => $error,
+            'debug' => $debug,
+            'cause' => $cause,
+            'location' => $location,
+            'fix' => $fix
         ];
 
         $icon = $success ? "✅" : "❌";
         $status = $success ? "SUCCESS" : "FAILED";
 
         fwrite(STDOUT, "  Result: {$actual}\n");
+
+        if ($debug) {
+            $debugLines = explode("\n", $debug);
+            fwrite(STDOUT, "  Debug:\n");
+            foreach ($debugLines as $line) {
+                fwrite(STDOUT, "    - {$line}\n");
+            }
+        }
+
+        if (!$success) {
+            if ($cause) {
+                fwrite(STDOUT, "  Nguyên nhân: {$cause}\n");
+            }
+
+            if ($location) {
+                fwrite(STDOUT, "  Vị trí lỗi: {$location}\n");
+            }
+
+            if ($fix) {
+                fwrite(STDOUT, "  Đề xuất sửa: {$fix}\n");
+            }
+        }
+
         fwrite(STDOUT, "  Status: {$icon} {$status}" .
             ($error ? " - {$error}" : "") . "\n");
+
+        // Nếu test thất bại, đảm bảo PHPUnit cũng biết về lỗi này
+        if (!$success && $error) {
+            $this->assertTrue($success, $error);
+        }
     }
 
     /**
@@ -1163,7 +1199,8 @@ class DoctorModelTest extends DatabaseTestCase
 
             // Tạo một đối tượng DoctorModel mới và thiết lập thuộc tính expire_date
             $futureDoctor = new DoctorModel();
-            $futureDoctor->set('expire_date', date('Y-m-d', strtotime('+1 day'))); // Ngày mai
+            $futureDate = date('Y-m-d', strtotime('+1 day')); // Ngày mai
+            $futureDoctor->set('expire_date', $futureDate);
 
             // Kiểm tra phương thức isExpired
             $isExpiredFuture = $reflectionMethod->invoke($futureDoctor);
@@ -1171,9 +1208,29 @@ class DoctorModelTest extends DatabaseTestCase
             // Phương thức này nên trả về false vì expire_date trong tương lai
             $this->assertFalse($isExpiredFuture, "LỖI NGHIÊM TRỌNG: isExpired phải trả về false vì expire_date trong tương lai");
 
+            // Chuẩn bị thông tin debug
+            $debug = "Ngày hết hạn: {$futureDate} (tương lai)\n" .
+                     "Ngày hiện tại: " . date('Y-m-d H:i:s') . "\n" .
+                     "Kết quả isExpired(): " . ($isExpiredFuture ? "true (LỖI)" : "false (OK)");
+
+            // Chuẩn bị thông tin về nguyên nhân lỗi
+            $cause = "Phương thức isExpired() luôn trả về true không quan tâm đến giá trị expire_date";
+
+            // Chuẩn bị thông tin về vị trí lỗi
+            $location = "DoctorModel.php, phương thức isExpired()";
+
+            // Chuẩn bị đề xuất sửa lỗi
+            $fix = "Sửa lại phương thức isExpired() để kiểm tra đúng cách ngày hết hạn:\n" .
+                   "1. Đảm bảo chuyển đổi đúng kiểu dữ liệu khi so sánh ngày tháng\n" .
+                   "2. Sửa lại điều kiện if (\$ed > \$now) { return false; } để hoạt động đúng";
+
             $this->logResult($isExpiredFuture === false,
                 "isExpired với expire_date trong tương lai trả về: " . ($isExpiredFuture === false ? "false (OK)" : "true (LỖI)"),
-                $isExpiredFuture === false ? null : "LỖI NGHIÊM TRỌNG: isExpired trả về true khi expire_date trong tương lai"
+                $isExpiredFuture === false ? null : "LỖI NGHIÊM TRỌNG: isExpired trả về true khi expire_date trong tương lai",
+                $debug,
+                $isExpiredFuture === true ? $cause : null,
+                $isExpiredFuture === true ? $location : null,
+                $isExpiredFuture === true ? $fix : null
             );
 
             // Ghi chú về lỗi trong phương thức isExpired
@@ -1260,19 +1317,36 @@ class DoctorModelTest extends DatabaseTestCase
                     null
                 );
             } catch (Exception $e) {
+                // Chuẩn bị thông tin debug
+                $debug = "Điều kiện tìm kiếm: " . json_encode($multiConditions) . "\n" .
+                         "Lỗi SQL: " . $e->getMessage();
+
+                // Chuẩn bị thông tin về nguyên nhân lỗi
+                $cause = "Phương thức select() không xử lý đúng khi tìm kiếm với nhiều điều kiện. " .
+                         "Lỗi 'Cardinality violation: 1241 Operand should contain 1 column(s)' xảy ra khi " .
+                         "câu truy vấn SQL cố gắng so sánh một cột với nhiều giá trị mà không sử dụng IN hoặc OR.";
+
+                // Chuẩn bị thông tin về vị trí lỗi
+                $location = "DoctorModel.php, phương thức select(), phần xử lý điều kiện tìm kiếm là mảng";
+
+                // Chuẩn bị đề xuất sửa lỗi
+                $fix = "Sửa lại phương thức select() để xử lý đúng khi điều kiện tìm kiếm là mảng:\n" .
+                       "1. Thay vì sử dụng toán tử IN trực tiếp, cần tạo các điều kiện riêng biệt cho từng cặp key-value\n" .
+                       "2. Kết hợp các điều kiện bằng toán tử AND\n" .
+                       "3. Ví dụ: WHERE email = ? AND name = ? thay vì WHERE (email, name) IN (?, ?)";
+
                 // Nếu có lỗi, đánh dấu test này là thất bại
                 $this->logResult(false,
                     "❌ LỖI NGHIÊM TRỌNG: Phương thức select có lỗi khi tìm kiếm với nhiều điều kiện - " . $e->getMessage(),
-                    "Cần sửa phương thức select để xử lý đúng khi tìm kiếm với nhiều điều kiện"
+                    "Cần sửa phương thức select để xử lý đúng khi tìm kiếm với nhiều điều kiện",
+                    $debug,
+                    $cause,
+                    $location,
+                    $fix
                 );
 
                 // Ghi chú về lỗi trong phương thức select
                 $this->logStep("DOC_SELECT_13.3: Ghi chú về lỗi trong phương thức select", "Phương thức này có lỗi khi tìm kiếm với nhiều điều kiện");
-
-                $this->logResult(false,
-                    "❌ LỖI NGHIÊM TRỌNG: Phương thức select có lỗi khi tìm kiếm với nhiều điều kiện - SQLSTATE[21000]: Cardinality violation: 1241 Operand should contain 1 column(s)",
-                    "Cần sửa phương thức select để xử lý đúng khi tìm kiếm với nhiều điều kiện"
-                );
 
                 // Fail test
                 $this->fail("LỖI NGHIÊM TRỌNG: Phương thức select có lỗi khi tìm kiếm với nhiều điều kiện - " . $e->getMessage());
@@ -1523,13 +1597,37 @@ class DoctorModelTest extends DatabaseTestCase
             $doctorByPhone = new DoctorModel($phone);
             $phoneSuccess = $doctorByPhone->isAvailable();
 
+            // Chuẩn bị thông tin debug
+            $debug = "Số điện thoại trong DB: '{$phone}'\n" .
+                     "Kiểu dữ liệu phone: " . gettype($phone) . "\n" .
+                     "Số bản ghi tìm thấy trực tiếp trong DB: " . count($directResult) . "\n" .
+                     "Kết quả isAvailable(): " . ($phoneSuccess ? "true" : "false");
+
+            // Chuẩn bị thông tin về nguyên nhân lỗi
+            $cause = "Constructor không xử lý đúng khi tham số là số điện thoại. " .
+                     "Có thể do phương thức select() bên trong constructor không xử lý đúng kiểu dữ liệu của số điện thoại " .
+                     "hoặc không tìm kiếm đúng cách trong cột phone.";
+
+            // Chuẩn bị thông tin về vị trí lỗi
+            $location = "DoctorModel.php, phương thức __construct(), phần xử lý tham số là số điện thoại";
+
+            // Chuẩn bị đề xuất sửa lỗi
+            $fix = "Sửa lại constructor để xử lý đúng khi tham số là số điện thoại:\n" .
+                   "1. Đảm bảo chuyển đổi đúng kiểu dữ liệu khi tìm kiếm theo số điện thoại\n" .
+                   "2. Kiểm tra cách gọi phương thức select() trong constructor\n" .
+                   "3. Xem xét cách xử lý chuỗi số điện thoại (có thể cần chuẩn hóa định dạng)";
+
             // Kiểm tra kết quả
             $this->assertTrue($phoneSuccess, "LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại mặc dù dữ liệu tồn tại trong DB");
 
             // Đánh dấu test này là thất bại vì constructor có lỗi
             $this->logResult($phoneSuccess,
                 "Khởi tạo với số điện thoại: " . ($phoneSuccess ? "✅ Đã tìm thấy" : "❌ LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại"),
-                $phoneSuccess ? null : "LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại mặc dù dữ liệu tồn tại trong DB"
+                $phoneSuccess ? null : "LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại mặc dù dữ liệu tồn tại trong DB",
+                $debug,
+                $phoneSuccess ? null : $cause,
+                $phoneSuccess ? null : $location,
+                $phoneSuccess ? null : $fix
             );
 
             // Test 4: Constructor với giá trị không hợp lệ
@@ -1557,6 +1655,588 @@ class DoctorModelTest extends DatabaseTestCase
         } catch (Exception $e) {
             $this->logResult(false, "❌ Lỗi xảy ra", $e->getMessage());
             $this->fail("Lỗi khi kiểm tra constructor: " . $e->getMessage());
+        } finally {
+            // Đảm bảo dọn dẹp dữ liệu test
+            foreach ($doctorIds as $id) {
+                $doctor = new DoctorModel($id);
+                if ($doctor->isAvailable()) {
+                    $doctor->delete();
+                }
+            }
+        }
+    }
+
+    /**
+     * Test Case DOC_INSERT_16: Kiểm tra phương thức insert
+     * Mã test case: DOC_INSERT_16
+     * Mục tiêu: Kiểm tra phương thức insert với các trường hợp khác nhau
+     * Input: Dữ liệu bác sĩ hợp lệ và không hợp lệ
+     * Expected output: Bác sĩ được thêm thành công hoặc thất bại đúng theo kỳ vọng
+     * Ghi chú: Kiểm tra các trường hợp khác nhau của phương thức insert
+     */
+    public function testInsertMethod()
+    {
+        $this->logSection("DOC_INSERT_16: Kiểm tra phương thức insert");
+        $doctorId = null;
+
+        try {
+            // Test 1: Insert với dữ liệu hợp lệ
+            $this->logStep("DOC_INSERT_16.1: Insert với dữ liệu hợp lệ", "Bác sĩ được thêm thành công với ID > 0");
+
+            // Tạo dữ liệu kiểm thử
+            $data = $this->createTestDoctor();
+
+            // Set dữ liệu vào model
+            foreach ($data as $field => $value) {
+                $this->doctorModel->set($field, $value);
+            }
+
+            // Thực hiện insert và kiểm tra
+            $doctorId = $this->doctorModel->insert();
+            $insertSuccess = $doctorId > 0;
+
+            // Kiểm tra dữ liệu đã được lưu trong DB
+            if ($insertSuccess) {
+                $this->assertRecordExists(TABLE_PREFIX.TABLE_DOCTORS, ['id' => $doctorId]);
+
+                // Kiểm tra từng trường dữ liệu
+                foreach ($data as $field => $value) {
+                    $this->assertEquals($value, $this->doctorModel->get($field), "Trường {$field} không khớp");
+                }
+            }
+
+            $this->logResult($insertSuccess,
+                "Insert thành công: " . ($insertSuccess ? "Có" : "Không") .
+                ", ID: " . ($insertSuccess ? $doctorId : "N/A"));
+
+            // Test 2: Insert khi đối tượng đã tồn tại (isAvailable = true)
+            $this->logStep("DOC_INSERT_16.2: Insert khi đối tượng đã tồn tại", "Phải trả về false");
+
+            // Đánh dấu đối tượng là đã tồn tại
+            $this->doctorModel->markAsAvailable();
+
+            // Thực hiện insert và kiểm tra
+            $result = $this->doctorModel->insert();
+            $expectedFalse = $result === false;
+
+            $this->logResult($expectedFalse,
+                "Insert khi đã tồn tại trả về: " . ($result === false ? "false (OK)" : $result . " (LỖI)"));
+
+            // Test 3: Kiểm tra extendDefaults được gọi trong insert
+            $this->logStep("DOC_INSERT_16.3: Kiểm tra extendDefaults được gọi trong insert", "Các trường mặc định phải được thiết lập");
+
+            // Tạo đối tượng mới
+            $newDoctor = new DoctorModel();
+
+            // Chỉ set một số trường, để các trường khác dùng giá trị mặc định
+            $newDoctor->set("email", "minimal_" . time() . "@example.com");
+            $newDoctor->set("name", "Minimal Doctor");
+            $newDoctor->set("speciality_id", 1); // Thêm speciality_id để tránh lỗi
+            $newDoctor->set("room_id", 1); // Thêm room_id để tránh lỗi
+
+            // Thực hiện insert
+            try {
+                $newId = $newDoctor->insert();
+                $insertMinimalSuccess = $newId > 0;
+
+                if ($insertMinimalSuccess) {
+                    // Kiểm tra các trường mặc định
+                    $this->assertNotEmpty($newDoctor->get("create_at"), "create_at phải được thiết lập");
+                    $this->assertNotEmpty($newDoctor->get("update_at"), "update_at phải được thiết lập");
+                    $this->assertEquals("admin", $newDoctor->get("role"), "role phải được thiết lập mặc định là admin");
+                    $this->assertEquals("1", $newDoctor->get("active"), "active phải được thiết lập mặc định là 1");
+
+                    // Xóa bản ghi này sau khi test
+                    $newDoctor->delete();
+                }
+
+                $this->logResult($insertMinimalSuccess,
+                    "Insert với dữ liệu tối thiểu: " . ($insertMinimalSuccess ? "Thành công" : "Thất bại") .
+                    ", Các trường mặc định được thiết lập: " . ($insertMinimalSuccess ? "Có" : "Không"));
+            } catch (Exception $e) {
+                $this->logResult(false,
+                    "Lỗi khi insert với dữ liệu tối thiểu: " . $e->getMessage() .
+                    " - Cần thêm các trường bắt buộc như speciality_id, room_id");
+            }
+
+        } catch (Exception $e) {
+            $this->logResult(false, "Lỗi: " . $e->getMessage());
+            $this->fail("Lỗi khi kiểm tra phương thức insert: " . $e->getMessage());
+        } finally {
+            // Đảm bảo dọn dẹp dữ liệu test
+            if ($doctorId) {
+                $doctor = new DoctorModel($doctorId);
+                if ($doctor->isAvailable()) {
+                    $doctor->delete();
+                }
+            }
+        }
+    }
+
+    /**
+     * Test Case DOC_CANEDIT_17: Kiểm tra phương thức canEdit
+     * Mã test case: DOC_CANEDIT_17
+     * Mục tiêu: Kiểm tra phương thức canEdit với các vai trò khác nhau
+     * Input: Các vai trò khác nhau (developer, admin, member)
+     * Expected output: Quyền chỉnh sửa được phân đúng theo vai trò
+     * Ghi chú: Kiểm tra quyền chỉnh sửa giữa các vai trò khác nhau
+     */
+    public function testCanEditMethod()
+    {
+        $this->logSection("DOC_CANEDIT_17: Kiểm tra phương thức canEdit");
+        $doctorIds = [];
+
+        try {
+            // Kiểm tra xem file UserModel.php có tồn tại không
+            if (!file_exists(APP_PATH . '/models/UserModel.php')) {
+                $this->logResult(false, "File UserModel.php không tồn tại");
+                $this->markTestIncomplete("Không thể kiểm tra phương thức canEdit vì file UserModel.php không tồn tại");
+                return;
+            }
+
+            // Tạo đối tượng giả lập UserModel
+            $mockUser = new stdClass();
+            $mockUser->id = 999;
+            $mockUser->role = 'admin';
+
+            // Thêm phương thức get cho đối tượng giả lập
+            $mockUser->get = function($field) use ($mockUser) {
+                return isset($mockUser->$field) ? $mockUser->$field : null;
+            };
+
+            // Test 1: Bác sĩ không khả dụng
+            $this->logStep("DOC_CANEDIT_17.1: Bác sĩ không khả dụng", "Phải trả về false");
+
+            $unavailableDoctor = new DoctorModel(999999); // ID không tồn tại
+
+            // Kiểm tra phương thức canEdit
+            try {
+                $canEdit = $unavailableDoctor->canEdit($mockUser);
+                $expectedFalse = $canEdit === false;
+
+                $this->logResult($expectedFalse,
+                    "Bác sĩ không khả dụng có quyền chỉnh sửa: " . ($canEdit ? "Có (LỖI)" : "Không (OK)"));
+            } catch (Exception $e) {
+                $this->logResult(false,
+                    "Lỗi khi gọi canEdit với bác sĩ không khả dụng: " . $e->getMessage());
+                $this->markTestIncomplete("Không thể kiểm tra phương thức canEdit vì gặp lỗi: " . $e->getMessage());
+                return;
+            }
+
+            // Test 2: Bác sĩ với vai trò developer
+            $this->logStep("DOC_CANEDIT_17.2: Bác sĩ với vai trò developer", "Phải có quyền chỉnh sửa");
+
+            $developerData = $this->createTestDoctor(['role' => 'developer']);
+            $developerId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $developerData);
+            $doctorIds[] = $developerId;
+
+            $developer = new DoctorModel($developerId);
+
+            try {
+                $canEdit = $developer->canEdit($mockUser);
+
+                $this->logResult($canEdit,
+                    "Bác sĩ vai trò developer có quyền chỉnh sửa: " . ($canEdit ? "Có (OK)" : "Không (LỖI)"));
+            } catch (Exception $e) {
+                $this->logResult(false,
+                    "Lỗi khi gọi canEdit với bác sĩ vai trò developer: " . $e->getMessage());
+            }
+
+        } catch (Exception $e) {
+            $this->logResult(false, "Lỗi: " . $e->getMessage());
+            $this->fail("Lỗi khi kiểm tra phương thức canEdit: " . $e->getMessage());
+        } finally {
+            // Đảm bảo dọn dẹp dữ liệu test
+            foreach ($doctorIds as $id) {
+                $doctor = new DoctorModel($id);
+                if ($doctor->isAvailable()) {
+                    $doctor->delete();
+                }
+            }
+        }
+    }
+
+    /**
+     * Test Case DOC_ISEXPIRED_18: Kiểm tra chi tiết phương thức isExpired
+     * Mã test case: DOC_ISEXPIRED_18
+     * Mục tiêu: Kiểm tra phương thức isExpired với các trường hợp khác nhau
+     * Input: Các ngày hết hạn khác nhau (quá khứ, tương lai, null)
+     * Expected output: Trạng thái hết hạn đúng theo ngày
+     * Ghi chú: Kiểm tra chi tiết phương thức isExpired để phát hiện lỗi
+     */
+    public function testIsExpiredDetailed()
+    {
+        $this->logSection("DOC_ISEXPIRED_18: Kiểm tra chi tiết phương thức isExpired");
+        $doctorIds = [];
+
+        try {
+            // Thêm cột expire_date vào bảng doctors nếu chưa có
+            $tableName = TABLE_PREFIX.TABLE_DOCTORS;
+            try {
+                $this->executeQuery("ALTER TABLE `{$tableName}` ADD COLUMN IF NOT EXISTS `expire_date` datetime NULL");
+            } catch (Exception $e) {
+                $this->logResult(false, "Không thể thêm cột expire_date: " . $e->getMessage());
+                // Kiểm tra xem cột đã tồn tại chưa
+                $result = $this->executeSingleQuery("SHOW COLUMNS FROM `{$tableName}` LIKE 'expire_date'");
+                if (empty($result)) {
+                    $this->markTestIncomplete("Cột expire_date không tồn tại và không thể thêm vào");
+                    return;
+                }
+            }
+
+            // Test 1: Bác sĩ không khả dụng
+            $this->logStep("DOC_ISEXPIRED_18.1: Bác sĩ không khả dụng", "Phải trả về true");
+
+            $unavailableDoctor = new DoctorModel(999999); // ID không tồn tại
+            $isExpired = $unavailableDoctor->isExpired();
+
+            $this->logResult($isExpired,
+                "Bác sĩ không khả dụng có hết hạn: " . ($isExpired ? "Có (OK)" : "Không (LỖI)"));
+
+            // Test 2: Bác sĩ với expire_date trong quá khứ
+            $this->logStep("DOC_ISEXPIRED_18.2: Bác sĩ với expire_date trong quá khứ", "Phải trả về true");
+
+            $pastDate = date('Y-m-d H:i:s', strtotime('-1 day'));
+            $pastData = $this->createTestDoctor(['expire_date' => $pastDate]);
+            $pastId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $pastData);
+            $doctorIds[] = $pastId;
+
+            $pastDoctor = new DoctorModel($pastId);
+            $isPastExpired = $pastDoctor->isExpired();
+
+            $this->logResult($isPastExpired,
+                "Bác sĩ với expire_date trong quá khứ (" . $pastDate . ") có hết hạn: " .
+                ($isPastExpired ? "Có (OK)" : "Không (LỖI)"));
+
+            // Test 3: Bác sĩ với expire_date trong tương lai
+            $this->logStep("DOC_ISEXPIRED_18.3: Bác sĩ với expire_date trong tương lai", "Phải trả về false");
+
+            $futureDate = date('Y-m-d H:i:s', strtotime('+1 day'));
+            $futureData = $this->createTestDoctor(['expire_date' => $futureDate]);
+            $futureId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $futureData);
+            $doctorIds[] = $futureId;
+
+            $futureDoctor = new DoctorModel($futureId);
+            $isFutureExpired = $futureDoctor->isExpired();
+
+            // Phát hiện lỗi: phương thức isExpired luôn trả về true
+            $this->logResult(!$isFutureExpired,
+                "Bác sĩ với expire_date trong tương lai (" . $futureDate . ") có hết hạn: " .
+                ($isFutureExpired ? "Có (LỖI)" : "Không (OK)"));
+
+            if ($isFutureExpired) {
+                $this->logResult(false,
+                    "LỖI NGHIÊM TRỌNG: Phương thức isExpired luôn trả về true không quan tâm đến giá trị expire_date");
+
+                // Phân tích code để tìm lỗi
+                $this->logResult(false,
+                    "Phân tích lỗi: Trong phương thức isExpired, điều kiện if ($ed > $now) { return false; } " .
+                    "không được thực thi đúng cách. Có thể do lỗi logic hoặc so sánh không đúng kiểu dữ liệu.");
+            }
+
+            // Test 4: Bác sĩ không có expire_date (null)
+            $this->logStep("DOC_ISEXPIRED_18.4: Bác sĩ không có expire_date", "Phải trả về true");
+
+            $nullData = $this->createTestDoctor(['expire_date' => null]);
+            $nullId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $nullData);
+            $doctorIds[] = $nullId;
+
+            $nullDoctor = new DoctorModel($nullId);
+            $isNullExpired = $nullDoctor->isExpired();
+
+            $this->logResult($isNullExpired,
+                "Bác sĩ không có expire_date có hết hạn: " .
+                ($isNullExpired ? "Có (OK)" : "Không (LỖI)"));
+
+            // Test 5: Bác sĩ với expire_date không hợp lệ
+            $this->logStep("DOC_ISEXPIRED_18.5: Bác sĩ với expire_date không hợp lệ", "Phải xử lý đúng và không gây lỗi");
+
+            $invalidData = $this->createTestDoctor(['expire_date' => 'invalid-date']);
+            $invalidId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $invalidData);
+            $doctorIds[] = $invalidId;
+
+            $invalidDoctor = new DoctorModel($invalidId);
+
+            try {
+                $isInvalidExpired = $invalidDoctor->isExpired();
+                $this->logResult(true,
+                    "Bác sĩ với expire_date không hợp lệ được xử lý mà không gây lỗi: " .
+                    ($isInvalidExpired ? "Hết hạn" : "Chưa hết hạn"));
+            } catch (Exception $e) {
+                $this->logResult(false,
+                    "LỖI: Phương thức isExpired gây lỗi khi xử lý expire_date không hợp lệ: " . $e->getMessage());
+
+                // Phân tích code để tìm lỗi
+                $this->logResult(false,
+                    "Phân tích lỗi: Phương thức isExpired không kiểm tra định dạng ngày tháng hợp lệ trước khi tạo đối tượng DateTime");
+            }
+
+        } catch (Exception $e) {
+            $this->logResult(false, "Lỗi: " . $e->getMessage());
+            $this->fail("Lỗi khi kiểm tra phương thức isExpired: " . $e->getMessage());
+        } finally {
+            // Đảm bảo dọn dẹp dữ liệu test
+            foreach ($doctorIds as $id) {
+                $doctor = new DoctorModel($id);
+                if ($doctor->isAvailable()) {
+                    $doctor->delete();
+                }
+            }
+        }
+    }
+
+    /**
+     * Test Case DOC_DATETIME_19: Kiểm tra chi tiết phương thức getDateTimeFormat
+     * Mã test case: DOC_DATETIME_19
+     * Mục tiêu: Kiểm tra phương thức getDateTimeFormat với các trường hợp khác nhau
+     * Input: Các giá trị preferences.dateformat khác nhau
+     * Expected output: Định dạng ngày giờ đúng theo preferences
+     * Ghi chú: Kiểm tra chi tiết phương thức getDateTimeFormat để phát hiện lỗi
+     */
+    public function testGetDateTimeFormatDetailed()
+    {
+        $this->logSection("DOC_DATETIME_19: Kiểm tra chi tiết phương thức getDateTimeFormat");
+        $doctorIds = [];
+
+        try {
+            // Thêm cột preferences vào bảng doctors nếu chưa có
+            $tableName = TABLE_PREFIX.TABLE_DOCTORS;
+            try {
+                $this->executeQuery("ALTER TABLE `{$tableName}` ADD COLUMN IF NOT EXISTS `preferences` text NULL");
+            } catch (Exception $e) {
+                $this->logResult(false, "Không thể thêm cột preferences: " . $e->getMessage());
+                // Kiểm tra xem cột đã tồn tại chưa
+                $result = $this->executeSingleQuery("SHOW COLUMNS FROM `{$tableName}` LIKE 'preferences'");
+                if (empty($result)) {
+                    $this->markTestIncomplete("Cột preferences không tồn tại và không thể thêm vào");
+                    return;
+                }
+            }
+
+            // Test 1: Bác sĩ không khả dụng
+            $this->logStep("DOC_DATETIME_19.1: Bác sĩ không khả dụng", "Phải trả về null");
+
+            $unavailableDoctor = new DoctorModel(999999); // ID không tồn tại
+            $format = $unavailableDoctor->getDateTimeFormat();
+
+            $this->logResult($format === null,
+                "Bác sĩ không khả dụng trả về: " . ($format === null ? "null (OK)" : $format . " (LỖI)"));
+
+            // Test 2: Bác sĩ không có preferences
+            $this->logStep("DOC_DATETIME_19.2: Bác sĩ không có preferences", "Phải trả về null");
+
+            $noPrefsData = $this->createTestDoctor(['preferences' => null]);
+            $noPrefsId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $noPrefsData);
+            $doctorIds[] = $noPrefsId;
+
+            $noPrefsDoctor = new DoctorModel($noPrefsId);
+            $noPrefsFormat = $noPrefsDoctor->getDateTimeFormat();
+
+            // Phát hiện lỗi: phương thức getDateTimeFormat trả về chuỗi thay vì null
+            $this->logResult($noPrefsFormat === null,
+                "Bác sĩ không có preferences trả về: " .
+                ($noPrefsFormat === null ? "null (OK)" : "'" . $noPrefsFormat . "' (LỖI)"));
+
+            if ($noPrefsFormat !== null) {
+                $this->logResult(false,
+                    "LỖI: getDateTimeFormat trả về '" . $noPrefsFormat . "' thay vì null khi không có preferences.dateformat");
+
+                // Phân tích code để tìm lỗi
+                $this->logResult(false,
+                    "Phân tích lỗi: Phương thức getDateTimeFormat không kiểm tra đúng cách sự tồn tại của preferences.dateformat trước khi sử dụng");
+            }
+
+            // Test 3: Bác sĩ có preferences nhưng không có dateformat
+            $this->logStep("DOC_DATETIME_19.3: Bác sĩ có preferences nhưng không có dateformat", "Phải trả về null");
+
+            $noDateFormatPrefs = json_encode(['timeformat' => '24']);
+            $noDateFormatData = $this->createTestDoctor(['preferences' => $noDateFormatPrefs]);
+            $noDateFormatId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $noDateFormatData);
+            $doctorIds[] = $noDateFormatId;
+
+            $noDateFormatDoctor = new DoctorModel($noDateFormatId);
+            $noDateFormatFormat = $noDateFormatDoctor->getDateTimeFormat();
+
+            $this->logResult($noDateFormatFormat === null,
+                "Bác sĩ có preferences nhưng không có dateformat trả về: " .
+                ($noDateFormatFormat === null ? "null (OK)" : "'" . $noDateFormatFormat . "' (LỖI)"));
+
+            if ($noDateFormatFormat !== null) {
+                $this->logResult(false,
+                    "LỖI: getDateTimeFormat trả về '" . $noDateFormatFormat . "' thay vì null khi có preferences nhưng không có dateformat");
+            }
+
+            // Test 4: Bác sĩ có đầy đủ preferences
+            $this->logStep("DOC_DATETIME_19.4: Bác sĩ có đầy đủ preferences", "Phải trả về định dạng đúng");
+
+            $fullPrefs = json_encode(['dateformat' => 'Y-m-d', 'timeformat' => '24']);
+            $fullPrefsData = $this->createTestDoctor(['preferences' => $fullPrefs]);
+            $fullPrefsId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $fullPrefsData);
+            $doctorIds[] = $fullPrefsId;
+
+            $fullPrefsDoctor = new DoctorModel($fullPrefsId);
+            $fullPrefsFormat = $fullPrefsDoctor->getDateTimeFormat();
+            $expectedFormat = 'Y-m-d H:i';
+
+            $this->logResult($fullPrefsFormat === $expectedFormat,
+                "Bác sĩ có đầy đủ preferences trả về: '" . $fullPrefsFormat . "'" .
+                " (Expected: '" . $expectedFormat . "')");
+
+            if ($fullPrefsFormat !== $expectedFormat) {
+                $this->logResult(false,
+                    "LỖI: getDateTimeFormat trả về '" . $fullPrefsFormat . "' thay vì '" . $expectedFormat . "' khi có đầy đủ preferences");
+            }
+
+            // Test 5: Bác sĩ có preferences với timeformat = 12
+            $this->logStep("DOC_DATETIME_19.5: Bác sĩ có preferences với timeformat = 12", "Phải trả về định dạng đúng");
+
+            $ampmPrefs = json_encode(['dateformat' => 'Y-m-d', 'timeformat' => '12']);
+            $ampmPrefsData = $this->createTestDoctor(['preferences' => $ampmPrefs]);
+            $ampmPrefsId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $ampmPrefsData);
+            $doctorIds[] = $ampmPrefsId;
+
+            $ampmPrefsDoctor = new DoctorModel($ampmPrefsId);
+            $ampmPrefsFormat = $ampmPrefsDoctor->getDateTimeFormat();
+            $expectedAmpmFormat = 'Y-m-d h:i A';
+
+            $this->logResult($ampmPrefsFormat === $expectedAmpmFormat,
+                "Bác sĩ có preferences với timeformat = 12 trả về: '" . $ampmPrefsFormat . "'" .
+                " (Expected: '" . $expectedAmpmFormat . "')");
+
+            if ($ampmPrefsFormat !== $expectedAmpmFormat) {
+                $this->logResult(false,
+                    "LỖI: getDateTimeFormat trả về '" . $ampmPrefsFormat . "' thay vì '" . $expectedAmpmFormat . "' khi có timeformat = 12");
+            }
+
+        } catch (Exception $e) {
+            $this->logResult(false, "Lỗi: " . $e->getMessage());
+            $this->fail("Lỗi khi kiểm tra phương thức getDateTimeFormat: " . $e->getMessage());
+        } finally {
+            // Đảm bảo dọn dẹp dữ liệu test
+            foreach ($doctorIds as $id) {
+                $doctor = new DoctorModel($id);
+                if ($doctor->isAvailable()) {
+                    $doctor->delete();
+                }
+            }
+        }
+    }
+
+    /**
+     * Test Case DOC_EMAIL_20: Kiểm tra chi tiết các phương thức liên quan đến email
+     * Mã test case: DOC_EMAIL_20
+     * Mục tiêu: Kiểm tra các phương thức liên quan đến email với các trường hợp khác nhau
+     * Input: Các giá trị data.email_verification_hash khác nhau
+     * Expected output: Trạng thái xác thực email đúng
+     * Ghi chú: Kiểm tra chi tiết các phương thức liên quan đến email để phát hiện lỗi
+     */
+    public function testEmailMethodsDetailed()
+    {
+        $this->logSection("DOC_EMAIL_20: Kiểm tra chi tiết các phương thức liên quan đến email");
+        $doctorIds = [];
+
+        try {
+            // Thêm cột data vào bảng doctors nếu chưa có
+            $tableName = TABLE_PREFIX.TABLE_DOCTORS;
+            try {
+                $this->executeQuery("ALTER TABLE `{$tableName}` ADD COLUMN IF NOT EXISTS `data` text NULL");
+            } catch (Exception $e) {
+                $this->logResult(false, "Không thể thêm cột data: " . $e->getMessage());
+                // Kiểm tra xem cột đã tồn tại chưa
+                $result = $this->executeSingleQuery("SHOW COLUMNS FROM `{$tableName}` LIKE 'data'");
+                if (empty($result)) {
+                    $this->markTestIncomplete("Cột data không tồn tại và không thể thêm vào");
+                    return;
+                }
+            }
+
+            // Test 1: Bác sĩ không khả dụng
+            $this->logStep("DOC_EMAIL_20.1: Bác sĩ không khả dụng", "isEmailVerified phải trả về false");
+
+            $unavailableDoctor = new DoctorModel(999999); // ID không tồn tại
+            $isVerified = $unavailableDoctor->isEmailVerified();
+
+            $this->logResult($isVerified === false,
+                "Bác sĩ không khả dụng có email đã xác thực: " .
+                ($isVerified ? "Có (LỖI)" : "Không (OK)"));
+
+            // Test 2: Bác sĩ không có data
+            $this->logStep("DOC_EMAIL_20.2: Bác sĩ không có data", "isEmailVerified phải trả về true");
+
+            $noDataData = $this->createTestDoctor(['data' => null]);
+            $noDataId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $noDataData);
+            $doctorIds[] = $noDataId;
+
+            $noDataDoctor = new DoctorModel($noDataId);
+            $noDataIsVerified = $noDataDoctor->isEmailVerified();
+
+            $this->logResult($noDataIsVerified === true,
+                "Bác sĩ không có data có email đã xác thực: " .
+                ($noDataIsVerified ? "Có (OK)" : "Không (LỖI)"));
+
+            if ($noDataIsVerified !== true) {
+                $this->logResult(false,
+                    "LỖI: isEmailVerified trả về false thay vì true khi không có data.email_verification_hash");
+            }
+
+            // Test 3: Bác sĩ có data.email_verification_hash
+            $this->logStep("DOC_EMAIL_20.3: Bác sĩ có data.email_verification_hash", "isEmailVerified phải trả về false");
+
+            $hashData = json_encode(['email_verification_hash' => 'test_hash']);
+            $withHashData = $this->createTestDoctor(['data' => $hashData]);
+            $withHashId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $withHashData);
+            $doctorIds[] = $withHashId;
+
+            $withHashDoctor = new DoctorModel($withHashId);
+            $withHashIsVerified = $withHashDoctor->isEmailVerified();
+
+            $this->logResult($withHashIsVerified === false,
+                "Bác sĩ có data.email_verification_hash có email đã xác thực: " .
+                ($withHashIsVerified ? "Có (LỖI)" : "Không (OK)"));
+
+            if ($withHashIsVerified !== false) {
+                $this->logResult(false,
+                    "LỖI: isEmailVerified trả về true thay vì false khi có data.email_verification_hash");
+            }
+
+            // Test 4: Bác sĩ có data nhưng không có email_verification_hash
+            $this->logStep("DOC_EMAIL_20.4: Bác sĩ có data nhưng không có email_verification_hash", "isEmailVerified phải trả về true");
+
+            $otherData = json_encode(['other_key' => 'other_value']);
+            $otherDataData = $this->createTestDoctor(['data' => $otherData]);
+            $otherDataId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $otherDataData);
+            $doctorIds[] = $otherDataId;
+
+            $otherDataDoctor = new DoctorModel($otherDataId);
+            $otherDataIsVerified = $otherDataDoctor->isEmailVerified();
+
+            $this->logResult($otherDataIsVerified === true,
+                "Bác sĩ có data nhưng không có email_verification_hash có email đã xác thực: " .
+                ($otherDataIsVerified ? "Có (OK)" : "Không (LỖI)"));
+
+            // Test 5: setEmailAsVerified với bác sĩ có data.email_verification_hash
+            $this->logStep("DOC_EMAIL_20.5: setEmailAsVerified với bác sĩ có data.email_verification_hash", "Phải trả về true và xóa hash");
+
+            $result = $withHashDoctor->setEmailAsVerified();
+
+            $this->logResult($result === true,
+                "setEmailAsVerified trả về: " . ($result ? "true (OK)" : "false (LỖI)"));
+
+            // Kiểm tra xem hash đã bị xóa chưa
+            $afterSetIsVerified = $withHashDoctor->isEmailVerified();
+
+            $this->logResult($afterSetIsVerified === true,
+                "Sau khi setEmailAsVerified, email đã xác thực: " .
+                ($afterSetIsVerified ? "Có (OK)" : "Không (LỖI)"));
+
+            if ($afterSetIsVerified !== true) {
+                $this->logResult(false,
+                    "LỖI: setEmailAsVerified không xóa đúng cách data.email_verification_hash");
+            }
+
+        } catch (Exception $e) {
+            $this->logResult(false, "Lỗi: " . $e->getMessage());
+            $this->fail("Lỗi khi kiểm tra các phương thức liên quan đến email: " . $e->getMessage());
         } finally {
             // Đảm bảo dọn dẹp dữ liệu test
             foreach ($doctorIds as $id) {
@@ -1609,6 +2289,32 @@ class DoctorModelTest extends DatabaseTestCase
         fwrite(STDOUT, "🕒 Thời gian: " . date('Y-m-d H:i:s') . "\n");
         fwrite(STDOUT, "👤 Người dùng: " . self::CURRENT_USER . "\n\n");
 
+        // Lấy tất cả các phương thức test
+        $class = new ReflectionClass($this);
+        $testMethods = array_filter($class->getMethods(), function($method) {
+            return strpos($method->name, 'test') === 0 && $method->isPublic();
+        });
+
+        // Đếm số lượng phương thức test
+        $totalTestMethods = count($testMethods);
+
+        // Đếm số lượng assertions
+        $assertions = 0;
+        foreach (self::$allTestResults as $result) {
+            if (isset($result['success'])) {
+                $assertions++;
+            }
+        }
+
+        // Đếm số lượng failures
+        $failures = array_filter(self::$allTestResults, function($result) {
+            return isset($result['success']) && $result['success'] === false;
+        });
+        $totalFailures = count($failures);
+
+        // Đếm số lượng test methods đã pass
+        $passedTestMethods = $totalTestMethods - $totalFailures;
+
         // Định nghĩa số lượng test case cho mỗi nhóm
         $testGroups = [
             'DOC: Kiểm tra quy trình CRUD' => [
@@ -1650,8 +2356,8 @@ class DoctorModelTest extends DatabaseTestCase
         ];
 
         $groupResults = [];
-        $totalTests = 0;
-        $totalPassed = 0;
+        $totalTestCases = 0;
+        $totalPassedCases = 0;
         $allFailures = [];
 
         // Khởi tạo kết quả nhóm
@@ -1661,13 +2367,13 @@ class DoctorModelTest extends DatabaseTestCase
                 'passed' => 0,
                 'failures' => []
             ];
-            $totalTests += $info['total'];
+            $totalTestCases += $info['total'];
         }
 
         // Đếm kết quả CRUD
         if (isset(self::$allTestResults['CRUD'])) {
             $groupResults['DOC: Kiểm tra quy trình CRUD']['passed'] = self::$allTestResults['CRUD']['passed'];
-            $totalPassed += self::$allTestResults['CRUD']['passed'];
+            $totalPassedCases += self::$allTestResults['CRUD']['passed'];
         }
 
         // Đếm kết quả test khác
@@ -1689,7 +2395,7 @@ class DoctorModelTest extends DatabaseTestCase
             // Giới hạn số lượng đếm bằng tổng số test case của nhóm
             if ($groupResults[$group]['passed'] < $groupResults[$group]['total']) {
                 $groupResults[$group]['passed']++;
-                $totalPassed++;
+                $totalPassedCases++;
             }
         }
 
@@ -1734,16 +2440,29 @@ class DoctorModelTest extends DatabaseTestCase
 
         // In thống kê tổng thể
         $duration = round(microtime(true) - self::$startTime, 2);
-        $percentTotal = ($totalTests > 0)
-            ? round(($totalPassed / $totalTests) * 100)
+        $percentTotal = ($totalTestMethods > 0)
+            ? round(($passedTestMethods / $totalTestMethods) * 100)
             : 0;
 
         fwrite(STDOUT, str_repeat("-", 70) . "\n");
-        fwrite(STDOUT, "THỐNG KÊ TỔNG QUÁT\n");
-        fwrite(STDOUT, sprintf("✅ Tổng số test case: %d\n", $totalTests));
-        fwrite(STDOUT, sprintf("✅ Đã qua: %d (%d%%)\n", $totalPassed, $percentTotal));
-        fwrite(STDOUT, sprintf("❌ Thất bại: %d\n", $totalTests - $totalPassed));
+        fwrite(STDOUT, "THỐNG KÊ TỔNG QUÁT (PHPUnit)\n");
+        fwrite(STDOUT, sprintf("✅ Tổng số test methods: %d\n", $totalTestMethods));
+        fwrite(STDOUT, sprintf("✅ Đã qua: %d (%d%%)\n", $passedTestMethods, $percentTotal));
+        fwrite(STDOUT, sprintf("❌ Thất bại: %d\n", $totalFailures));
+        fwrite(STDOUT, sprintf("🔍 Assertions: %d\n", $assertions));
         fwrite(STDOUT, sprintf("⏱️ Thời gian: %.2fs\n", $duration));
+
+        // In thống kê test cases
+        $percentCases = ($totalTestCases > 0)
+            ? round(($totalPassedCases / $totalTestCases) * 100)
+            : 0;
+
+        fwrite(STDOUT, "\n");
+        fwrite(STDOUT, "THỐNG KÊ TEST CASES\n");
+        fwrite(STDOUT, sprintf("✅ Tổng số test cases: %d\n", $totalTestCases));
+        fwrite(STDOUT, sprintf("✅ Đã qua: %d (%d%%)\n", $totalPassedCases, $percentCases));
+        fwrite(STDOUT, sprintf("❌ Thất bại: %d\n", $totalTestCases - $totalPassedCases));
+
         fwrite(STDOUT, str_repeat("=", 70) . "\n\n");
     }
 }

@@ -508,11 +508,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveSuccess()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -557,11 +552,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveMissingRequiredField()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -587,11 +577,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInvalidEmail()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -618,11 +603,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveExistingEmail()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -652,11 +632,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInvalidName()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -683,11 +658,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInvalidPhoneShort()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -714,11 +684,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInvalidPhoneFormat()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -745,11 +710,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInvalidPriceFormat()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -777,11 +737,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSavePriceTooLow()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -809,11 +764,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInvalidRole()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -840,11 +790,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveNonExistentSpeciality()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -875,11 +820,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveNonExistentRoom()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 
@@ -910,11 +850,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveInsufficientPermissions()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user member (không phải admin)
         $this->mockAuthUser('member');
 
@@ -999,11 +934,6 @@ class DoctorsControllerTest extends ControllerTestCase
      */
     public function testSaveEmailSending()
     {
-        // Đánh dấu test là incomplete do vấn đề SQL syntax trong database test
-        $this->markTestIncomplete(
-          'This test fails due to SQL syntax issues in the database test. Need to fix database schema first.'
-        );
-
         // Thiết lập user admin
         $this->mockAuthUser('admin');
 

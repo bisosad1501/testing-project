@@ -6,33 +6,60 @@ use Pixie\QueryBuilder\QueryBuilderHandler;
 
 class DatabaseTestCase extends TestCase
 {
+    /**
+     * @var Connection Kết nối Pixie được chia sẻ giữa các test
+     */
     protected static $connection;
+
+    /**
+     * @var PDO Kết nối PDO được chia sẻ giữa các test
+     */
+    protected static $pdoConnection;
+
+    /**
+     * @var PDO Kết nối PDO cho test hiện tại
+     */
     protected $pdo;
 
-    protected function setUp()
+    /**
+     * @var bool Kiểm soát việc đóng kết nối sau khi tất cả các test hoàn thành
+     */
+    protected static $connectionClosed = false;
+
+    /**
+     * Thiết lập trước khi chạy tất cả các test
+     */
+    public static function setUpBeforeClass()
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
 
         try {
             require_once __DIR__ . '/../vendor/autoload.php';
             require_once __DIR__ . '/../config/db.test.config.php';
 
-            // PDO connection setup
-            $dsn = sprintf(
-                "mysql:unix_socket=/Applications/MAMP/tmp/mysql/mysql.sock;dbname=%s",
-                DB_NAME
-            );
+            // Tạo kết nối PDO một lần duy nhất cho tất cả các test
+            if (!self::$pdoConnection) {
+                $dsn = sprintf(
+                    "mysql:unix_socket=/Applications/MAMP/tmp/mysql/mysql.sock;dbname=%s",
+                    DB_NAME
+                );
 
-            $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ];
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    // Thiết lập thời gian chờ kết nối
+                    PDO::ATTR_TIMEOUT => 5,
+                    // Giữ kết nối liên tục
+                    PDO::ATTR_PERSISTENT => true
+                ];
 
-            $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+                self::$pdoConnection = new PDO($dsn, DB_USER, DB_PASS, $options);
 
-            // Initialize Pixie only once
-            if (!self::$connection) {
+                // Tăng giới hạn kết nối
+                self::$pdoConnection->exec("SET GLOBAL max_connections = 1000");
+
+                // Khởi tạo Pixie một lần duy nhất
                 $config = [
                     'driver'   => 'mysql',
                     'unix_socket' => '/Applications/MAMP/tmp/mysql/mysql.sock',
@@ -44,17 +71,33 @@ class DatabaseTestCase extends TestCase
 
                 $container = new Container();
                 self::$connection = new Connection('mysql', $config, 'DB', $container);
+                self::$connection->setPdoInstance(self::$pdoConnection);
             }
+        } catch (Exception $e) {
+            echo "Setup failed in setUpBeforeClass: " . $e->getMessage() . "\n";
+        }
+    }
 
-            // Always set PDO instance for current test
-            self::$connection->setPdoInstance($this->pdo);
+    /**
+     * Thiết lập trước mỗi test case
+     */
+    protected function setUp()
+    {
+        parent::setUp();
 
-            $this->pdo->beginTransaction();
+        try {
+            // Sử dụng kết nối PDO đã được tạo
+            $this->pdo = self::$pdoConnection;
 
+            // Bắt đầu transaction cho test hiện tại
+            if ($this->pdo && !$this->pdo->inTransaction()) {
+                $this->pdo->beginTransaction();
+            }
         } catch (Exception $e) {
             $this->fail("Setup failed: " . $e->getMessage());
         }
     }
+
     /**
      * Dọn dẹp môi trường sau mỗi test
      */
@@ -64,7 +107,23 @@ class DatabaseTestCase extends TestCase
         if ($this->pdo && $this->pdo->inTransaction()) {
             $this->pdo->rollBack();
         }
+
         parent::tearDown();
+    }
+
+    /**
+     * Dọn dẹp sau khi tất cả các test hoàn thành
+     */
+    public static function tearDownAfterClass()
+    {
+        // Đóng kết nối PDO sau khi tất cả các test hoàn thành
+        if (!self::$connectionClosed && self::$pdoConnection) {
+            self::$pdoConnection = null;
+            self::$connection = null;
+            self::$connectionClosed = true;
+        }
+
+        parent::tearDownAfterClass();
     }
 
     /**

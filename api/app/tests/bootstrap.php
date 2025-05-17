@@ -64,12 +64,8 @@ require_once APP_PATH . '/controllers/ChartsController.php';
 require_once APP_PATH . '/controllers/ClinicController.php';
 require_once APP_PATH . '/controllers/DoctorController.php';
 require_once APP_PATH . '/controllers/DoctorsController.php';
-
-
-
-
-
-
+require_once APP_PATH . '/controllers/PatientController.php';
+require_once APP_PATH . '/controllers/PatientNotificationController.php';
 
 
 

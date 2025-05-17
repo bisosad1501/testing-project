@@ -18,17 +18,28 @@ if [[ $TEST_NAME != *".php" ]]; then
     TEST_NAME="${TEST_NAME}.php"
 fi
 
-# Đường dẫn đến thư mục tests/models
-TESTS_DIR="tests/models"
+# Tìm file test trong thư mục tests/models hoặc tests/controllers
+MODELS_DIR="tests/models"
+CONTROLLERS_DIR="tests/controllers"
+TEST_FILE=""
 
-# Đường dẫn đầy đủ đến file test
-TEST_FILE="${TESTS_DIR}/${TEST_NAME}"
-
-# Kiểm tra file test tồn tại
-if [ ! -f "$TEST_FILE" ]; then
-    echo "File test không tồn tại: $TEST_FILE"
-    echo "Các file test có sẵn:"
-    ls -1 $TESTS_DIR
+# Kiểm tra trong thư mục models
+if [ -f "${MODELS_DIR}/${TEST_NAME}" ]; then
+    TEST_FILE="${MODELS_DIR}/${TEST_NAME}"
+# Kiểm tra trong thư mục controllers
+elif [ -f "${CONTROLLERS_DIR}/${TEST_NAME}" ]; then
+    TEST_FILE="${CONTROLLERS_DIR}/${TEST_NAME}"
+# Kiểm tra trong thư mục tests
+elif [ -f "tests/${TEST_NAME}" ]; then
+    TEST_FILE="tests/${TEST_NAME}"
+else
+    echo "File test không tồn tại: ${TEST_NAME}"
+    echo "Các file test có sẵn trong models:"
+    ls -1 $MODELS_DIR
+    echo "Các file test có sẵn trong controllers:"
+    ls -1 $CONTROLLERS_DIR
+    echo "Các file test có sẵn trong thư mục tests:"
+    ls -1 tests/*.php 2>/dev/null
     exit 1
 fi
 
@@ -53,3 +64,25 @@ else
     echo "❌ Test thất bại!"
     echo "==================================================="
 fi
+
+# Hiển thị đường dẫn đến báo cáo độ phủ
+COVERAGE_PATH="$(pwd)/tests/coverage/index.html"
+echo ""
+echo "📊 Báo cáo độ phủ đã được tạo tại:"
+echo "file://$COVERAGE_PATH"
+echo ""
+echo "Bạn có thể click vào link trên để xem báo cáo độ phủ."
+
+# Tự động mở báo cáo độ phủ trong trình duyệt mặc định
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    open "$COVERAGE_PATH"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux với xdg-open
+    xdg-open "$COVERAGE_PATH" &>/dev/null &
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    # Windows
+    start "$COVERAGE_PATH"
+fi
+
+echo "==================================================="

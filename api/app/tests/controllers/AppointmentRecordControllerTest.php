@@ -1,10 +1,10 @@
 <?php
 /**
  * Unit tests for AppointmentRecordController
- * 
+ *
  * File: api/app/tests/controllers/AppointmentRecordControllerTest.php
  * Class: AppointmentRecordControllerTest
- * 
+ *
  * Test suite cho các chức năng của AppointmentRecordController:
  * - Xem chi tiết bản ghi lịch hẹn
  * - Cập nhật thông tin bản ghi lịch hẹn
@@ -18,12 +18,12 @@ class AppointmentRecordControllerTest extends ControllerTestCase
      * @var AppointmentRecordController The controller instance
      */
     protected $controller;
-    
+
     /**
      * @var array Test data for fixtures
      */
     protected $testData;
-    
+
     /**
      * Debug function for response
      */
@@ -37,17 +37,17 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         }
         echo "-------------------------\n";
     }
-    
+
     /**
      * Set up test environment before each test
      */
     protected function setUp()
     {
         parent::setUp();
-        
+
         // Create controller
         $this->controller = $this->createController('AppointmentRecordController');
-        
+
         // Set up test data
         $this->testData = [
             'doctors' => [
@@ -136,11 +136,11 @@ class AppointmentRecordControllerTest extends ControllerTestCase
                 ]
             ]
         ];
-        
+
         // Create fixtures for common test dependencies
         $this->createFixtures();
     }
-    
+
     /**
      * Create database fixtures for testing
      */
@@ -149,12 +149,12 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         try {
             // Insert specialities
             $specialityId = $this->insertFixture(TABLE_PREFIX.TABLE_SPECIALITIES, $this->testData['specialities']['speciality1']);
-            
+
             // Insert rooms
             $roomId1 = $this->insertFixture(TABLE_PREFIX.TABLE_ROOMS, $this->testData['rooms']['room1']);
             $roomId2 = $this->insertFixture(TABLE_PREFIX.TABLE_ROOMS, $this->testData['rooms']['room2']);
             $roomId3 = $this->insertFixture(TABLE_PREFIX.TABLE_ROOMS, $this->testData['rooms']['room3']);
-            
+
             // Update references
             $this->testData['doctors']['admin']['speciality_id'] = $specialityId;
             $this->testData['doctors']['admin']['room_id'] = $roomId1;
@@ -162,15 +162,15 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             $this->testData['doctors']['member']['room_id'] = $roomId2;
             $this->testData['doctors']['supporter']['speciality_id'] = $specialityId;
             $this->testData['doctors']['supporter']['room_id'] = $roomId3;
-            
+
             // Insert doctors
             $adminDoctorId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['doctors']['admin']);
             $memberDoctorId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['doctors']['member']);
             $supporterDoctorId = $this->insertFixture(TABLE_PREFIX.TABLE_DOCTORS, $this->testData['doctors']['supporter']);
-            
+
             // Insert patients
             $patientId = $this->insertFixture(TABLE_PREFIX.TABLE_PATIENTS, $this->testData['patients']['patient1']);
-            
+
             // Store IDs for later use
             $this->testData['doctors']['admin']['id'] = $adminDoctorId;
             $this->testData['doctors']['member']['id'] = $memberDoctorId;
@@ -184,10 +184,10 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             $this->fail("Failed to create fixtures: " . $e->getMessage());
         }
     }
-    
+
     /**
      * Create a test appointment
-     * 
+     *
      * @param array $overrides Optional data overrides
      * @return int Appointment ID
      */
@@ -195,7 +195,7 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Format ngày tháng đúng với định dạng controller
         $today = date('d-m-Y');
-        
+
         $appointmentData = array_merge([
             'booking_id' => 0,
             'date' => $today,
@@ -212,13 +212,13 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             'create_at' => date('Y-m-d H:i:s'),
             'update_at' => date('Y-m-d H:i:s')
         ], $overrides);
-        
+
         return $this->insertFixture(TABLE_PREFIX.TABLE_APPOINTMENTS, $appointmentData);
     }
 
     /**
      * Create a test appointment record
-     * 
+     *
      * @param array $overrides Optional data overrides
      * @return int AppointmentRecord ID
      */
@@ -233,39 +233,39 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             'create_at' => date('Y-m-d H:i:s'),
             'update_at' => date('Y-m-d H:i:s')
         ], $overrides);
-        
+
         return $this->insertFixture(TABLE_PREFIX.TABLE_APPOINTMENT_RECORDS, $appointmentRecordData);
     }
-    
+
     /**
      * Mock authenticated user
-     * 
+     *
      * @param string $role User role (admin, member, etc.)
      * @return DoctorModel Authenticated user model
      */
     private function mockAuthUser($role = 'admin')
     {
         $doctorData = $this->testData['doctors'][$role];
-        
+
         // Create reflection method to set protected property
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('variables');
         $property->setAccessible(true);
-        
+
         // Create AuthUser model
         $AuthUser = new DoctorModel($doctorData['id']);
-        
+
         // Set the AuthUser in controller's variables
         $variables = $property->getValue($this->controller);
         $variables['AuthUser'] = $AuthUser;
         $property->setValue($this->controller, $variables);
-        
+
         return $AuthUser;
     }
-    
+
     /**
      * Set route parameters
-     * 
+     *
      * @param array $params Route parameters
      */
     private function setRouteParams($params)
@@ -273,30 +273,30 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         // Create route object with params
         $route = new stdClass();
         $route->params = new stdClass();
-        
+
         foreach ($params as $key => $value) {
             $route->params->$key = $value;
         }
-        
+
         // Set route in controller variables
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('variables');
         $property->setAccessible(true);
-        
+
         $variables = $property->getValue($this->controller);
         $variables['Route'] = $route;
         $property->setValue($this->controller, $variables);
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_GET_001
      * Mục tiêu: Kiểm tra chức năng xem chi tiết bản ghi lịch hẹn với ID hợp lệ
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Admin doctor
      * - ID bản ghi lịch hẹn tồn tại trong hệ thống
      * - Phương thức: GET
-     * 
+     *
      * Expected Output:
      * - result = 1 (thành công)
      * - msg = "Action successfully !"
@@ -306,32 +306,32 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Create test appointment
         $appointmentId = $this->createTestAppointment();
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
-        
+
         // Mock admin user
         $this->mockAuthUser('admin');
-        
+
         // Set route params
         $this->setRouteParams(['id' => $appointmentRecordId]);
-        
+
         // Mock GET request with type = id
         $_GET['type'] = 'id';
         $this->mockRequest('GET', $_GET);
-        
+
         // Start output buffering to capture any direct output
         ob_start();
-        
+
         try {
             // Call the private method using reflection
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('getById');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
@@ -339,13 +339,13 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response directly from controller's resp property
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testGetByIdWithID');
-        
+
         // Assertions
         $this->assertEquals(1, $response['result']);
         $this->assertEquals('Action successfully !', $response['msg']);
@@ -353,21 +353,21 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         $this->assertEquals($appointmentId, $response['data']['appointment']['id']);
         $this->assertEquals($this->testData['patients']['patient1']['name'], $response['data']['appointment']['patient_name']);
         $this->assertEquals($this->testData['doctors']['admin']['id'], $response['data']['doctor']['id']);
-        
+
         // Additional assertions to verify data structure
         $this->assertArrayHasKey('speciality', $response['data'], 'Response should contain speciality data');
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_GET_002
      * Mục tiêu: Kiểm tra chức năng xem chi tiết bản ghi lịch hẹn với appointment_id
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Member doctor
      * - appointment_id tồn tại trong hệ thống
      * - Phương thức: GET
      * - Parameter: type=appointment_id
-     * 
+     *
      * Expected Output:
      * - result = 1 (thành công)
      * - msg = "Action successfully !"
@@ -379,45 +379,45 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         $appointmentId = $this->createTestAppointment([
             'doctor_id' => $this->testData['doctors']['member']['id']
         ]);
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
-        
+
         // Mock member user
         $this->mockAuthUser('member');
-        
+
         // Set route params with appointment ID
         $this->setRouteParams(['id' => $appointmentId]);
-        
+
         // Mock GET request with type = appointment_id
         $_GET['type'] = 'appointment_id';
         $this->mockRequest('GET', $_GET);
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the private method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('getById');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testGetByIdWithAppointmentID');
-        
+
         // Assertions
         $this->assertEquals(1, $response['result']);
         $this->assertEquals('Action successfully !', $response['msg']);
@@ -425,16 +425,16 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         $this->assertEquals($this->testData['patients']['patient1']['name'], $response['data']['appointment']['patient_name']);
         $this->assertEquals($this->testData['doctors']['member']['id'], $response['data']['doctor']['id']);
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_GET_NORECORD_003
      * Mục tiêu: Kiểm tra xử lý khi không tìm thấy bản ghi lịch hẹn
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Admin doctor
      * - ID bản ghi lịch hẹn không tồn tại (99999)
      * - Phương thức: GET
-     * 
+     *
      * Expected Output:
      * - result = 0
      * - msg chứa thông báo không tìm thấy bản ghi
@@ -443,42 +443,42 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Mock admin user
         $this->mockAuthUser('admin');
-        
+
         // Set route params with non-existent ID
         $this->setRouteParams(['id' => 99999]);
-        
+
         // Mock GET request with type = id để đảm bảo đi đúng nhánh trong controller
         $_GET['type'] = 'id';
         $this->mockRequest('GET', $_GET);
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the private method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('getById');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testGetByIdNotFound');
-        
+
         // Assertions - controller should indicate no record found
         $this->assertEquals(0, $response['result']);
         // Thay đổi assertion để kiểm tra các thông báo lỗi có thể xảy ra
         $this->assertTrue(
-            $this->stringContainsOneOf($response['msg'], 
+            $this->stringContainsOneOf($response['msg'],
                 ['no appointment record found', 'There is no appointment record found', 'Undefined offset: 0']
             ),
             'Response should contain error message about record not found or array access'
@@ -494,21 +494,21 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         }
         return false;
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_UPDATE_004
      * Mục tiêu: Kiểm tra chức năng cập nhật thông tin bản ghi lịch hẹn thành công
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Admin doctor
      * - ID bản ghi lịch hẹn tồn tại
      * - Phương thức: PUT
-     * - Dữ liệu cập nhật: 
+     * - Dữ liệu cập nhật:
      *   + reason mới
      *   + description mới
      *   + status_before mới
      *   + status_after mới
-     * 
+     *
      * Expected Output:
      * - result = 1 (thành công)
      * - msg = "Appointment record has been UPDATE successfully"
@@ -518,18 +518,18 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Create test appointment
         $appointmentId = $this->createTestAppointment();
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
-        
+
         // Mock admin user
         $this->mockAuthUser('admin');
-        
+
         // Set route params
         $this->setRouteParams(['id' => $appointmentRecordId]);
-        
+
         // Prepare update data
         $updateData = [
             'appointment_id' => $appointmentId,
@@ -538,10 +538,10 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             'status_before' => 'Updated Normal',
             'status_after' => 'Updated Better'
         ];
-        
+
         // Mock PUT request
         $this->mockRequest('PUT', $updateData);
-        
+
         // Debug PUT mock
         echo "\nDEBUG PUT MOCK in testUpdate:\n";
         if (isset(InputMock::$putMock)) {
@@ -551,37 +551,37 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         } else {
             echo "PUT mock is not set!\n";
         }
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('update');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testUpdate');
-        
+
         // Assertions
         $this->assertEquals(1, $response['result']);
         $this->assertEquals('Appointment record has been UPDATE successfully', $response['msg']);
         $this->assertEquals($appointmentRecordId, $response['data']['id']);
         $this->assertEquals($updateData['reason'], $response['data']['reason']);
         $this->assertEquals($updateData['description'], $response['data']['description']);
-        
+
         // Check database
         $this->assertModelMatchesDatabase(
             ['reason' => $updateData['reason']],
@@ -589,17 +589,17 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             ['id' => $appointmentRecordId]
         );
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_UPDATE_MISSING_005
      * Mục tiêu: Kiểm tra cập nhật bản ghi với dữ liệu thiếu
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Admin doctor
      * - ID bản ghi lịch hẹn tồn tại
      * - Phương thức: PUT
      * - Dữ liệu thiếu trường reason
-     * 
+     *
      * Expected Output:
      * - result = 0 (thất bại)
      * - msg = "Missing field: reason"
@@ -608,75 +608,66 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Create test appointment
         $appointmentId = $this->createTestAppointment();
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
-        
+
         // Mock admin user
         $this->mockAuthUser('admin');
-        
+
         // Set route params
         $this->setRouteParams(['id' => $appointmentRecordId]);
-        
+
         // Prepare incomplete update data (missing reason)
         $updateData = [
             'appointment_id' => $appointmentId,
             // 'reason' => 'Updated diagnosis', - Missing required field
             'description' => 'Updated description for the diagnosis'
         ];
-        
-        // Vấn đề: Trong trường hợp này, controller hiện tại không xác thực trường reason
-        // Giải pháp: Điều chỉnh test để khớp với hành vi thực tế của controller
-        
+
         // Mock PUT request
         $this->mockRequest('PUT', $updateData);
-        
-        // Kiểm tra trước khi gọi phương thức để đảm bảo Input::put('reason') trả về null
-        $this->assertNull(Input::put('reason'), 'reason should be null');
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('update');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
-        // Điều chỉnh assertion để phù hợp với hành vi thực tế của controller
+
+        // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testUpdateMissingRequiredField');
-        
-        // Một trong hai: hoặc là cập nhật assertion để phù hợp với controller thực tế
-        // $this->assertEquals(1, $response['result']);
-        // Hoặc skip test này nếu controller có lỗi cần sửa
-        $this->markTestSkipped(
-            'Controller không xác thực trường reason như mong đợi. Cần xem xét lại controller.'
-        );
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện thiếu trường reason");
+        $this->assertEquals("Missing field: reason", $response['msg'], "LỖI: Thông báo lỗi không chính xác");
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_UPDATE_PERMISSION_006
      * Mục tiêu: Kiểm tra quyền cập nhật - member doctor chỉ có thể cập nhật bản ghi của mình
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Member doctor
      * - ID bản ghi lịch hẹn thuộc về bác sĩ khác
      * - Phương thức: PUT
      * - Dữ liệu cập nhật đầy đủ
-     * 
+     *
      * Expected Output:
      * - result = 0 (thất bại)
      * - msg thông báo không có quyền cập nhật
@@ -687,65 +678,67 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         $appointmentId = $this->createTestAppointment([
             'doctor_id' => $this->testData['doctors']['admin']['id'] // Lịch hẹn của admin doctor
         ]);
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
-        
+
         // Mock member doctor (trying to update another doctor's record)
         $this->mockAuthUser('member');
-        
+
         // Set route params
         $this->setRouteParams(['id' => $appointmentRecordId]);
-        
+
         // Prepare update data
         $updateData = [
             'appointment_id' => $appointmentId,
             'reason' => 'Unauthorized update attempt',
             'description' => 'This should fail due to permissions'
         ];
-        
+
         // Mock PUT request
         $this->mockRequest('PUT', $updateData);
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('update');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testUpdatePermissions');
-        
-        // Vấn đề: Controller không kiểm tra quyền như mong đợi
-        $this->markTestSkipped(
-            'Controller hiện tại không thực hiện kiểm tra quyền cho member doctor như mong đợi.'
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện member doctor đang cố cập nhật bản ghi của bác sĩ khác");
+        $this->assertTrue(
+            strpos($response['msg'], "does not belong to you") !== false,
+            "LỖI: Thông báo lỗi không chỉ ra rằng bản ghi không thuộc về member doctor"
         );
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_SUPPORTER_007
      * Mục tiêu: Kiểm tra quyền truy cập - supporter không có quyền truy cập controller
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Supporter
      * - Phương thức: GET
-     * 
+     *
      * Expected Output:
      * - result = 0 (thất bại)
      * - msg thông báo không có quyền
@@ -754,49 +747,49 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Mock supporter user
         $this->mockAuthUser('supporter');
-        
+
         // Set route params
         $this->setRouteParams(['id' => 1]);
-        
+
         // Mock GET request
         $this->mockRequest('GET');
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Gọi process() trực tiếp để test role validation
             $this->controller->process();
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testSupporterAccess');
-        
-        // Sửa assertion để kiểm tra kết quả thực tế
-        $this->assertEquals(0, $response['result']);
-        // Hoặc skip test này
-        $this->markTestSkipped(
-            'Controller không trả về lỗi đúng như kỳ vọng khi supporter truy cập. Cần xem xét lại controller.'
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện supporter không có quyền truy cập");
+        $this->assertTrue(
+            strpos($response['msg'], "Only Doctor's role as admin, member") !== false,
+            "LỖI: Thông báo lỗi không chỉ ra rằng chỉ admin và member mới có quyền truy cập"
         );
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_NO_AUTH_008
      * Mục tiêu: Kiểm tra xử lý khi không có người dùng đăng nhập
-     * 
+     *
      * Input:
      * - Không có AuthUser
      * - Phương thức: GET
-     * 
+     *
      * Expected Output:
      * - Redirect đến trang login
      */
@@ -809,10 +802,10 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         $variables = $property->getValue($this->controller);
         $variables['AuthUser'] = null; // Xóa AuthUser
         $property->setValue($this->controller, $variables);
-        
+
         // Chuẩn bị request
         $this->mockRequest('GET');
-        
+
         // Kiểm tra bằng cách bắt exception khi cố gắng redirect
         try {
             // Bắt output
@@ -820,7 +813,7 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             // Thực thi process()
             $this->controller->process();
             ob_end_clean();
-            
+
             // Nếu không throw exception, đánh dấu test là thất bại
             $this->fail('Expected exception was not thrown when no user is authenticated');
         } catch (Exception $e) {
@@ -831,16 +824,16 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             $this->assertTrue(true, 'Redirect to login page was attempted');
         }
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_NO_ID_009
      * Mục tiêu: Kiểm tra xử lý khi không có ID trong route
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Admin doctor
      * - Không có ID trong route params
      * - Phương thức: GET
-     * 
+     *
      * Expected Output:
      * - result = 0 (thất bại)
      * - msg = "ID is required !"
@@ -849,63 +842,61 @@ class AppointmentRecordControllerTest extends ControllerTestCase
     {
         // Mock admin user
         $this->mockAuthUser('admin');
-        
+
         // Set empty route params nhưng đảm bảo route->params->id tồn tại với giá trị null
         $route = new stdClass();
         $route->params = new stdClass();
-        $route->params->id = null;
-        
+        // Không set route->params->id để mô phỏng trường hợp không có ID
+
         // Set route trong controller variables
         $reflection = new ReflectionClass($this->controller);
         $property = $reflection->getProperty('variables');
         $property->setAccessible(true);
-        
+
         $variables = $property->getValue($this->controller);
         $variables['Route'] = $route;
         $property->setValue($this->controller, $variables);
-        
+
         // Mock GET request
         $this->mockRequest('GET');
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the private method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('getById');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testNoId');
-        
-        // Điều chỉnh assertion để phù hợp với thực tế
-        $this->assertEquals(0, $response['result']);
-        $this->markTestSkipped(
-            'Controller trả về thông báo lỗi khác với mong đợi. Cần xem xét lại logic controller.'
-        );
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện thiếu ID");
+        $this->assertEquals("ID is required !", $response['msg'], "LỖI: Thông báo lỗi không chính xác");
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_DELETE_010
      * Mục tiêu: Kiểm tra chức năng xóa bản ghi lịch hẹn thành công
-     * 
+     *
      * Input:
      * - Tài khoản đăng nhập: Admin doctor
      * - ID bản ghi lịch hẹn tồn tại
      * - Phương thức: DELETE
-     * 
+     *
      * Expected Output:
      * - result = 1 (thành công)
      * - msg = "Appointment record is deleted successfully"
@@ -917,8 +908,11 @@ class AppointmentRecordControllerTest extends ControllerTestCase
         $this->markTestSkipped(
             'Phương thức delete() không tồn tại trong AppointmentRecordController.'
         );
+
+        // Lỗi: Controller tham chiếu đến phương thức delete() trong process() nhưng không định nghĩa phương thức này
+        // Cần bổ sung phương thức delete() trong controller hoặc sửa lại phương thức process()
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_DELETE_PERM_011
      * Mục tiêu: Kiểm tra quyền xóa - member doctor không có quyền xóa bản ghi của bác sĩ khác
@@ -930,27 +924,37 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             'Phương thức delete() không tồn tại trong AppointmentRecordController.'
         );
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_UPDATE_VALIDATION_012
      * Mục tiêu: Kiểm tra validation cho trường status_before/status_after
+     *
+     * Input:
+     * - Tài khoản đăng nhập: Admin doctor
+     * - ID bản ghi lịch hẹn tồn tại
+     * - Phương thức: PUT
+     * - Dữ liệu cập nhật với status_before chứa ký tự đặc biệt
+     *
+     * Expected Output:
+     * - result = 0 (thất bại)
+     * - msg thông báo lỗi về định dạng status_before
      */
     public function testUpdateWithInvalidStatusFormat()
     {
         // Create test appointment
         $appointmentId = $this->createTestAppointment();
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
-        
+
         // Mock admin user
         $this->mockAuthUser('admin');
-        
+
         // Set route params
         $this->setRouteParams(['id' => $appointmentRecordId]);
-        
+
         // Prepare update data with invalid status format
         $updateData = [
             'appointment_id' => $appointmentId,
@@ -959,55 +963,166 @@ class AppointmentRecordControllerTest extends ControllerTestCase
             'status_before' => '#Invalid Status!@#', // Invalid format with special characters
             'status_after' => 'Valid status'
         ];
-        
+
         // Mock PUT request
         $this->mockRequest('PUT', $updateData);
-        
+
         // Start output buffering
         ob_start();
-        
+
         try {
             // Call the method
             $reflection = new ReflectionClass($this->controller);
             $method = $reflection->getMethod('update');
             $method->setAccessible(true);
             $method->invoke($this->controller);
-            
+
             // Clean output buffer
             ob_end_clean();
         } catch (Exception $e) {
             ob_end_clean();
             $this->fail("Exception occurred: " . $e->getMessage());
         }
-        
+
         // Get response
         $response = $this->getControllerResponse();
-        
+
         // Debug response
         $this->debugResponse($response, 'testUpdateWithInvalidStatusFormat');
-        
-        // Vấn đề: Controller không xác thực status_before như mong đợi
-        $this->markTestSkipped(
-            'Controller không xác thực định dạng status_before như mong đợi. Cần xem xét lại controller.'
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện status_before không hợp lệ");
+        $this->assertTrue(
+            strpos($response['msg'], "Status before only has letters") !== false,
+            "LỖI: Thông báo lỗi không chỉ ra rằng status_before chỉ được chứa chữ cái, số và dấu gạch ngang"
         );
     }
-    
+
     /**
      * Test Case ID: CTRL_APREC_UPDATE_DATE_013
      * Mục tiêu: Kiểm tra validation cho ngày hẹn không phải ngày hiện tại
+     *
+     * Input:
+     * - Tài khoản đăng nhập: Admin doctor
+     * - ID bản ghi lịch hẹn tồn tại với ngày hẹn là ngày hôm qua
+     * - Phương thức: PUT
+     * - Dữ liệu cập nhật hợp lệ
+     *
+     * Expected Output:
+     * - result = 0 (thất bại)
+     * - msg thông báo lỗi về ngày hẹn không phải ngày hiện tại
      */
     public function testUpdateWithPastDate()
     {
         // Create test appointment with date in past (yesterday)
         $yesterday = date('d-m-Y', strtotime('-1 day'));
-        
+
         $appointmentId = $this->createTestAppointment([
             'date' => $yesterday  // Lịch hẹn ngày hôm qua
         ]);
-        
+
         // Create test appointment record
         $appointmentRecordId = $this->createTestAppointmentRecord([
             'appointment_id' => $appointmentId
         ]);
+
+        // Mock admin user
+        $this->mockAuthUser('admin');
+
+        // Set route params
+        $this->setRouteParams(['id' => $appointmentRecordId]);
+
+        // Prepare update data
+        $updateData = [
+            'appointment_id' => $appointmentId,
+            'reason' => 'Updated diagnosis',
+            'description' => 'Updated description for the diagnosis'
+        ];
+
+        // Mock PUT request
+        $this->mockRequest('PUT', $updateData);
+
+        // Start output buffering
+        ob_start();
+
+        try {
+            // Call the method
+            $reflection = new ReflectionClass($this->controller);
+            $method = $reflection->getMethod('update');
+            $method->setAccessible(true);
+            $method->invoke($this->controller);
+
+            // Clean output buffer
+            ob_end_clean();
+        } catch (Exception $e) {
+            ob_end_clean();
+            $this->fail("Exception occurred: " . $e->getMessage());
+        }
+
+        // Get response
+        $response = $this->getControllerResponse();
+
+        // Debug response
+        $this->debugResponse($response, 'testUpdateWithPastDate');
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện ngày hẹn không phải ngày hiện tại");
+        $this->assertTrue(
+            strpos($response['msg'], "Today is") !== false &&
+            strpos($response['msg'], "but this appointment's is") !== false,
+            "LỖI: Thông báo lỗi không chỉ ra rằng ngày hẹn không phải ngày hiện tại"
+        );
+    }
+
+    /**
+     * Test Case ID: CTRL_APREC_PROCESS_014
+     * Mục tiêu: Kiểm tra phương thức process() với request method không hợp lệ
+     *
+     * Input:
+     * - Tài khoản đăng nhập: Admin doctor
+     * - Phương thức: POST (không được hỗ trợ)
+     *
+     * Expected Output:
+     * - result = 0 (thất bại)
+     * - msg thông báo lỗi về phương thức không hợp lệ
+     */
+    public function testProcessWithInvalidMethod()
+    {
+        // Mock admin user
+        $this->mockAuthUser('admin');
+
+        // Set route params
+        $this->setRouteParams(['id' => 1]);
+
+        // Mock POST request (không được hỗ trợ trong controller)
+        $this->mockRequest('POST');
+
+        // Start output buffering
+        ob_start();
+
+        try {
+            // Call the process method
+            $this->controller->process();
+
+            // Clean output buffer
+            ob_end_clean();
+        } catch (Exception $e) {
+            ob_end_clean();
+            $this->fail("Exception occurred: " . $e->getMessage());
+        }
+
+        // Get response
+        $response = $this->getControllerResponse();
+
+        // Debug response
+        $this->debugResponse($response, 'testProcessWithInvalidMethod');
+
+        // Assertions
+        $this->assertEquals(0, $response['result'], "LỖI: Controller không phát hiện phương thức không hợp lệ");
+        $this->assertTrue(
+            strpos($response['msg'], "method") !== false ||
+            strpos($response['msg'], "Method") !== false,
+            "LỖI: Thông báo lỗi không chỉ ra rằng phương thức không hợp lệ"
+        );
     }
 }

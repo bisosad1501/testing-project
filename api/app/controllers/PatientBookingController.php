@@ -1,4 +1,4 @@
-<?php 
+<?php
     /**
      * @author Phong-Kaster
      * @since 20-10-2022
@@ -23,14 +23,16 @@
                 $this->jsonecho();
             }
 
-            $request_method = Input::method();
+            $request_method = isset($this->request_method) ? $this->request_method : Input::method();
             if( $request_method === 'GET')
             {
                 $this->getById();
+                return;
             }
             if( $request_method === 'DELETE')
             {
                 $this->delete();
+                return;
             }
         }
 
@@ -150,7 +152,7 @@
                 $this->resp->msg = "This booking's status is cancelled. No need any more action !";
                 $this->jsonecho();
             }
-            
+
             /**Step 4 - if status == processing or status verified => allow set status to CANCELLED */
             $status = $Booking->get("status");
             $valid_status = ["processing"];
@@ -161,7 +163,7 @@
                                     .implode(', ',$valid_status)." !";
                 $this->jsonecho();
             }
-            
+
             /**Step 5 - save change */
             $Booking->set("status", "cancelled")
                     ->set("update_at", $update_at)
@@ -173,7 +175,7 @@
             $serviceName = $Service->get("name");
             $date = $Booking->get("appointment_date");
             $time = $Booking->get("appointment_time");
-            
+
             $notificationMessage = "Lịch hẹn khám ".$serviceName." lúc ".$time." ngày ".$date." đã được hủy bỏ thành công!";
             $Notification->set("message", $notificationMessage)
                     ->set("record_id", $Booking->get("id") )
@@ -183,7 +185,7 @@
                     ->set("create_at", $update_at)
                     ->set("update_at", $update_at)
                     ->save();
-            
+
             $this->resp->result = 1;
             $this->resp->msg = "Booking has been cancelled successfully !";
             $this->jsonecho();
