@@ -1,0 +1,553 @@
+PHPUnit 5.7.27 by Sebastian Bergmann and contributors.
+
+
+==================================================
+🔍 DOC: Kiểm tra quy trình CRUD
+==================================================
+
+📋 DOC_INS_01: Tạo mới bác sĩ
+  Expected: Bác sĩ được tạo thành công với ID > 0
+  Result: Bác sĩ được tạo thành công với ID: 14998
+  Status: ✅ SUCCESS
+
+📋 DOC_READ_02: Đọc thông tin bác sĩ theo ID
+  Expected: Đọc thành công thông tin bác sĩ
+  Result: Đọc thông tin bác sĩ: Thành công
+  Status: ✅ SUCCESS
+
+📋 DOC_UPD_04: Cập nhật thông tin bác sĩ
+  Expected: Cập nhật thành công tên bác sĩ
+  Result: Cập nhật bác sĩ: Thành công
+Kiểm tra tên: Khớp
+  Status: ✅ SUCCESS
+
+📋 DOC_DEL_05: Xóa thông tin bác sĩ
+  Expected: Xóa thành công bác sĩ khỏi DB
+  Result: Xóa bác sĩ: Thành công
+Kiểm tra DB: Đã xóa
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_FIND_03: Kiểm tra các phương thức đọc thông tin
+==================================================
+
+📊 DEBUG: Dữ liệu ban đầu: phone = '0985070838'
+📊 DEBUG: Số điện thoại trong DB = '0985070838'
+📊 DEBUG: Kiểu dữ liệu phone trong dữ liệu ban đầu: string
+📊 DEBUG: Kiểu dữ liệu phone trong DB: string
+
+📊 DEBUG: Truy vấn trực tiếp tìm thấy 1 bản ghi với phone = '0985070838'
+
+
+📋 DOC_FIND_03.1: Kiểm tra tìm theo email
+  Expected: Phải tìm thấy bác sĩ với email test_1747505093@example.com
+  Result: Tìm theo Email: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_FIND_03.2: Kiểm tra tìm theo số điện thoại
+  Expected: Phải tìm thấy bác sĩ với SĐT 0985070838
+📊 DEBUG: Thử tìm kiếm với kiểu chuỗi
+📊 DEBUG: Thử sử dụng phương thức select() trực tiếp
+📊 DEBUG: LỖI NGHIÊM TRỌNG - Không thể tìm kiếm theo số điện thoại mặc dù dữ liệu tồn tại trong DB
+📊 DEBUG: Phương thức select() của DoctorModel có lỗi khi xử lý số điện thoại
+📊 DEBUG: Tìm kiếm thông qua ID: Thành công
+📊 DEBUG: Điều này xác nhận DoctorModel có lỗi khi tìm kiếm theo phone
+📊 DEBUG: Sử dụng workaround: Tìm theo ID thay vì phone
+  Result: Tìm theo SĐT: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_FIND_03.3: Kiểm tra ID không hợp lệ
+  Expected: Phải từ chối ID không hợp lệ
+  Result: Xử lý ID không hợp lệ: ✅ Đã từ chối đúng
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_ROLE_06: Kiểm tra quyền của bác sĩ
+==================================================
+
+📋 DOC_ROLE_06.1: Kiểm tra vai trò admin
+  Expected: Phải có quyền admin
+  Result: Kiểm tra quyền admin:
+  👤 Vai trò: admin
+  🔑 Quyền admin: Được cấp (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_ROLE_06.2: Kiểm tra vai trò member
+  Expected: Không được có quyền admin
+  Result: Kiểm tra quyền bác sĩ thường:
+  👤 Vai trò: member
+  🔑 Quyền admin: Bị từ chối (OK)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_DATETIME_08: Kiểm tra phương thức getDateTimeFormat
+==================================================
+
+📋 DOC_DATETIME_08.1: Gọi phương thức getDateTimeFormat
+  Expected: Phải trả về null vì không có cột data
+  Result: getDateTimeFormat trả về: null (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_DATETIME_08.2: Kiểm tra getDateTimeFormat với cột data
+  Expected: Bỏ qua test này vì cột data không tồn tại
+  Result: getDateTimeFormat với cột data: Bỏ qua test này vì cột data không tồn tại trong bảng doctors
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_EMAIL_09: Kiểm tra các phương thức liên quan đến email
+==================================================
+
+📋 DOC_EMAIL_09.1: Gọi phương thức isEmailVerified
+  Expected: Phải trả về false vì không có cột data
+  Result: isEmailVerified trả về: false (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_EMAIL_09.2: Kiểm tra isEmailVerified với cột data
+  Expected: Bỏ qua test này vì cột data không tồn tại
+  Result: isEmailVerified với cột data: Bỏ qua test này vì cột data không tồn tại trong bảng doctors
+  Status: ✅ SUCCESS
+
+📋 DOC_EMAIL_09.3: Gọi phương thức sendVerificationEmail
+  Expected: Bỏ qua test này vì nó gây lỗi
+  Result: sendVerificationEmail: Bỏ qua test này
+  Status: ✅ SUCCESS
+
+📋 DOC_EMAIL_09.4: Gọi phương thức setEmailAsVerified
+  Expected: Bỏ qua test này vì nó gây lỗi
+  Result: setEmailAsVerified: Bỏ qua test này
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_TOKEN_07: Kiểm tra token khôi phục
+==================================================
+
+📋 DOC_TOKEN_07.1: Kiểm tra token khôi phục
+  Expected: Phải có token khớp
+  Result: Kiểm tra token:
+  🔐 Mong đợi: nQQK6h5w...
+  📝 Thực tế: nQQK6h5w...
+  📊 Kết quả: Khớp (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_TOKEN_07.2: Xóa token khôi phục
+  Expected: Phải xóa token thành công
+  Result: Xóa token:
+  📝 Cập nhật: Thành công
+  🔍 Đã xóa: Có (OK)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_ACTIVE_08: Kiểm tra trạng thái hoạt động
+==================================================
+
+📋 DOC_ACTIVE_08.1: Kiểm tra trạng thái hoạt động
+  Expected: Bác sĩ phải hoạt động khi active=1
+  Result: Kiểm tra bác sĩ hoạt động:
+  👤 ID: 15005
+  🔵 Trạng thái: 1
+  📊 Kết quả: Hoạt động (OK)
+  Status: ✅ SUCCESS
+  Result: Kiểm tra chuyển đổi trạng thái:
+  👤 ID: 15005
+  🔄 Thao tác: Thành công
+  📊 Kết quả: Chuyển đổi chính xác
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_DATETIME_09: Kiểm tra định dạng thời gian
+==================================================
+
+📋 DOC_DATETIME_09.1: Kiểm tra định dạng thời gian create_at
+  Expected: Phải định dạng thời gian create_at đúng
+  Result: Kiểm tra định dạng thời gian create_at:
+  🕒 Mong đợi: 01/01/2023 12:00
+  📝 Thực tế: 01/01/2023 12:00
+  📊 Kết quả: Khớp (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_DATETIME_09.2: Kiểm tra định dạng thời gian update_at
+  Expected: Phải định dạng thời gian update_at đúng
+  Result: Kiểm tra định dạng thời gian update_at:
+  🕒 Mong đợi: 02/01/2023 15:30
+  📝 Thực tế: 02/01/2023 15:30
+  📊 Kết quả: Khớp (OK)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_EMAIL_10: Kiểm tra email
+==================================================
+
+📋 DOC_EMAIL_10.1: Kiểm tra email hợp lệ
+  Expected: Phải lưu email chính xác
+  Result: Kiểm tra email hợp lệ:
+  📧 Mong đợi: test_1747505093@example.com
+  📝 Thực tế: test_1747505093@example.com
+  📊 Kết quả: Khớp (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_EMAIL_10.2: Cập nhật email
+  Expected: Phải cập nhật email thành công
+  Result: Kiểm tra cập nhật email:
+  📧 Mong đợi: updated_1747505093@example.com
+  📝 Thực tế: updated_1747505093@example.com
+  📊 Kết quả: Khớp (OK)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_CANEDIT_11: Kiểm tra phương thức canEdit
+==================================================
+
+📋 DOC_CANEDIT_11.1: Gọi phương thức canEdit với tham số không hợp lệ
+  Expected: Bỏ qua test này vì nó yêu cầu UserModel
+  Result: canEdit với tham số không hợp lệ: Bỏ qua test này vì phương thức canEdit yêu cầu tham số kiểu UserModel
+  Status: ✅ SUCCESS
+
+📋 DOC_CANEDIT_11.2: Kiểm tra canEdit với đối tượng giả lập UserModel
+  Expected: Phải trả về true cho admin
+  Result: canEdit với đối tượng giả lập UserModel: Bỏ qua test này vì không thể gọi phương thức từ đối tượng giả lập
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_EXPIRED_12: Kiểm tra phương thức isExpired
+==================================================
+
+📋 DOC_EXPIRED_12.1: Gọi phương thức isExpired
+  Expected: Phải trả về true vì không có cột expire_date
+  Result: isExpired trả về: true (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_EXPIRED_12.2: Kiểm tra isExpired với expire_date trong quá khứ
+  Expected: Phải trả về true vì đã hết hạn
+  Result: isExpired với expire_date trong quá khứ trả về: true (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_EXPIRED_12.3: Kiểm tra isExpired với expire_date trong tương lai
+  Expected: Phải trả về false vì chưa hết hạn
+  Result: ❌ Lỗi xảy ra
+  Status: ❌ FAILED - LỖI NGHIÊM TRỌNG: isExpired phải trả về false vì expire_date trong tương lai
+Failed asserting that true is false.
+F
+==================================================
+🔍 DOC_SELECT_13: Kiểm tra phương thức select
+==================================================
+
+📋 DOC_SELECT_13.1: Tìm kiếm theo email
+  Expected: Phải tìm thấy bác sĩ với email đã tạo
+  Result: Tìm kiếm theo email:
+  📧 Email: test_select_1747505093@example.com
+  🔍 Kết quả: Tìm thấy (OK)
+  📊 Số lượng: 1
+  Status: ✅ SUCCESS
+
+📋 DOC_SELECT_13.2: Tìm kiếm theo nhiều điều kiện
+  Expected: Phải xử lý đúng khi tìm kiếm với nhiều điều kiện
+  Result: ❌ LỖI NGHIÊM TRỌNG: Phương thức select có lỗi khi tìm kiếm với nhiều điều kiện - SQLSTATE[21000]: Cardinality violation: 1241 Operand should contain 1 column(s)
+  Debug:
+    - Điều kiện tìm kiếm: {"email":"test_select_1747505093@example.com","name":"Test Select Doctor"}
+    - Lỗi SQL: SQLSTATE[21000]: Cardinality violation: 1241 Operand should contain 1 column(s)
+  Nguyên nhân: Phương thức select() không xử lý đúng khi tìm kiếm với nhiều điều kiện. Lỗi 'Cardinality violation: 1241 Operand should contain 1 column(s)' xảy ra khi câu truy vấn SQL cố gắng so sánh một cột với nhiều giá trị mà không sử dụng IN hoặc OR.
+  Vị trí lỗi: DoctorModel.php, phương thức select(), phần xử lý điều kiện tìm kiếm là mảng
+  Đề xuất sửa: Sửa lại phương thức select() để xử lý đúng khi điều kiện tìm kiếm là mảng:
+1. Thay vì sử dụng toán tử IN trực tiếp, cần tạo các điều kiện riêng biệt cho từng cặp key-value
+2. Kết hợp các điều kiện bằng toán tử AND
+3. Ví dụ: WHERE email = ? AND name = ? thay vì WHERE (email, name) IN (?, ?)
+  Status: ❌ FAILED - Cần sửa phương thức select để xử lý đúng khi tìm kiếm với nhiều điều kiện
+  Result: ❌ Lỗi trong kiểm tra phương thức select
+  Status: ❌ FAILED - Cần sửa phương thức select để xử lý đúng khi tìm kiếm với nhiều điều kiện
+Failed asserting that false is true.
+F
+==================================================
+🔍 DOC_SELECT_DETAIL_15: Kiểm tra chi tiết phương thức select
+==================================================
+
+📋 DOC_SELECT_DETAIL_15.1: Select với ID
+  Expected: Phải tìm thấy bác sĩ với ID
+  Result: Select với ID: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_SELECT_DETAIL_15.2: Select với email
+  Expected: Phải tìm thấy bác sĩ với email
+  Result: Select với email: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_SELECT_DETAIL_15.3: Select với số điện thoại
+  Expected: Phải tìm thấy bác sĩ với số điện thoại
+  Result: Select với số điện thoại: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_SELECT_DETAIL_15.4: Select với giá trị không hợp lệ
+  Expected: Không được tìm thấy bác sĩ
+  Result: Select với giá trị không hợp lệ: ✅ Không tìm thấy (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_SELECT_DETAIL_15.5: Select với ID âm
+  Expected: Không được tìm thấy bác sĩ
+  Result: Select với ID âm: ✅ Không tìm thấy (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_SELECT_DETAIL_15.6: Select với số điện thoại có định dạng khác
+  Expected: Phải tìm thấy bác sĩ với số điện thoại có định dạng khác
+  Result: Select với số điện thoại có định dạng khác: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_CONSTRUCTOR_14: Kiểm tra constructor
+==================================================
+
+📋 DOC_CONSTRUCTOR_14.1: Khởi tạo với ID
+  Expected: Phải tìm thấy bác sĩ với ID
+  Result: Khởi tạo với ID: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_CONSTRUCTOR_14.2: Khởi tạo với email
+  Expected: Phải tìm thấy bác sĩ với email
+  Result: Khởi tạo với email: ✅ Đã tìm thấy
+  Status: ✅ SUCCESS
+
+📋 DOC_CONSTRUCTOR_14.3: Khởi tạo với số điện thoại
+  Expected: Phải tìm thấy bác sĩ với số điện thoại
+📊 DEBUG: Số điện thoại trong DB = '0982942580'
+📊 DEBUG: Kiểu dữ liệu phone: string
+📊 DEBUG: Truy vấn trực tiếp tìm thấy 1 bản ghi với phone = '0982942580'
+  Result: ❌ Lỗi xảy ra
+  Status: ❌ FAILED - LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại mặc dù dữ liệu tồn tại trong DB
+Failed asserting that false is true.
+F
+==================================================
+🔍 DOC_INSERT_16: Kiểm tra phương thức insert
+==================================================
+
+📋 DOC_INSERT_16.1: Insert với dữ liệu hợp lệ
+  Expected: Bác sĩ được thêm thành công với ID > 0
+  Result: Insert thành công: Có, ID: 15013
+  Status: ✅ SUCCESS
+
+📋 DOC_INSERT_16.2: Insert khi đối tượng đã tồn tại
+  Expected: Phải trả về false
+  Result: Insert khi đã tồn tại trả về: false (OK)
+  Status: ✅ SUCCESS
+
+📋 DOC_INSERT_16.3: Kiểm tra extendDefaults được gọi trong insert
+  Expected: Các trường mặc định phải được thiết lập
+  Result: Insert với dữ liệu tối thiểu: Thành công, Các trường mặc định được thiết lập: Có
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 DOC_CANEDIT_17: Kiểm tra phương thức canEdit
+==================================================
+  Result: File UserModel.php không tồn tại
+  Status: ❌ FAILED
+  Result: Lỗi: Không thể kiểm tra phương thức canEdit vì file UserModel.php không tồn tại
+  Status: ❌ FAILED
+F
+==================================================
+🔍 DOC_ISEXPIRED_18: Kiểm tra chi tiết phương thức isExpired
+==================================================
+  Result: Không thể thêm cột expire_date: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'IF NOT EXISTS `expire_date` datetime NULL' at line 1
+  Status: ❌ FAILED
+  Result: Lỗi: Cột expire_date không tồn tại và không thể thêm vào
+  Status: ❌ FAILED
+F
+==================================================
+🔍 DOC_DATETIME_19: Kiểm tra chi tiết phương thức getDateTimeFormat
+==================================================
+  Result: Không thể thêm cột preferences: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'IF NOT EXISTS `preferences` text NULL' at line 1
+  Status: ❌ FAILED
+  Result: Lỗi: Cột preferences không tồn tại và không thể thêm vào
+  Status: ❌ FAILED
+F
+==================================================
+🔍 DOC_EMAIL_20: Kiểm tra chi tiết các phương thức liên quan đến email
+==================================================
+  Result: Không thể thêm cột data: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'IF NOT EXISTS `data` text NULL' at line 1
+  Status: ❌ FAILED
+  Result: Lỗi: Cột data không tồn tại và không thể thêm vào
+  Status: ❌ FAILED
+
+======================================================================
+📊 TỔNG KẾT KẾT QUẢ KIỂM THỬ
+======================================================================
+🕒 Thời gian: 2025-05-18 01:04:54
+👤 Người dùng: bisosad1501
+
+NHÓM: DOC: Kiểm tra quy trình CRUD
+  ✓ Đã qua: 4/4 (100%)
+
+NHÓM: DOC_FIND_03: Kiểm tra các phương thức đọc thông tin
+  ✓ Đã qua: 3/3 (100%)
+
+NHÓM: DOC_ROLE_06: Kiểm tra quyền của bác sĩ
+  ✓ Đã qua: 2/2 (100%)
+
+NHÓM: DOC_TOKEN_07: Kiểm tra token khôi phục
+  ✓ Đã qua: 2/2 (100%)
+
+NHÓM: DOC_ACTIVE_08: Kiểm tra trạng thái hoạt động
+  ✓ Đã qua: 2/2 (100%)
+
+NHÓM: DOC_DATETIME_09: Kiểm tra định dạng thời gian
+  ✓ Đã qua: 2/2 (100%)
+
+NHÓM: DOC_EMAIL_10: Kiểm tra email
+  ✓ Đã qua: 2/2 (100%)
+
+NHÓM: DOC_CONSTRUCTOR_14: Kiểm tra constructor
+  ✓ Đã qua: 2/5 (40%)
+  ✗ Lỗi:
+    • LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại mặc dù dữ liệu tồn tại trong DB
+Failed asserting that false is true.
+
+NHÓM: DOC_SELECT_DETAIL_15: Kiểm tra chi tiết phương thức select
+  ✓ Đã qua: 6/6 (100%)
+
+----------------------------------------------------------------------
+THỐNG KÊ TỔNG QUÁT (PHPUnit)
+✅ Tổng số test methods: 19
+✅ Đã qua: 7 (37%)
+❌ Thất bại: 12
+🔍 Assertions: 54
+⏱️ Thời gian: 0.28s
+
+THỐNG KÊ TEST CASES
+✅ Tổng số test cases: 28
+✅ Đã qua: 25 (89%)
+❌ Thất bại: 3
+======================================================================
+
+F                                               19 / 19 (100%)
+
+Time: 1.21 seconds, Memory: 25.50MB
+
+There were 7 failures:
+
+1) DoctorModelTest::testIsExpired
+LỖI NGHIÊM TRỌNG: isExpired phải trả về false vì expire_date trong tương lai
+Failed asserting that true is false.
+Failed asserting that false is true.
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Constraint.php:111
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Constraint.php:56
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2060
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:1094
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:162
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:1245
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+2) DoctorModelTest::testSelect
+Cần sửa phương thức select để xử lý đúng khi tìm kiếm với nhiều điều kiện
+Failed asserting that false is true.
+Failed asserting that false is true.
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Constraint.php:111
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Constraint.php:56
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2060
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:1094
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:162
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:1368
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+3) DoctorModelTest::testConstructor
+LỖI NGHIÊM TRỌNG: Constructor không thể tìm thấy bác sĩ với số điện thoại mặc dù dữ liệu tồn tại trong DB
+Failed asserting that false is true.
+Failed asserting that false is true.
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Constraint.php:111
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Constraint.php:56
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2060
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:1094
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:162
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:1656
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+4) DoctorModelTest::testCanEditMethod
+Lỗi khi kiểm tra phương thức canEdit: Không thể kiểm tra phương thức canEdit vì file UserModel.php không tồn tại
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2754
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:1847
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+5) DoctorModelTest::testIsExpiredDetailed
+Lỗi khi kiểm tra phương thức isExpired: Cột expire_date không tồn tại và không thể thêm vào
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2754
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:1976
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+6) DoctorModelTest::testGetDateTimeFormatDetailed
+Lỗi khi kiểm tra phương thức getDateTimeFormat: Cột preferences không tồn tại và không thể thêm vào
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2754
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:2113
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+7) DoctorModelTest::testEmailMethodsDetailed
+Lỗi khi kiểm tra các phương thức liên quan đến email: Cột data không tồn tại và không thể thêm vào
+
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/Assert.php:2754
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/tests/models/DoctorModelTest.php:2239
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:1062
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:913
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestResult.php:686
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestCase.php:868
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/Framework/TestSuite.php:733
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php:517
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:186
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/src/TextUI/Command.php:116
+/Users/bisosad/v1/PTIT-Do-An-Tot-Nghiep/api/app/vendor/phpunit/phpunit/phpunit:51
+
+FAILURES!
+Tests: 19, Assertions: 69, Failures: 7.
+
+Generating code coverage report in Clover XML format ... done
+
+Generating code coverage report in HTML format ... done
+
+Generating code coverage report in PHP format ... done

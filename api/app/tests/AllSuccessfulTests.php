@@ -16,6 +16,16 @@ class AllSuccessfulTests extends PHPUnit_Framework_TestSuite
         $suite->addTestFile(__DIR__ . '/controllers/AppointmentsControllerTest.php');
         $suite->addTestFile(__DIR__ . '/controllers/DoctorControllerTest.php');
         $suite->addTestFile(__DIR__ . '/controllers/DoctorsControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/AppointmentRecordsControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/AppointmentsControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/BookingControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/BookingPhotoControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/BookingPhotosControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/BookingsControllerTest.php');
+        $suite->addTestFile(__DIR__ . '/controllers/PatientProfileControllerTest.php');
+        //$suite->addTestFile(__DIR__ . '/controllers/ClinicControllerTest.php');
+        //$suite->addTestFile(__DIR__ . '/controllers/ClinicsControllerTest.php');
+
         $suite->addTestFile(__DIR__ . '/DatabaseConnectionTest.php');
         $suite->addTestFile(__DIR__ . '/models/AppointmentModelTest.php');
         $suite->addTestFile(__DIR__ . '/models/AppointmentRecordModelTest.php');

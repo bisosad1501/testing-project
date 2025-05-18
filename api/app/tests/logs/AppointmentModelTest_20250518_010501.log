@@ -1,0 +1,97 @@
+PHPUnit 5.7.27 by Sebastian Bergmann and contributors.
+
+
+==================================================
+🔍 APPT_CONS_01: Kiểm tra constructor và phương thức select
+==================================================
+
+📋 Kiểm tra constructor với ID hợp lệ
+  Expected: Model khởi tạo và select bản ghi thành công
+  Result: Khởi tạo với ID 5608: Thành công
+  Status: ✅ SUCCESS
+
+📋 Kiểm tra dữ liệu được load chính xác
+  Expected: Dữ liệu trùng khớp với dữ liệu trong DB
+  Result: Dữ liệu load: Chính xác
+  Status: ✅ SUCCESS
+
+📋 Kiểm tra select với ID không tồn tại
+  Expected: Model không available
+  Result: Select ID không tồn tại 999999: Đúng
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 APPT_DEF_02: Kiểm tra phương thức extendDefaults
+==================================================
+
+📋 Kiểm tra các giá trị mặc định
+  Expected: Các trường có giá trị mặc định đúng
+  Result: Tất cả trường có giá trị mặc định: Đúng
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 APPT: Kiểm tra quy trình CRUD
+==================================================
+
+📋 APPT_INS_03: Tạo mới lịch hẹn
+  Expected: Lịch hẹn được tạo thành công với ID > 0
+  Result: Insert lịch hẹn: Thành công, ID: 5609
+  Status: ✅ SUCCESS
+
+📋 APPT_READ_04: Đọc thông tin lịch hẹn
+  Expected: Lịch hẹn được đọc thành công và dữ liệu khớp
+  Result: Đọc lịch hẹn: Thành công, Dữ liệu khớp: Đúng
+  Status: ✅ SUCCESS
+
+📋 APPT_UPD_05: Cập nhật lịch hẹn
+  Expected: Lịch hẹn được cập nhật thành công và dữ liệu được lưu trong DB
+  Result: Cập nhật lịch hẹn: Thành công
+  Status: ✅ SUCCESS
+  Result: Kiểm tra DB sau update: Thành công, position: 5, time: 14:30
+  Status: ✅ SUCCESS
+
+📋 APPT_DEL_06: Xóa lịch hẹn
+  Expected: Lịch hẹn được xóa thành công khỏi DB
+  Result: Xóa lịch hẹn: Thành công
+  Status: ✅ SUCCESS
+  Result: Trạng thái model sau khi xóa: Không khả dụng (đúng)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 APPT_ERR_07: Kiểm tra xóa lịch hẹn không tồn tại
+==================================================
+
+📋 Kiểm tra xóa khi ID không tồn tại
+  Expected: Phương thức delete trả về false
+  Result: Kết quả delete: false (đúng)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 APPT_CHAIN_08: Kiểm tra giao diện fluent (method chaining)
+==================================================
+
+📋 Kiểm tra các phương thức trả về đối tượng model
+  Expected: Các phương thức select/update trả về đối tượng model
+  Result: select() trả về: AppointmentModel (đúng)
+  Status: ✅ SUCCESS
+  Result: update() trả về: AppointmentModel (đúng)
+  Status: ✅ SUCCESS
+
+==================================================
+📊 TỔNG KẾT KIỂM THỬ AppointmentModel
+==================================================
+✅ Tổng số test thành công: 13
+❌ Tổng số test thất bại: 0
+⏱️ Thời gian thực thi: 0.04s
+==================================================
+.                                                               5 / 5 (100%)
+
+Time: 960 ms, Memory: 24.75MB
+
+OK (5 tests, 16 assertions)
+
+Generating code coverage report in Clover XML format ... done
+
+Generating code coverage report in HTML format ... done
+
+Generating code coverage report in PHP format ... done

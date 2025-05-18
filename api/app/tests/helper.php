@@ -15,7 +15,7 @@ if (!function_exists('__')) {
      * @param array $params Parameters to replace in the text
      * @return string Translated text
      */
-    function __($text, $params = []) {
+    function __($text, $params = array()) {
         if (!empty($params)) {
             foreach ($params as $key => $value) {
                 $text = str_replace($key, $value, $text);
@@ -54,7 +54,7 @@ if (!class_exists('Email')) {
      * This is a mock implementation for testing purposes only.
      */
     class Email {
-        public $to = [];
+        public $to = array();
         public $subject = '';
 
         /**
@@ -74,7 +74,6 @@ if (!class_exists('Email')) {
          * @return bool Always returns true for testing
          */
         public function sendmail($body) {
-            // Just return true for testing
             return true;
         }
     }
@@ -93,10 +92,80 @@ if (!class_exists('GeneralData')) {
          */
         public function __construct() {
             parent::__construct();
-            $this->set('data', json_encode(['site_name' => 'Test Site']));
+            $this->set('data', json_encode(array('site_name' => 'Test Site')));
             $this->is_available = true;
         }
     }
+}
+
+// Define MockHelperInput class for testing if it doesn't exist
+if (!class_exists('MockHelperInput')) {
+    class MockHelperInput {
+        /**
+         * @var string Mock method value for Input::method()
+         */
+        public static $method_value = 'GET';
+        
+        /**
+         * @var array Mock values for Input::post()
+         */
+        public static $post_values = array();
+        
+        /**
+         * @var array Mock values for Input::get()
+         */
+        public static $get_values = array();
+        
+        /**
+         * @var array Mock values for Input::put()
+         */
+        public static $put_values = array();
+        
+        /**
+         * @var array Mock values for Input::patch()
+         */
+        public static $patch_values = array();
+    }
+}
+
+// Override Input class methods if it exists
+if (class_exists('Input')) {
+    // Override method()
+    Input::$methodMock = function() {
+        return MockHelperInput::$method_value;
+    };
+    
+    // Override post()
+    Input::$postMock = function($key = null) {
+        if ($key === null) {
+            return MockHelperInput::$post_values;
+        }
+        return isset(MockHelperInput::$post_values[$key]) ? MockHelperInput::$post_values[$key] : null;
+    };
+    
+    // Override get()
+    Input::$getMock = function($key = null) {
+        if ($key === null) {
+            return MockHelperInput::$get_values;
+        }
+        return isset(MockHelperInput::$get_values[$key]) ? MockHelperInput::$get_values[$key] : null;
+    };
+    
+    // Override put()
+    Input::$putMock = function($key = null) {
+        if ($key === null) {
+            return MockHelperInput::$put_values;
+        }
+        return isset(MockHelperInput::$put_values[$key]) ? MockHelperInput::$put_values[$key] : null;
+    };
+    
+    // Override patch()
+    Input::$patchMock = function($key = null) {
+        if ($key === null) {
+            return MockHelperInput::$patch_values;
+        }
+        return isset(MockHelperInput::$patch_values[$key]) ? MockHelperInput::$patch_values[$key] : null;
+    };
 }
 
 // Define MockDBResult class if it doesn't exist
@@ -122,138 +191,251 @@ if (!class_exists('MockDBResult')) {
          * @return array Results
          */
         public function get() {
-            return [];
+            return array();
         }
     }
 }
 
 // Define MockDB class for testing
-/**
- * Mock DB class for testing
- *
- * This is a mock implementation for testing purposes only.
- * We use MockDB instead of DB to avoid conflicts with the Pixie DB class.
- */
-class MockDB {
-    public static $queryResult = [];
-    public static $updateResult = 0;
-    public static $selectResult = [];
-
+if (!class_exists('MockDB')) {
     /**
-     * Get a table instance
+     * Mock DB class for testing
      *
-     * @param string $table Table name
-     * @return MockDB Table instance
+     * This is a mock implementation for testing purposes only.
      */
-    public static function table($table) {
-        return new self();
-    }
+    class MockDB {
+        /**
+         * @var mixed The result to return from query methods
+         */
+        public static $queryResult = array();
+        
+        /**
+         * @var mixed The result to return from update methods
+         */
+        public static $updateResult = 0;
+        
+        /**
+         * @var MockDB|null The mock query builder instance
+         */
+        public static $mockQuery = null;
+        
+        /**
+         * @var array Store the query parts for later inspection
+         */
+        private $query = array(
+            'table' => '',
+            'where' => array(),
+            'limit' => null,
+            'offset' => null,
+            'orderBy' => array(),
+            'joins' => array(),
+            'select' => array(),
+        );
+        
+        /**
+         * @var mixed The result or exception to return from get()
+         */
+        private $result = null;
+        
+        /**
+         * @var Exception|null The exception to throw from get()
+         */
+        private $exception = null;
 
-    /**
-     * Select columns from a table
-     *
-     * @param string $query SQL query
-     * @return object Results
-     */
-    public static function select($query) {
-        $result = new MockDBResult();
-        return $result;
-    }
-
-    /**
-     * Insert a record
-     *
-     * @param string $table Table name
-     * @param array $data Data to insert
-     * @return int ID of the inserted record
-     */
-    public static function insert($table, $data) {
-        return 1;
-    }
-
-    /**
-     * Add a where clause
-     *
-     * @param string $column Column name
-     * @param string $operator Operator
-     * @param mixed $value Value
-     * @return MockDB Self instance
-     */
-    public function where($column, $operator, $value) {
-        return $this;
-    }
-
-    /**
-     * Add a limit clause
-     *
-     * @param int $limit Limit
-     * @return MockDB Self instance
-     */
-    public function limit($limit) {
-        return $this;
-    }
-
-    /**
-     * Add an order by clause
-     *
-     * @param string $column Column name
-     * @param string $direction Direction (asc or desc)
-     * @return MockDB Self instance
-     */
-    public function orderBy($column, $direction) {
-        return $this;
-    }
-
-    /**
-     * Get results
-     *
-     * @return array Results
-     */
-    public function get() {
-        if (is_callable(self::$queryResult)) {
-            $callback = self::$queryResult;
-            return $callback();
+        /**
+         * Static factory method to start building a query
+         *
+         * @param string $table The table name
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public static function table($table) {
+            if (self::$mockQuery) {
+                self::$mockQuery->query['table'] = $table;
+                return self::$mockQuery;
+            }
+            $instance = new self();
+            $instance->query['table'] = $table;
+            return $instance;
         }
-        return self::$queryResult;
-    }
-
-    /**
-     * Update records
-     *
-     * @param array $data Data to update
-     * @return int Number of affected rows
-     */
-    public function update($data) {
-        if (is_callable(self::$updateResult)) {
-            $callback = self::$updateResult;
-            return $callback();
+        
+        /**
+         * Add a raw SQL expression
+         *
+         * @param string $expression The raw SQL expression
+         * @return stdClass Mock object for chaining
+         */
+        public static function raw($expression) {
+            $raw = new stdClass();
+            $raw->expression = $expression;
+            return $raw;
         }
-        return self::$updateResult;
+        
+        /**
+         * Add a where condition to the query
+         *
+         * @param string|callable $column The column name or a callable for subquery
+         * @param string|null $operator The comparison operator
+         * @param mixed|null $value The value to compare
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public function where($column, $operator = null, $value = null) {
+            if (is_callable($column)) {
+                $this->query['where'][] = array('subquery' => true);
+            } else {
+                $this->query['where'][] = array(
+                    'column' => $column,
+                    'operator' => $operator,
+                    'value' => $value,
+                );
+            }
+            return $this;
+        }
+        
+        /**
+         * Add a limit to the query
+         *
+         * @param int $limit The maximum number of rows to return
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public function limit($limit) {
+            $this->query['limit'] = $limit;
+            return $this;
+        }
+        
+        /**
+         * Add an offset to the query
+         *
+         * @param int $offset The number of rows to skip
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public function offset($offset) {
+            $this->query['offset'] = $offset;
+            return $this;
+        }
+        
+        /**
+         * Add an order by clause to the query
+         *
+         * @param string $column The column to sort by
+         * @param string $direction The sort direction
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public function orderBy($column, $direction = 'asc') {
+            $this->query['orderBy'][] = array(
+                'column' => $column,
+                'direction' => $direction,
+            );
+            return $this;
+        }
+        
+        /**
+         * Add columns to select in the query
+         *
+         * @param string|array $columns The columns to select
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public function select($columns = '*') {
+            if (!is_array($columns)) {
+                $columns = array($columns);
+            }
+            $this->query['select'] = array_merge($this->query['select'], $columns);
+            return $this;
+        }
+        
+        /**
+         * Add a left join to the query
+         *
+         * @param string $table The table to join
+         * @param string $first The first column
+         * @param string $operator The comparison operator
+         * @param string $second The second column
+         * @return MockDB Instance of MockDB for method chaining
+         */
+        public function leftJoin($table, $first, $operator, $second) {
+            $this->query['joins'][] = array(
+                'type' => 'left',
+                'table' => $table,
+                'first' => $first,
+                'operator' => $operator,
+                'second' => $second,
+            );
+            return $this;
+        }
+        
+        /**
+         * Count the number of results
+         *
+         * @return int Number of results
+         */
+        public function count() {
+            if (is_array($this->result)) {
+                return count($this->result);
+            } elseif ($this->exception) {
+                return 0;
+            }
+            return 0;
+        }
+        
+        /**
+         * Execute the query and return the result
+         *
+         * @return array The query result
+         * @throws Exception
+         */
+        public function get() {
+            if ($this->exception) {
+                throw $this->exception;
+            }
+            return $this->result ?: array();
+        }
+        
+        /**
+         * Execute an update query and return the number of affected rows
+         *
+         * @param array $data The data to update
+         * @return int The number of affected rows
+         */
+        public function update($data) {
+            if (is_callable(self::$updateResult)) {
+                return call_user_func(self::$updateResult);
+            }
+            return self::$updateResult;
+        }
+        
+        /**
+         * Insert data and return the ID of the inserted record
+         *
+         * @param array $data The data to insert
+         * @return int The ID of the inserted record
+         */
+        public function insert($data) {
+            return 1;
+        }
+        
+        /**
+         * Set the result or exception for the query
+         *
+         * @param mixed $result The result to return
+         * @param Exception|null $exception The exception to throw
+         * @return void
+         */
+        public function setResult($result = null, $exception = null) {
+            $this->result = $result;
+            $this->exception = $exception;
+        }
+        
+        /**
+         * Mock a query result or behavior
+         *
+         * @param object $mockQuery Mock query object with a get() method
+         * @return void
+         */
+        public static function mockQuery($mockQuery) {
+            self::$queryResult = function() use ($mockQuery) {
+                return $mockQuery->get();
+            };
+        }
     }
-
-    /**
-     * Insert a record (instance method)
-     *
-     * @param array $data Data to insert
-     * @return int ID of the inserted record
-     */
-    public function insertRecord($data) {
-        return 1;
-    }
-
-    /**
-     * Delete records
-     *
-     * @return int Number of affected rows
-     */
-    public function delete() {
-        return 1;
-    }
-}
-
-// Define DB class if it doesn't exist and we're not using Pixie
-if (!class_exists('DB') && !class_exists('Pixie\\AliasFacade')) {
-    class_alias('MockDB', 'DB');
 }
 
 // Define Controller class if it doesn't exist
@@ -264,12 +446,15 @@ if (!class_exists('Controller')) {
      * This is a mock implementation for testing purposes only.
      */
     class Controller {
-        protected $variables = [];
+        protected $variables = array();
         public $resp;
         public $jsonechoCalled = false;
         public $headerCalled = false;
         public $headerRedirect = '';
         public $exitCalled = false;
+        public static $testMode = false;
+        public static $modelMocks = [];
+        public static $modelMethod = null;
 
         /**
          * Constructor
@@ -339,7 +524,19 @@ if (!class_exists('Controller')) {
          * @param int $id Model ID
          * @return object Model instance
          */
-        public function model($name, $id = 0) {
+        public static function model($name, $id = 0) {
+            if (self::$testMode && isset(self::$modelMocks[$name])) {
+                $mock = self::$modelMocks[$name];
+                return is_callable($mock) ? call_user_func($mock, $id) : $mock;
+            }
+            if (self::$testMode && self::$modelMethod && is_callable(self::$modelMethod)) {
+                $method = self::$modelMethod;
+                return call_user_func($method, $name, $id);
+            }
+            $className = $name . 'Model';
+            if (class_exists($className)) {
+                return new $className($id);
+            }
             return new MockModel();
         }
     }
@@ -354,10 +551,10 @@ if (!class_exists('Controller')) {
  */
 class MockHelperInput {
     public static $method_value = 'GET';
-    public static $put_values = [];
-    public static $get_values = [];
-    public static $post_values = [];
-    public static $patch_values = [];
+    public static $put_values = array();
+    public static $get_values = array();
+    public static $post_values = array();
+    public static $patch_values = array();
 
     /**
      * Get the request method
@@ -420,3 +617,4 @@ class MockHelperInput {
         return isset(self::$patch_values[$key]) ? self::$patch_values[$key] : null;
     }
 }
+?>

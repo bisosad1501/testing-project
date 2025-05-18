@@ -12,8 +12,9 @@ class MockAuthUser
 {
     private $data;
     private $role;
+    private $available = true;
 
-    public function __construct($role = 'member', $data = [])
+    public function __construct($role = null, $data = [])
     {
         $this->data = is_array($data) ? $data : [];
         $this->role = $role;
@@ -35,13 +36,19 @@ class MockAuthUser
 
     public function save()
     {
-        // Mock save method - không thực sự lưu vào database
+        // Mock save method - giả lập lưu thành công
         return $this;
     }
 
     public function isAvailable()
     {
-        // Mock isAvailable method - luôn trả về true trừ khi id không tồn tại
-        return isset($this->data['id']) && $this->data['id'] > 0;
+        // Trả về trạng thái available đã thiết lập
+        return $this->available;
+    }
+
+    public function setAvailable($available)
+    {
+        $this->available = $available;
+        return $this;
     }
 }

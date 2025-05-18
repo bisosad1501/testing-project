@@ -1,0 +1,82 @@
+PHPUnit 5.7.27 by Sebastian Bergmann and contributors.
+
+
+==================================================
+🔍 BOOK: Kiểm tra quy trình CRUD
+==================================================
+
+📋 BOOK_INS_01: Tạo mới đặt lịch
+  Expected: Đặt lịch được tạo thành công với ID > 0
+  Result: Booking ID: 3755
+  Status: ✅ SUCCESS
+
+📋 BOOK_READ_02: Đọc thông tin đặt lịch theo ID
+  Expected: Đặt lịch được tìm thấy và có dữ liệu đúng
+  Result: ID: 3755 - Tìm thấy: Có, Dữ liệu khớp
+  Status: ✅ SUCCESS
+
+📋 BOOK_UPD_03: Cập nhật thông tin đặt lịch
+  Expected: Đặt lịch được cập nhật thành công
+  Result: Cập nhật thành công, Dữ liệu khớp
+  Status: ✅ SUCCESS
+
+📋 BOOK_DEL_04: Xóa đặt lịch
+  Expected: Đặt lịch được xóa thành công
+  Result: Xóa thành công, Kiểm tra tồn tại: Đã xóa, Kiểm tra DB: Đã xóa khỏi DB
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 BOOK_ERR_ID_05: Kiểm tra select với ID không tồn tại
+==================================================
+
+📋 Tìm kiếm đặt lịch với ID không tồn tại
+  Expected: Đặt lịch không được tìm thấy
+  Result: ID không tồn tại: 1098, Kết quả: Không tìm thấy (đúng)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 BOOK_DEF_06: Kiểm tra phương thức extendDefaults
+==================================================
+
+📋 Kiểm tra giá trị mặc định sau khi gọi extendDefaults
+  Expected: Các trường được thiết lập đúng giá trị mặc định
+  Result: Tất cả giá trị mặc định đều đúng
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 BOOK_ERR_UPD_07: Kiểm tra update đặt lịch không tồn tại
+==================================================
+
+📋 Cập nhật thông tin đặt lịch không tồn tại
+  Expected: Hàm update trả về false
+  Result: Update đặt lịch không tồn tại trả về: false (đúng)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 BOOK_ERR_DEL_08: Kiểm tra delete đặt lịch không tồn tại
+==================================================
+
+📋 Xóa đặt lịch không tồn tại
+  Expected: Hàm delete trả về false
+  Result: Delete đặt lịch không tồn tại trả về: false (đúng)
+  Status: ✅ SUCCESS
+.
+==================================================
+🔍 BOOK_DUP_09: Kiểm tra insert đặt lịch đã tồn tại
+==================================================
+
+📋 Thực hiện insert trên model đã khả dụng
+  Expected: Hàm insert trả về false
+  Result: Insert đặt lịch đã tồn tại trả về: false (đúng)
+  Status: ✅ SUCCESS
+.                                                              6 / 6 (100%)
+
+Time: 926 ms, Memory: 24.75MB
+
+OK (6 tests, 19 assertions)
+
+Generating code coverage report in Clover XML format ... done
+
+Generating code coverage report in HTML format ... done
+
+Generating code coverage report in PHP format ... done
