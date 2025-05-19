@@ -3,7 +3,7 @@
  * Controller
  */
 class Controller
-{   
+{
     /**
      * Enable test mode
      * @var boolean
@@ -21,7 +21,7 @@ class Controller
      * @var array
      */
     public static $modelMocks = [];
-    
+
     /**
      * Assosiative array
      * Key: will be converted to variable for view
@@ -51,7 +51,7 @@ class Controller
      * Get model
      * @param  string|array $name name of model
      * @param  array|string $args Array of arguments for model constructor
-     * @return null|mixed       
+     * @return null|mixed
      */
     public static function model($name, $args=array())
     {
@@ -60,7 +60,7 @@ class Controller
             $method = self::$modelMethod;
             return $method($name, $args);
         }
-        
+
         if (is_array($name)) {
             if (count($name) != 2) {
                 throw new Exception('Invalid parameter');
@@ -90,8 +90,8 @@ class Controller
     /**
      * View
      * @param  string $view name of view file
-     * @param  string $context 
-     * @return void       
+     * @param  string $context
+     * @return void
      */
     public function view($view, $context = "app")
     {
@@ -108,7 +108,7 @@ class Controller
                 $path = active_theme("path") . "/views/" . $view .".php";
                 break;
 
-            default: 
+            default:
                 $path = $view;
         }
 
@@ -120,7 +120,7 @@ class Controller
     /**
      * Set new variable for view.
      * @param string $name  Name of the variable.
-     * @param mixed $value 
+     * @param mixed $value
      */
     public function setVariable($name, $value)
     {
@@ -132,7 +132,7 @@ class Controller
     /**
      * Get variable
      * @param  string $name Name of the varaible.
-     * @return mixed       
+     * @return mixed
      */
     public function getVariable($name)
     {
@@ -142,23 +142,33 @@ class Controller
 
     /**
  * Print json(or jsonp) string and exit;
- * @return void 
+ * @return void
  */
 protected function jsonecho($resp = null)
 {
     if (is_null($resp)) {
         $resp = $this->resp;
     }
-    
-    $output = Input::get("callback") ? 
-            Input::get("callback")."(".json_encode($resp).")" : 
+
+    $output = Input::get("callback") ?
+            Input::get("callback")."(".json_encode($resp).")" :
                 json_encode($resp);
-    
+
     echo $output;
-    
+
     // Không gọi exit() trong môi trường test
     if (!defined('PHPUNIT_TESTSUITE') || PHPUNIT_TESTSUITE !== true) {
         exit;
     }
+}
+
+/**
+ * Wrapper for DB::table to support testing
+ * @param string $table Table name
+ * @return mixed
+ */
+protected function getDBTable($table)
+{
+    return DB::table($table);
 }
 }

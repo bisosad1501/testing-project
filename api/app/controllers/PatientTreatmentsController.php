@@ -40,7 +40,7 @@
             $AuthUser = $this->getVariable("AuthUser");
             $Route = $this->getVariable("Route");
             $data = [];
-            
+
 
             /**Check Appointment's ID */
             if( !isset($Route->params->id) )
@@ -67,7 +67,7 @@
             try
             {
                 /**Step 3 - query */
-                $query = DB::table(TABLE_PREFIX.TABLE_TREATMENTS)
+                $query = $this->getDBTable(TABLE_PREFIX.TABLE_TREATMENTS)
                         ->leftJoin(TABLE_PREFIX.TABLE_APPOINTMENTS,
                                     TABLE_PREFIX.TABLE_APPOINTMENTS.".id", "=", TABLE_PREFIX.TABLE_TREATMENTS.".appointment_id")
                         ->where(TABLE_PREFIX.TABLE_APPOINTMENTS.".id", "=", $appointment_id)
@@ -81,9 +81,9 @@
 
                 $res = $query->get();
                 $quantity = count($res);
-    
-    
-    
+
+
+
                 /**Step 4 */
                 $result = $query->get();
                 foreach($result as $element)
@@ -100,8 +100,8 @@
                         "repeat_time" => $element->repeat_time
                     );
                 }
-    
-    
+
+
                 /**Step 5 - return */
                 $this->resp->result = 1;
                 $this->resp->quantity = $quantity;

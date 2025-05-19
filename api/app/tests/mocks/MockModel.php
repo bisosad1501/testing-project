@@ -6,7 +6,7 @@ class MockModel
 {
     private $data = [];
     private $is_available = true;
-    
+
     /**
      * Thiết lập giá trị cho một trường
      */
@@ -15,7 +15,7 @@ class MockModel
         $this->data[$key] = $value;
         return $this;
     }
-    
+
     /**
      * Lấy giá trị của một trường
      */
@@ -23,7 +23,7 @@ class MockModel
     {
         return isset($this->data[$key]) ? $this->data[$key] : null;
     }
-    
+
     /**
      * Kiểm tra xem model có tồn tại không
      */
@@ -31,7 +31,7 @@ class MockModel
     {
         return $this->is_available;
     }
-    
+
     /**
      * Thiết lập trạng thái tồn tại
      */
@@ -40,12 +40,21 @@ class MockModel
         $this->is_available = $available;
         return $this;
     }
-    
+
     /**
      * Lưu model
      */
     public function save()
     {
+        return $this;
+    }
+
+    /**
+     * Xóa model
+     */
+    public function delete()
+    {
+        $this->is_available = false;
         return $this;
     }
 }
