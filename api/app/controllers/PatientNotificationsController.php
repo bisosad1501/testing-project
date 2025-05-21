@@ -84,7 +84,7 @@
                 $this->resp->quantityUnread = $quantityUnread;
                 $this->resp->data = $data;
             } 
-            catch (\Exception $ex) 
+            catch (\Exceptio $ex) 
             {
                 $this->resp->msg = $ex->getMessage();
             }

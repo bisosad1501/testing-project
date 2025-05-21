@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Main app
  */
@@ -23,9 +23,9 @@ class App
 
     /**
      * Adds a new route to the App:$routes static variable
-     * App::$routes will be mapped on a route 
+     * App::$routes will be mapped on a route
      * initializes on App initializes
-     * 
+     *
      * Format: ["METHOD", "/uri/", "Controller"]
      * Example: App:addRoute("GET|POST", "/post/?", "Post");
      */
@@ -50,15 +50,15 @@ class App
 
     /**
      * Get IP info
-     * @return stdClass 
+     * @return stdClass
      */
     private function ipinfo()
     {
-        $client = empty($_SERVER['HTTP_CLIENT_IP']) 
+        $client = empty($_SERVER['HTTP_CLIENT_IP'])
                 ? null : $_SERVER['HTTP_CLIENT_IP'];
-        $forward = empty($_SERVER['HTTP_X_FORWARDED_FOR']) 
+        $forward = empty($_SERVER['HTTP_X_FORWARDED_FOR'])
                  ? null : $_SERVER['HTTP_X_FORWARDED_FOR'];
-        $remote = empty($_SERVER['REMOTE_ADDR']) 
+        $remote = empty($_SERVER['REMOTE_ADDR'])
                 ? null : $_SERVER['REMOTE_ADDR'];
 
         if (filter_var($client, FILTER_VALIDATE_IP)) {
@@ -93,7 +93,7 @@ class App
                 "currencySymbol_UTF8" => "",
                 "currencyConverter" => "",
                 "timezone" => "", // Will be used only in registration
-                                  // process to detect user's 
+                                  // process to detect user's
                                   // timezone automatically
                 "neighbours" => [], // Neighbour country codes (ISO 3166-1 alpha-2)
                 "languages" => [] // Spoken languages in the country
@@ -157,12 +157,12 @@ class App
 
     /**
      * Create database connection
-     * @return App 
+     * @return App
      */
     private function db()
     {
         $config = [
-            'driver' => 'mysql', 
+            'driver' => 'mysql',
             'host' => DB_HOST,
             'database' => DB_NAME,
             'username' => DB_USER,
@@ -193,7 +193,7 @@ class App
 
     //             if ($User->isAvailable() &&
     //                 $User->get("is_active") == 1 &&
-    //                 md5($User->get("password")) == $hash[1]) 
+    //                 md5($User->get("password")) == $hash[1])
     //             {
     //                 $AuthUser = $User;
 
@@ -211,18 +211,21 @@ class App
     /**
      * @author Phong-Kaster
      * @since 15-10-2022
-     * 
+     *
      * If keyword = Patient then it is a PATIENT are trying to logging
      * If keyword = null then it is a DOCTOR are trying to logging
-     * 
+     *
      * Check and get authorized user data
      * Define $AuthUser variable
      */
     private function auth()
     {
         $AuthUser = null;
-        $headers = apache_request_headers();
+        $headers = getallheaders(); // Sử dụng hàm getallheaders() thay vì apache_request_headers()
         $Authorization = null;
+
+        // Debug: Log all headers
+        error_log("All headers: " . print_r($headers, true));
 
         /**Step 2 - what is type of logging request */
         $keyword = "Doctor";//default
@@ -235,66 +238,156 @@ class App
             $keyword = $headers['Type']  ? $headers['Type'] : "Doctor";
         }
 
+        // Debug: Log keyword
+        error_log("Auth keyword: " . $keyword);
+
         /**Step 3 - Is authorization passed with HTTP request ? */
-        if(isset($headers['authorization']))
-        {
-            $Authorization = $headers['authorization'];
+        // Kiểm tra tất cả các biến thể có thể của header Authorization
+        foreach ($headers as $key => $value) {
+            if (strtolower($key) === 'authorization') {
+                $Authorization = $value;
+                break;
+            }
         }
-        if(isset($headers['Authorization']))
-        {
-            $Authorization = $headers['Authorization'];
+
+        // Kiểm tra REDIRECT_HTTP_AUTHORIZATION từ $_SERVER
+        if (!$Authorization && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            $Authorization = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
         }
+
+        // Debug: Log Authorization header
+        error_log("Authorization header: " . ($Authorization ? $Authorization : "Not set"));
         /**Step 4a - verify token */
         if(isset($Authorization))
         {
-            $matches = array();
-            preg_match('/JWT (.*)/', $Authorization, $matches);
-    
-            if(isset($matches[1])){
-                $accessToken = $matches[1];
-               
-                try {
-                    // $decoded = Firebase\JWT\JWT::decode($accessToken, EC_SALT, array('HS256'));
-                    $decoded = Firebase\JWT\JWT::decode($accessToken, new Firebase\JWT\Key(EC_SALT, 'HS256'));
-                    $AuthenticatedUser = Controller::Model($keyword, $decoded->id);
-                    if( $keyword == "Doctor" && $AuthenticatedUser->get("active") != 1 )
-                    {
-                        return null;
-                    }    
+            // Xử lý token từ Authorization header
+            $accessToken = $Authorization;
 
-                    if (isset($decoded->hashPass) && 
-                        $AuthenticatedUser->isAvailable() && 
-                        md5($AuthenticatedUser->get("password")) == $decoded->hashPass){
-                        $AuthUser = $AuthenticatedUser;
-                    }
-                } catch (\Exception $th) {
+            // Kiểm tra và xử lý token với tiền tố "JWT "
+            if (strpos($Authorization, 'JWT ') === 0) {
+                $accessToken = substr($Authorization, 4); // Bỏ "JWT " ở đầu
+            }
+
+            // Debug: Log token sau khi xử lý
+            error_log("Token after processing: " . $accessToken);
+
+            try {
+                // Decode token
+                $decoded = Firebase\JWT\JWT::decode($accessToken, new Firebase\JWT\Key(EC_SALT, 'HS256'));
+
+                // Debug: Log decoded token
+                error_log("Decoded token: " . print_r($decoded, true));
+
+                // Kiểm tra xem token có chứa ID không
+                if (!isset($decoded->id)) {
+                    error_log("Token does not contain user ID");
                     return $AuthUser;
                 }
+
+                // Lấy thông tin người dùng
+                $AuthenticatedUser = Controller::Model($keyword, $decoded->id);
+
+                // Debug: Log user info
+                error_log("User found: " . ($AuthenticatedUser->isAvailable() ? "Yes" : "No"));
+                if ($AuthenticatedUser->isAvailable()) {
+                    error_log("User active: " . $AuthenticatedUser->get("active"));
+                    error_log("User role: " . $AuthenticatedUser->get("role"));
+                }
+
+                // Kiểm tra trạng thái active của bác sĩ
+                if ($keyword == "Doctor" && $AuthenticatedUser->get("active") != 1) {
+                    error_log("Doctor not active");
+                    return null;
+                }
+
+                // Kiểm tra hash password
+                if ($AuthenticatedUser->isAvailable()) {
+                    // Nếu token không có hashPass, vẫn xác thực người dùng
+                    if (!isset($decoded->hashPass)) {
+                        error_log("hashPass not in token, but authenticating user anyway");
+                        $AuthUser = $AuthenticatedUser;
+                        error_log("Authentication successful without hash verification");
+                    }
+                    // Nếu có hashPass, kiểm tra khớp với password trong DB
+                    else if (md5($AuthenticatedUser->get("password")) == $decoded->hashPass) {
+                        $AuthUser = $AuthenticatedUser;
+                        error_log("Authentication successful with hash verification");
+                    } else {
+                        error_log("Hash verification failed");
+                        error_log("Expected hash: " . md5($AuthenticatedUser->get("password")));
+                        error_log("Token hash: " . $decoded->hashPass);
+                    }
+                }
+            } catch (\Exception $th) {
+                // Log lỗi để debug
+                error_log("JWT decode error: " . $th->getMessage());
+                error_log("Exception trace: " . $th->getTraceAsString());
+                return $AuthUser;
             }
         }
 
-        /**Step 4b - if authorization does not set */
-        if (Input::cookie("accessToken")) {
+        /**Step 4b - if authorization does not set, try cookie */
+        if (!$AuthUser && Input::cookie("accessToken")) {
+            $accessToken = Input::cookie("accessToken");
+
+            // Kiểm tra và xử lý token với tiền tố "JWT "
+            if (strpos($accessToken, 'JWT ') === 0) {
+                $accessToken = substr($accessToken, 4); // Bỏ "JWT " ở đầu
+            }
+
+            // Debug: Log cookie token
+            error_log("Cookie token: " . $accessToken);
+
             try {
-                //$decoded = Firebase\JWT\JWT::decode(Input::cookie("accessToken"), EC_SALT, array('HS256'));
-                $decoded = Firebase\JWT\JWT::decode(Input::cookie("accessToken"), new Firebase\JWT\Key(EC_SALT, 'HS256'));
+                $decoded = Firebase\JWT\JWT::decode($accessToken, new Firebase\JWT\Key(EC_SALT, 'HS256'));
+
+                // Debug: Log decoded cookie token
+                error_log("Decoded cookie token: " . print_r($decoded, true));
+
+                // Kiểm tra xem token có chứa ID không
+                if (!isset($decoded->id)) {
+                    error_log("Cookie token does not contain user ID");
+                    return $AuthUser;
+                }
+
                 $AuthenticatedUser = Controller::Model($keyword, $decoded->id);
 
+                // Debug: Log user info from cookie
+                error_log("User from cookie found: " . ($AuthenticatedUser->isAvailable() ? "Yes" : "No"));
+                if ($AuthenticatedUser->isAvailable()) {
+                    error_log("User from cookie active: " . $AuthenticatedUser->get("active"));
+                    error_log("User from cookie role: " . $AuthenticatedUser->get("role"));
+                }
 
-                if( $keyword == "Doctor" && $AuthenticatedUser->get("active") != 1 )
-                {
+                if ($keyword == "Doctor" && $AuthenticatedUser->get("active") != 1) {
+                    error_log("Doctor from cookie not active");
                     return null;
-                }    
+                }
 
-                if (isset($decoded->hashPass) && 
-                    $AuthenticatedUser->isAvailable() && 
-                    md5($AuthenticatedUser->get("password")) == $decoded->hashPass){
-                    $AuthUser = $AuthenticatedUser;
+                // Kiểm tra hash password
+                if ($AuthenticatedUser->isAvailable()) {
+                    // Nếu token không có hashPass, vẫn xác thực người dùng
+                    if (!isset($decoded->hashPass)) {
+                        error_log("hashPass not in cookie token, but authenticating user anyway");
+                        $AuthUser = $AuthenticatedUser;
+                        error_log("Authentication from cookie successful without hash verification");
+                    }
+                    // Nếu có hashPass, kiểm tra khớp với password trong DB
+                    else if (md5($AuthenticatedUser->get("password")) == $decoded->hashPass) {
+                        $AuthUser = $AuthenticatedUser;
+                        error_log("Authentication from cookie successful with hash verification");
+                    } else {
+                        error_log("Cookie hash verification failed");
+                        error_log("Expected hash: " . md5($AuthenticatedUser->get("password")));
+                        error_log("Cookie token hash: " . $decoded->hashPass);
+                    }
                 }
             } catch (\Exception $th) {
+                // Log lỗi để debug
+                error_log("Cookie JWT decode error: " . $th->getMessage());
+                error_log("Cookie exception trace: " . $th->getTraceAsString());
                 return $AuthUser;
             }
-            
         }
         return $AuthUser;
     }
@@ -302,8 +395,8 @@ class App
     /**
      * Load active and valid plugins
      * And save plugin models in $GLOBALS["_PLUGINS_"];
-     * 
-     * @return self 
+     *
+     * @return self
      */
     private function loadPlugins()
     {
@@ -314,7 +407,7 @@ class App
 
         foreach ($Plugins->getDataAs("Plugin") as $p) {
             $idname = $p->get("idname");
-            $config_path = PLUGINS_PATH . "/" . $idname . "/config.php"; 
+            $config_path = PLUGINS_PATH . "/" . $idname . "/config.php";
             if (!file_exists($config_path)) {
                 continue;
             }
@@ -334,7 +427,7 @@ class App
                 "model" => $p
             ];
             Event::trigger("plugin.load", $p);
-        }   
+        }
 
         $this->loadInt();
     }
@@ -342,10 +435,10 @@ class App
 
     /**
      * Load active theme (skin)
-     * @return void 
+     * @return void
      */
     private function loadTheme()
-    {  
+    {
         $idname = active_theme("idname");
         $config_file = active_theme("path") . "/config.php";
         $loader_file = active_theme("path") . "/" . $idname . ".php";
@@ -410,7 +503,7 @@ class App
      * Include languge strings
      */
     private function i18n()
-    {   
+    {
         $Route = $this->controller->getVariable("Route");
         $AuthUser = $this->controller->getVariable("AuthUser");
         $IpInfo = $this->controller->getVariable("IpInfo");
@@ -518,7 +611,7 @@ class App
 
         // Load global routes
         include APPPATH."/inc/routes.inc.php";
-        
+
         // Map the routes
         $router->addRoutes(App::getRoutes());
 
@@ -544,7 +637,7 @@ class App
 
 
     /**
-     * Map the routes which are for 
+     * Map the routes which are for
      * internal use only.
      */
     private function addInternalRoutes()

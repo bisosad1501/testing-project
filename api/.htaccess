@@ -9,7 +9,11 @@ RewriteEngine On
 Options +FollowSymLinks
 Options -Indexes
 
-RewriteCond %{SCRIPT_FILENAME} !-d  
+# Chuyển tiếp header Authorization đến PHP
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteRule . index.php [L,QSA]
 
@@ -46,6 +50,16 @@ RewriteRule . index.php [L,QSA]
 
 # BEGIN Cache-Control Headers
 <ifModule mod_headers.c>
+  # CORS Headers
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Allow-Credentials "true"
+  Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  Header always set Access-Control-Allow-Headers "X-Requested-With, Content-Type, Authorization, Origin, Accept, Type, X-Auth-Token"
+
+  # Handle OPTIONS method for preflight
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteRule ^(.*)$ $1 [R=200,L]
+
   <filesMatch ".(ico|jpe?g|png|gif|swf)$">
     Header set Cache-Control "public"
   </filesMatch>
@@ -58,7 +72,6 @@ RewriteRule . index.php [L,QSA]
   <filesMatch ".(x?html?|php)$">
     Header set Cache-Control "private, must-revalidate"
   </filesMatch>
-
   <filesMatch ".(woff|woff2|ttf|otf|eot)$">
     Header set Cache-Control "max-age=31536000 private, must-revalidate"
   </filesMatch>

@@ -3,10 +3,9 @@
 	 * Get value of input (get, post, request, session, cookie)
 	 *
 	 * @version 1.0
-	 * @author Onelab <hello@onelab.co>
-	 *
+	 * @author Onelab <hello@onelab.co> 
+	 * 
 	 */
-	if (!class_exists('Input')) {
 	class Input
 	{
 
@@ -35,7 +34,7 @@
 		 * @param  string  $input_name 	name of input
 		 * @param  int|bool  $index   	index in input array of treat as $trim
 		 * @param  boolean $trim      	trim input value (if it is string) or not
-		 * @return mix
+		 * @return mix              
 		 */
 		public static function getInput($method, $input_name, $index = true, $trim = true)
 		{
@@ -61,11 +60,11 @@
 			}
 
 
-			if (!is_array($input) || !is_int($index))
+			if (!is_array($input) || !is_int($index)) 
 				$trim = (bool)$index;
 
 
-			if (is_string($input) && $trim)
+			if (is_string($input) && $trim) 
 				$input =  trim($input);
 
 			return $input;
@@ -73,8 +72,8 @@
 
 
 
-		public static function __callStatic($name, $arguments)
-		{
+		public static function __callStatic($name, $arguments) 
+		{	
 			$name = strtolower($name);
 
 			if($name == "req")
@@ -89,8 +88,8 @@
 	    }
 
 
-	    public function __call($name, $arguments)
-		{
+	    public function __call($name, $arguments) 
+		{	
 			$name = strtolower($name);
 
 			if($name == "req")
@@ -105,5 +104,4 @@
 	    }
 
 	}
-}
 ?>

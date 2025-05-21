@@ -1,4 +1,4 @@
-<?php
+<?php 
     /**
      * @author Phong-Kaster
      * @since 18-10-2022
@@ -7,7 +7,7 @@
      * getAll - get all services that doctor is working.
      * update - update services that doctor is ready to work.
      */
-    class DoctorsAndServicesController extends Controller
+    class DoctorsAndServicesController extends Controller 
     {
         public function process()
         {
@@ -24,24 +24,8 @@
                 $this->resp->msg = "You are not admin & you can't do this action !";
                 $this->jsonecho();
             }
-
+            
             $request_method = Input::method();
-
-            // Kiểm tra nếu là old flow (cho mục đích test)
-            if (Input::get('oldflow') === 'true' || Input::post('oldflow') === 'true') {
-                if($request_method === 'GET')
-                {
-                    $this->oldFlowGetAll();
-                    return;
-                }
-                else if( $request_method === 'PUT' || $request_method === 'POST')
-                {
-                    // Cho phép sử dụng POST thay cho PUT trong môi trường test
-                    $this->oldFlowUpdate();
-                    return;
-                }
-            }
-
             if($request_method === 'GET')
             {
                 $this->getAll();
@@ -97,7 +81,7 @@
                 $query = DB::table(TABLE_PREFIX.TABLE_SERVICES)
                 ->where(TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE.".service_id", "=", $id)
 
-                ->leftJoin(TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE,
+                ->leftJoin(TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE, 
                            TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE.".service_id", "=", TABLE_PREFIX.TABLE_SERVICES.".id")
 
                 ->leftJoin(TABLE_PREFIX.TABLE_DOCTORS,
@@ -105,7 +89,7 @@
 
                 ->leftJoin(TABLE_PREFIX.TABLE_SPECIALITIES,
                         TABLE_PREFIX.TABLE_SPECIALITIES.".id", "=", TABLE_PREFIX.TABLE_DOCTORS.".speciality_id")
-
+                           
                 ->select([
                     DB::raw(TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE.".id as doctor_and_service_id"),
                     DB::raw(TABLE_PREFIX.TABLE_DOCTORS.".avatar as doctor_avatar"),
@@ -115,7 +99,7 @@
                     DB::raw(TABLE_PREFIX.TABLE_DOCTORS.".email as doctor_email"),
                     DB::raw(TABLE_PREFIX.TABLE_SPECIALITIES.".id as speciality_id"),
                     DB::raw(TABLE_PREFIX.TABLE_SPECIALITIES.".name as speciality_name"),
-
+                    
 
                 ]);
 
@@ -140,7 +124,7 @@
                         );
                     }
                 }
-
+                
 
                 $this->resp->result = 1;
                 $this->resp->msg = "Action successfully";
@@ -151,8 +135,8 @@
                     "description" => $Service->get("description")
                 );
                 $this->resp->data = $data;
-            }
-            catch (\Exception $ex)
+            } 
+            catch (\Exception $ex) 
             {
                 $this->resp->msg = $ex->getMessage();
             }
@@ -203,22 +187,22 @@
             if( $Doctor->get("active") != 1)
             {
                 $this->resp->msg = "Doctor was deactivated !";
-                $this->jsonecho();
+                $this->jsonecho(); 
             }
 
 
 
-            try
+            try 
             {
                 $DoctorAndService = Controller::model("DoctorAndService");
                 $DoctorAndService->set("service_id", $service_id)
                                 ->set("doctor_id", $doctor_id)
                                 ->save();
-
+                
                 $this->resp->result = 1;
                 $this->resp->msg = "Created successfully";
-            }
-            catch (\Exception $ex)
+            } 
+            catch (\Exception $ex) 
             {
                 $this->resp->msg = $ex->getMessage();
             }
@@ -255,14 +239,14 @@
                 $this->jsonecho();
             }
 
-            try
+            try 
             {
                 $DoctorAndService->delete();
 
                 $this->resp->result = 1;
                 $this->resp->msg = "Deleted successfully";
-            }
-            catch (\Exception $ex)
+            } 
+            catch (\Exception $ex) 
             {
                 $this->resp->msg = $ex->getMessage();
             }
@@ -304,7 +288,7 @@
 
             /**Step 4 - get services that he/she is working */
             $query = DB::table(TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE)
-                ->leftJoin(TABLE_PREFIX.TABLE_SERVICES,
+                ->leftJoin(TABLE_PREFIX.TABLE_SERVICES, 
                     TABLE_PREFIX.TABLE_SERVICES.".id", "=", TABLE_PREFIX.TABLE_DOCTOR_AND_SERVICE.".service_id")
                 ->select([
                     DB::raw(TABLE_PREFIX.TABLE_SERVICES.".id as service_id"),
@@ -312,7 +296,7 @@
                 ]);
 
             $result = $query->get();
-
+            
             foreach($result as $element)
             {
                 $data[] = array(
@@ -371,7 +355,7 @@
                 $this->jsonecho();
             }
             /**Step 4.2 - are they available ? */
-            foreach ( $services as $element)
+            foreach ( $services as $element) 
             {
                 print_r($element);
                 $Service = Controller::model("Service", (int)$element);
