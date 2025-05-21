@@ -221,8 +221,22 @@ class App
     private function auth()
     {
         $AuthUser = null;
-        $headers = getallheaders(); // Sử dụng hàm getallheaders() thay vì apache_request_headers()
         $Authorization = null;
+
+        // Sử dụng getallheaders() nếu có sẵn, nếu không thì sử dụng apache_request_headers()
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+        } else if (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+        } else {
+            // Fallback nếu cả hai hàm đều không có sẵn
+            $headers = [];
+            foreach ($_SERVER as $key => $value) {
+                if (substr($key, 0, 5) == 'HTTP_') {
+                    $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))))] = $value;
+                }
+            }
+        }
 
         // Debug: Log all headers
         error_log("All headers: " . print_r($headers, true));
@@ -242,17 +256,34 @@ class App
         error_log("Auth keyword: " . $keyword);
 
         /**Step 3 - Is authorization passed with HTTP request ? */
-        // Kiểm tra tất cả các biến thể có thể của header Authorization
-        foreach ($headers as $key => $value) {
-            if (strtolower($key) === 'authorization') {
-                $Authorization = $value;
-                break;
+        // Phương pháp 1: Kiểm tra trực tiếp các key cụ thể (cho web)
+        if (isset($headers['authorization'])) {
+            $Authorization = $headers['authorization'];
+        } else if (isset($headers['Authorization'])) {
+            $Authorization = $headers['Authorization'];
+        } else {
+            // Phương pháp 2: Lặp qua tất cả các header (cho mobile)
+            foreach ($headers as $key => $value) {
+                if (strtolower($key) === 'authorization') {
+                    $Authorization = $value;
+                    break;
+                }
             }
         }
 
-        // Kiểm tra REDIRECT_HTTP_AUTHORIZATION từ $_SERVER
+        // Kiểm tra REDIRECT_HTTP_AUTHORIZATION từ $_SERVER (cho mobile với Apache)
         if (!$Authorization && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
             $Authorization = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+        }
+
+        // Kiểm tra HTTP_AUTHORIZATION từ $_SERVER (cho mobile với một số server)
+        if (!$Authorization && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $Authorization = $_SERVER['HTTP_AUTHORIZATION'];
+        }
+
+        // Kiểm tra HTTP_ACCESS_TOKEN từ $_SERVER (được thiết lập bởi .htaccess)
+        if (!$Authorization && isset($_SERVER['HTTP_ACCESS_TOKEN'])) {
+            $Authorization = 'JWT ' . $_SERVER['HTTP_ACCESS_TOKEN'];
         }
 
         // Debug: Log Authorization header
@@ -326,17 +357,29 @@ class App
             }
         }
 
-        /**Step 4b - if authorization does not set, try cookie */
-        if (!$AuthUser && Input::cookie("accessToken")) {
-            $accessToken = Input::cookie("accessToken");
+        /**Step 4b - if authorization does not set, try cookie or HTTP_ACCESS_TOKEN */
+        $accessToken = null;
 
+        // Thử lấy từ cookie
+        if (Input::cookie("accessToken")) {
+            $accessToken = Input::cookie("accessToken");
+            error_log("Found token in cookie: " . substr($accessToken, 0, 10) . "...");
+        }
+        // Thử lấy từ biến môi trường HTTP_ACCESS_TOKEN (được thiết lập bởi .htaccess)
+        else if (isset($_SERVER['HTTP_ACCESS_TOKEN'])) {
+            $accessToken = $_SERVER['HTTP_ACCESS_TOKEN'];
+            error_log("Found token in HTTP_ACCESS_TOKEN: " . substr($accessToken, 0, 10) . "...");
+        }
+
+        // Nếu có accessToken và chưa xác thực được user
+        if (!$AuthUser && $accessToken) {
             // Kiểm tra và xử lý token với tiền tố "JWT "
             if (strpos($accessToken, 'JWT ') === 0) {
                 $accessToken = substr($accessToken, 4); // Bỏ "JWT " ở đầu
             }
 
             // Debug: Log cookie token
-            error_log("Cookie token: " . $accessToken);
+            error_log("Using token for auth: " . substr($accessToken, 0, 10) . "...");
 
             try {
                 $decoded = Firebase\JWT\JWT::decode($accessToken, new Firebase\JWT\Key(EC_SALT, 'HS256'));
@@ -660,6 +703,11 @@ class App
      */
     public function process()
     {
+        // Khởi tạo session nếu chưa được khởi tạo
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
         // Define global variables
         $GLOBALS["PaymentGateways"] = [];
 
